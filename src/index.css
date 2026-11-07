@@ -303,3 +303,15 @@ p { margin: 0; }
 .toast { --tx: -50%; }
 
 button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+
+/* ---------- iPhone fixes ---------- */
+html, body { overflow-x: hidden; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+.phone, .scroll { overflow-x: hidden; }
+/* iOS zooms in on any input under 16px, which leaves the page off-center */
+input, textarea, select { font-size: 16px !important; min-width: 0; max-width: 100%; }
+/* iOS date/time inputs have a wide built-in size; let them shrink to the grid */
+input[type='date'], input[type='time'] { -webkit-appearance: none; appearance: none; display: block; width: 100%; text-align: left; }
+input[type='date']::-webkit-date-and-time-value, input[type='time']::-webkit-date-and-time-value { text-align: left; }
+h1, h2, h3, strong, p, span { overflow-wrap: anywhere; }
+.toast { white-space: normal; max-width: calc(100% - 32px); text-align: center; }
