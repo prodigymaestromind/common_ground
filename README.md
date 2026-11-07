@@ -1,16 +1,32 @@
-# React + Vite
+# Common Ground
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Campus events. People to go with.** Built for Capital Hacks 5.0 at Sacramento State.
 
-Currently, two official plugins are available:
+Live demo: https://prodigymaestromind.github.io/common_ground/ (works best on a phone)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## The problem
+Our interviews with Sac State students turned up three things:
+1. **Event info is scattered** across Instagram, emails, posters, and friends.
+2. **Finding an event isn't the same as going.** Class, work, commuting, cost, and parking get in the way.
+3. **Walking in alone is the hardest part.** Everyone else seems to arrive in groups.
 
-## React Compiler
+## What Common Ground does
+- **Happening now first:** the home screen opens on what's live and later today.
+- **Fits my day:** add your class/work blocks once, and every event shows ✓ fits or ⚠ conflicts.
+- **Go with someone:** at any event, turn on "open to company" and see others who did too. Say hi with suggested conversation starters, or send a meet-up invite (time + public spot).
+- **Solo crew:** at a live event, join a group chat of people who also came alone.
+- **Scan a flyer:** snap a campus poster and OCR fills in the event form.
+- **Stay in touch:** contact is only shared if *both* people say yes.
+- **Built to put the phone down:** the feed ends ("You're all caught up"). No likes, followers, or infinite scroll.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Privacy by design
+First names + interests only. "Open to company" is off by default and works both ways. Location is never shared. Block & report from any chat. Verified @csus.edu emails only.
 
-## Expanding the ESLint configuration
+## Tech
+React + Vite, deployed to GitHub Pages with GitHub Actions. Flyer OCR runs in the browser with Tesseract.js. Demo data is stored locally in the browser. Event sources are modeled on the public Sac State Events (Trumba) calendar.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Run locally
+```
+npm install
+npm run dev
+```
