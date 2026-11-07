@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
-import { Camera, Loader2, ShieldCheck, Sparkles } from 'lucide-react'
+import { Camera, Loader2, ShieldCheck, Sparkles, Megaphone, GraduationCap } from 'lucide-react'
 import { INTERESTS } from '../data'
-import { Chip, useNav } from '../components'
+import { Chip, Empty, useGate, useNav } from '../components'
+import { placeFromText } from '../places'
 import { useStore } from '../store'
 import { readFlyer, parseFlyer } from '../flyer'
 import { uid } from '../utils'
@@ -13,7 +14,8 @@ const todayStr = () => {
 
 export default function Post() {
   const nav = useNav()
-  const { dispatch, showToast } = useStore()
+  const gate = useGate()
+  const { state, dispatch, showToast } = useStore()
   const fileRef = useRef(null)
   const [scan, setScan] = useState({ state: 'idle' }) // idle | reading | done | error
   const [preview, setPreview] = useState(null)
@@ -23,9 +25,11 @@ export default function Post() {
   })
   const set = (patch) => setF((x) => ({ ...x, ...patch }))
 
+  const [image, setImage] = useState(null)
   const onFile = async (file) => {
     if (!file) return
     setPreview(URL.createObjectURL(file))
+    shrink(file).then(setImage).catch(() => {})
     setScan({ state: 'reading', progress: 0 })
     try {
       const text = await readFlyer(file, (p) => setScan({ state: 'reading', progress: p }))
@@ -48,15 +52,30 @@ export default function Post() {
       id: `p-${uid()}`, title: f.title.trim(), host: f.host.trim() || 'Student post', interest: f.interest,
       emoji: interest?.emoji || '📌', place: f.place.trim(), cost: Number(f.cost) || 0,
       parking: f.parking.trim() || 'See host for details', desc: f.desc.trim() || 'Posted on Common Ground.',
-      going: 1, soloFriendly: f.soloFriendly, source: 'Club post', open: [], here: [],
+      going: 1, soloFriendly: f.soloFriendly, open: [], here: [],
+      source: state.user?.role === 'organizer' ? 'Club post' : 'Student post',
+      pending: state.user?.role !== 'organizer', placeId: placeFromText(f.place), image,
       startAt: startAt.toISOString(), endAt: endAt.toISOString(),
     }
     dispatch({ type: 'POST_EVENT', event })
     dispatch({ type: 'RSVP', eventId: event.id, value: 'going' })
-    showToast('Event posted ✓')
+    showToast(state.user?.role === 'organizer' ? 'Event published ✓' : 'Posted ✓ The host club will give it a quick check')
     nav.tab('home')
     nav.push('event', { id: event.id })
   }
+
+  if (!state.user) return (
+    <div className="screen">
+      <h1 className="page-title">Post an event</h1>
+      <Empty icon="📣" title="Share what's happening on campus">Post your club's event, or snap a flyer you saw so others can find it.</Empty>
+      <button className="card role" onClick={() => gate('organizer')}>
+        <Megaphone size={28} /><span><strong>I run a club or event</strong><span>Organizer accounts publish instantly</span></span>
+      </button>
+      <button className="card role" onClick={() => gate('student')}>
+        <GraduationCap size={28} /><span><strong>I'm a student</strong><span>Share a flyer you saw. The host club gives it a quick check</span></span>
+      </button>
+    </div>
+  )
 
   return (
     <div className="screen">
@@ -103,4 +122,21 @@ export default function Post() {
       </div>
     </div>
   )
+}
+
+// Shrink a photo so it fits in browser storage (about 60 KB)
+function shrink(file, max = 640) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height))
+      const c = document.createElement('canvas')
+      c.width = Math.round(img.width * k)
+      c.height = Math.round(img.height * k)
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height)
+      resolve(c.toDataURL('image/jpeg', 0.72))
+    }
+    img.onerror = reject
+    img.src = URL.createObjectURL(file)
+  })
 }

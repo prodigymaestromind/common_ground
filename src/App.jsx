@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Home as HomeIcon, Compass, Plus, CalendarCheck, MessageCircle } from 'lucide-react'
 import { NavCtx } from './components'
 import { StoreProvider, useStore } from './store'
-import Onboarding from './screens/Onboarding'
+import SignIn, { Welcome } from './screens/Onboarding'
 import Home from './screens/Home'
+import HomeBoard from './screens/HomeBoard'
+import HomeCrews, { Crew } from './screens/Crews'
 import Explore from './screens/Explore'
 import EventDetail from './screens/EventDetail'
 import WhoIsHere from './screens/WhoIsHere'
@@ -12,9 +14,11 @@ import Plans from './screens/Plans'
 import Post from './screens/Post'
 import Profile from './screens/Profile'
 
+const HOMES = { classic: Home, board: HomeBoard, crews: HomeCrews }
+
 const SCREENS = {
-  home: Home, explore: Explore, post: Post, plans: Plans, chats: ChatList,
-  event: EventDetail, here: WhoIsHere, chat: Chat, profile: Profile,
+  explore: Explore, post: Post, plans: Plans, chats: ChatList,
+  event: EventDetail, here: WhoIsHere, chat: Chat, profile: Profile, signin: SignIn, crew: Crew,
 }
 
 const TABS = [
@@ -41,28 +45,32 @@ function Shell() {
     tab: (name) => setStack([{ name, params: {} }]),
   }
 
-  if (!state.user) return <div className="phone"><Onboarding /></div>
-
-  const Screen = SCREENS[top.name] || Home
+  const Screen = top.name === 'home' ? HOMES[state.style] || Home : SCREENS[top.name] || Home
   const rootTab = stack[0].name
   const showTabs = stack.length === 1
   const unread = Object.values(state.chats).reduce((n, c) => n + (c.unread || 0), 0)
+  const { then, ...shown } = top.params
+  const screenKey = stack.length + top.name + state.style + JSON.stringify(shown)
 
   return (
     <NavCtx.Provider value={nav}>
-      <div className="phone">
-        <main ref={scroller} className={`scroll ${showTabs ? 'with-tabs' : ''}`}>
-          <Screen key={stack.length + top.name + JSON.stringify(top.params)} {...top.params} />
-        </main>
-        {showTabs && (
-          <nav className="tabbar" aria-label="Main">
-            {TABS.map(({ id, label, Icon, center }) => (
-              <button key={id} className={`tab ${rootTab === id ? 'on' : ''} ${center ? 'tab-center' : ''}`} onClick={() => nav.tab(id)} aria-label={label}>
-                <span className="tab-icon"><Icon size={center ? 26 : 22} />{id === 'chats' && unread > 0 && <span className="dot">{unread}</span>}</span>
-                {!center && <span>{label}</span>}
-              </button>
-            ))}
-          </nav>
+      <div className={`phone style-${state.style}`}>
+        {!state.welcomed ? <Welcome /> : (
+          <>
+            <main ref={scroller} className={`scroll ${showTabs ? 'with-tabs' : ''}`}>
+              <Screen key={screenKey} {...shown} then={then} />
+            </main>
+            {showTabs && (
+              <nav className="tabbar" aria-label="Main">
+                {TABS.map(({ id, label, Icon, center }) => (
+                  <button key={id} className={`tab ${rootTab === id ? 'on' : ''} ${center ? 'tab-center' : ''}`} onClick={() => nav.tab(id)} aria-label={label}>
+                    <span className="tab-icon"><Icon size={center ? 26 : 22} />{id === 'chats' && unread > 0 && <span className="dot">{unread}</span>}</span>
+                    {!center && <span>{label}</span>}
+                  </button>
+                ))}
+              </nav>
+            )}
+          </>
         )}
         {toast && <div className="toast" role="status">{toast}</div>}
       </div>

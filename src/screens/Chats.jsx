@@ -1,12 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { Send, Sparkles, MapPin, Clock, Check, X, Ban, Users } from 'lucide-react'
 import { studentById } from '../data'
-import { Avatar, Empty, TopBar, useNav } from '../components'
+import { Avatar, Empty, TopBar, useGate, useNav } from '../components'
 import { useStore, icebreakers } from '../store'
 
 export function ChatList() {
   const nav = useNav()
+  const gate = useGate()
   const { state } = useStore()
+  if (!state.user) return (
+    <div className="screen">
+      <h1 className="page-title">Chats</h1>
+      <Empty icon="💬" title="Chat with people going to the same things">
+        Sign in with your csus.edu email to message students who opted in to meet people.
+      </Empty>
+      <button className="btn btn-primary btn-lg" onClick={() => gate('student')}>Sign in as a student</button>
+    </div>
+  )
   const chats = Object.values(state.chats)
     .filter((c) => c.type !== 'dm' || !state.blocked.includes(c.studentId))
     .sort((a, b) => (b.messages.at(-1)?.ts || 0) - (a.messages.at(-1)?.ts || 0))
@@ -21,7 +31,7 @@ export function ChatList() {
           const person = c.type === 'dm' ? studentById[c.studentId] : null
           return (
             <button key={c.id} className="card chat-row" onClick={() => nav.push('chat', { id: c.id })}>
-              {person ? <Avatar person={person} size={46} /> : <span className="group-icon"><Users size={22} /></span>}
+              {person ? <Avatar person={person} size={46} /> : <span className="group-icon">{c.crewId ? c.title.split(' ')[0] : <Users size={22} />}</span>}
               <div className="chat-row-body">
                 <strong>{c.title}</strong>
                 <span className="muted">{preview(last)}</span>

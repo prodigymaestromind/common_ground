@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, List, Map as MapIcon } from 'lucide-react'
 import { INTERESTS } from '../data'
 import { Chip, EventCard, Empty } from '../components'
 import { useStore } from '../store'
 import { isPast, dayLabel, fitCheck } from '../utils'
+import CampusMap from './MapView'
 
 const QUICK = [
   { id: 'free', label: 'Free' },
@@ -16,6 +17,7 @@ export default function Explore() {
   const [q, setQ] = useState('')
   const [quick, setQuick] = useState([])
   const [interest, setInterest] = useState(null)
+  const [view, setView] = useState('list')
 
   const toggleQuick = (id) => setQuick((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
   const list = events
@@ -24,7 +26,7 @@ export default function Explore() {
     .filter((e) => !interest || e.interest === interest)
     .filter((e) => !quick.includes('free') || !e.cost)
     .filter((e) => !quick.includes('solo') || e.soloFriendly)
-    .filter((e) => !quick.includes('fits') || fitCheck(e, state.user.busy).status !== 'conflict')
+    .filter((e) => !quick.includes('fits') || fitCheck(e, state.user?.busy).status !== 'conflict')
     .sort((a, b) => a.startAt - b.startAt)
 
   const groups = []
@@ -37,7 +39,13 @@ export default function Explore() {
 
   return (
     <div className="screen">
-      <h1 className="page-title">Explore</h1>
+      <div className="title-row">
+        <h1 className="page-title">Explore</h1>
+        <div className="seg seg-sm">
+          <button className={view === 'list' ? 'on' : ''} onClick={() => setView('list')}><List size={15} /> List</button>
+          <button className={view === 'map' ? 'on' : ''} onClick={() => setView('map')}><MapIcon size={15} /> Map</button>
+        </div>
+      </div>
       <label className="search">
         <Search size={18} />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search events, clubs, places" />
@@ -51,14 +59,15 @@ export default function Explore() {
         ))}
       </div>
 
-      {groups.length === 0 && <Empty icon="🔍" title="Nothing matches">Try removing a filter.</Empty>}
-      {groups.map((g) => (
+      {view === 'map' && <CampusMap events={list} />}
+      {view === 'list' && groups.length === 0 && <Empty icon="🔍" title="Nothing matches">Try removing a filter.</Empty>}
+      {view === 'list' && groups.map((g) => (
         <section key={g.label}>
           <h2 className="section-title">{g.label}</h2>
           <div className="stack">{g.items.map((e) => <EventCard key={e.id} event={e} />)}</div>
         </section>
       ))}
-      {groups.length > 0 && <p className="end-note">That's every event this week ✓</p>}
+      {view === 'list' && groups.length > 0 && <p className="end-note">That's every event this week ✓</p>}
     </div>
   )
 }

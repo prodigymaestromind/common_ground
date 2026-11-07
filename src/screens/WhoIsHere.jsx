@@ -30,7 +30,7 @@ export default function WhoIsHere({ id }) {
       <h2 className="section-title">Looking for company</h2>
       <div className="stack">
         {solos.map((p) => {
-          const shared = p.interests.filter((i) => state.user.interests.includes(i))
+          const shared = p.interests.filter((i) => state.user?.interests?.includes(i))
           return (
             <div key={p.id} className="card person">
               <Avatar person={p} size={44} />

@@ -1,9 +1,10 @@
 // Small shared UI pieces.
-import { createContext, useContext } from 'react'
-import { ChevronLeft, Clock, MapPin, Users, CheckCircle2, AlertTriangle, CalendarPlus, Radio, Sparkles } from 'lucide-react'
+import { createContext, useContext, useState } from 'react'
+import { ChevronLeft, Clock, MapPin, Users, CheckCircle2, AlertTriangle, CalendarPlus, Radio, Sparkles, Palette, Check } from 'lucide-react'
 import { interestById } from './data'
+import { PLACES, photoUrl } from './places'
 import { fmtRange, dayLabel, costLabel, fitCheck, isLive, initials } from './utils'
-import { useStore } from './store'
+import { useStore, STYLES } from './store'
 
 // ----- Navigation (a simple screen stack) -----
 export const NavCtx = createContext(null)
@@ -76,7 +77,7 @@ export function EventCard({ event }) {
   const r = state.rsvp[event.id]
   return (
     <button className="card event-card" onClick={() => nav.push('event', { id: event.id })}>
-      <div className="event-emoji" aria-hidden="true">{event.emoji}</div>
+      <Cover event={event} className="event-thumb" small />
       <div className="event-body">
         <div className="event-top">
           <span className="event-tag">{interestById[event.interest]?.label}</span>
@@ -131,5 +132,87 @@ export function Sheet({ open, onClose, title, children }) {
         {children}
       </div>
     </div>
+  )
+}
+
+// ----- Photo cover: your photo in public/places/<id>.jpg, or a colored illustration -----
+const missing = new Set()
+export function Cover({ event, placeId, className = '', small, children }) {
+  const id = placeId || event?.placeId || 'union'
+  const place = PLACES[id] || PLACES.union
+  const src = event?.image || (!missing.has(id) ? photoUrl(id) : null)
+  const [failed, setFailed] = useState(!src)
+  const [c1, c2] = place.colors
+  return (
+    <div className={`cover ${className}`} style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
+      {!failed && (
+        <img src={src} alt={place.name} loading="lazy"
+          onError={() => { if (!event?.image) missing.add(id); setFailed(true) }} />
+      )}
+      {failed && (
+        <div className="cover-art" aria-hidden="true">
+          <span className="cover-icon">{event?.emoji || place.icon}</span>
+          {!small && <span className="cover-place">{place.short}</span>}
+        </div>
+      )}
+      {children}
+    </div>
+  )
+}
+
+// ----- Sign in only when needed -----
+export function useGate() {
+  const nav = useNav()
+  const { state } = useStore()
+  return (role, then, reason) => {
+    if (state.user) return then?.()
+    nav.push('signin', { role, reason, then })
+  }
+}
+
+export function SignInButton() {
+  const nav = useNav()
+  return <button className="btn btn-sm btn-outline" onClick={() => nav.push('signin', {})}>Sign in</button>
+}
+
+// ----- Style switcher -----
+export function StyleButton() {
+  const [open, setOpen] = useState(false)
+  const { state } = useStore()
+  const cur = STYLES.find((x) => x.id === state.style)
+  return (
+    <>
+      <button className="style-pill" onClick={() => setOpen(true)} aria-label="Switch style">
+        <Palette size={14} /> {cur?.name}
+      </button>
+      <StyleSheet open={open} onClose={() => setOpen(false)} />
+    </>
+  )
+}
+
+export function StylePicker({ onPick }) {
+  const { state, dispatch } = useStore()
+  return (
+    <div className="stack-sm">
+      {STYLES.map((st) => (
+        <button key={st.id} className={`option style-option ${state.style === st.id ? 'on' : ''}`}
+          onClick={() => { dispatch({ type: 'STYLE', style: st.id }); onPick?.(st.id) }}>
+          <span className="style-emoji">{st.emoji}</span>
+          <span className="style-text"><strong>{st.name}</strong><span>{st.desc}</span></span>
+          {state.style === st.id && <Check size={18} />}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+export function StyleSheet({ open, onClose }) {
+  const nav = useNav()
+  return (
+    <Sheet open={open} onClose={onClose} title="Pick a style">
+      <p className="muted">Same app, same data, different feel. Switch anytime.</p>
+      <StylePicker onPick={() => { onClose(); nav.tab('home') }} />
+      <p className="muted small center">Share a style directly: add <b>?style=board</b> or <b>?style=crews</b> to the link.</p>
+    </Sheet>
   )
 }

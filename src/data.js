@@ -36,7 +36,7 @@ export const studentById = Object.fromEntries(STUDENTS.map((s) => [s.id, s]))
 // day = days from today (0 = today). live = happening right now (times set at load).
 export const EVENTS = [
   {
-    id: 'e1', title: 'Open Mic Night', host: 'University Union', interest: 'music', emoji: '🎤',
+    id: 'e1', placeId: 'union', title: 'Open Mic Night', host: 'University Union', interest: 'music', emoji: '🎤',
     live: true, place: 'University Union, Redwood Room', cost: 0,
     parking: 'Lot 5 / Structure 5. Free after 6 PM',
     desc: 'Sing, play, read poetry, or try stand-up, or just hang out and enjoy the show. All skill levels welcome.',
@@ -44,84 +44,84 @@ export const EVENTS = [
     open: ['s1', 's2', 's3'], here: ['s3', 's2', 's7'],
   },
   {
-    id: 'e2', title: 'Free Jamba Juice Pop-Up', host: 'Drama Club', interest: 'food', emoji: '🥤',
+    id: 'e2', placeId: 'quad', title: 'Free Jamba Juice Pop-Up', host: 'Drama Club', interest: 'food', emoji: '🥤',
     live: true, place: 'Library Quad', cost: 0, parking: 'Walk-up, center of campus',
     desc: 'Come say hi to the Drama Club and grab a free smoothie while they last.',
     going: 54, soloFriendly: false, source: 'Club post',
     open: ['s8', 's9'], here: ['s8'],
   },
   {
-    id: 'e3', title: 'Board Game Night', host: 'Anime & Games Club', interest: 'games', emoji: '🎲',
+    id: 'e3', placeId: 'union', title: 'Board Game Night', host: 'Anime & Games Club', interest: 'games', emoji: '🎲',
     day: 0, start: '19:00', end: '21:30', place: 'University Union, Ballroom', cost: 0,
     parking: 'Structure 3. $3 evening permit',
     desc: 'Catan, Codenames, Uno and more. Tables are mixed so you play with new people.',
     going: 22, soloFriendly: true, source: 'Club post', open: ['s4', 's6', 's10'], here: [],
   },
   {
-    id: 'e4', title: 'Hornet Volleyball vs UC San Diego', host: 'Hornet Athletics', interest: 'sports', emoji: '🏐',
+    id: 'e4', placeId: 'nest', title: 'Hornet Volleyball vs UC San Diego', host: 'Hornet Athletics', interest: 'sports', emoji: '🏐',
     day: 1, start: '13:00', end: '15:00', place: 'The Nest', cost: 0,
     parking: 'Lot 9 next to the Nest. Free on weekends',
     desc: 'Free for students with OneCard. Wear green and gold!',
     going: 140, soloFriendly: false, source: 'Sac State Events', open: ['s5', 's3', 's8'], here: [],
   },
   {
-    id: 'e5', title: 'Fall Colors Day Hike', host: 'ASI Peak Adventures', interest: 'outdoors', emoji: '🍂',
+    id: 'e5', placeId: 'well', title: 'Fall Colors Day Hike', host: 'ASI Peak Adventures', interest: 'outdoors', emoji: '🍂',
     day: 1, start: '07:00', end: '17:00', place: 'Meet at Peak Adventures (The WELL)', cost: 25,
     parking: 'Lot 7 near The WELL',
     desc: 'Guided day hike with transportation included. Spots are limited, so register ahead.',
     going: 14, soloFriendly: true, source: 'Sac State Events', open: ['s9', 's5'], here: [],
   },
   {
-    id: 'e6', title: 'Intro to Pottery Night', host: 'Department of Art', interest: 'art', emoji: '🏺',
+    id: 'e6', placeId: 'kadema', title: 'Intro to Pottery Night', host: 'Department of Art', interest: 'art', emoji: '🏺',
     day: 2, start: '18:00', end: '20:00', place: 'Kadema Hall, Studio 145', cost: 5,
     parking: 'Structure 2',
     desc: 'Hands-on wheel throwing for beginners. All materials provided.',
     going: 12, soloFriendly: true, source: 'Sac State Events', open: ['s2', 's7'], here: [],
   },
   {
-    id: 'e7', title: 'Resume Review Drop-In', host: 'Career Center', interest: 'career', emoji: '📄',
+    id: 'e7', placeId: 'lassen', title: 'Resume Review Drop-In', host: 'Career Center', interest: 'career', emoji: '📄',
     day: 2, start: '12:00', end: '14:00', place: 'Lassen Hall 2nd floor', cost: 0,
     parking: 'Structure 2',
     desc: 'Bring a printed or digital resume and get 15-minute feedback from a career advisor.',
     going: 38, soloFriendly: false, source: 'Sac State Events', open: ['s4', 's8'], here: [],
   },
   {
-    id: 'e8', title: 'Weekly Dose of Mindfulness', host: 'Student Health & Counseling', interest: 'wellness', emoji: '🧘',
+    id: 'e8', placeId: 'well', title: 'Weekly Dose of Mindfulness', host: 'Student Health & Counseling', interest: 'wellness', emoji: '🧘',
     day: 3, start: '12:00', end: '12:30', place: 'The WELL, Room 1010', cost: 0,
     parking: 'Lot 7',
     desc: 'A 30-minute guided session to reset between classes. No experience needed.',
     going: 9, soloFriendly: true, source: 'Sac State Events', open: ['s7', 's5'], here: [],
   },
   {
-    id: 'e9', title: 'Hack Night: Build a Discord Bot', host: 'ACM Sac State', interest: 'tech', emoji: '🤖',
+    id: 'e9', placeId: 'riverside', title: 'Hack Night: Build a Discord Bot', host: 'ACM Sac State', interest: 'tech', emoji: '🤖',
     day: 3, start: '17:30', end: '19:30', place: 'Riverside Hall 1001', cost: 0,
     parking: 'Structure 5',
     desc: 'Bring a laptop. Mentors help you build and deploy your first bot. Pizza provided.',
     going: 27, soloFriendly: true, source: 'Club post', open: ['s4', 's6', 's10'], here: [],
   },
   {
-    id: 'e10', title: 'Bollywood Night', host: 'Indian Student Association', interest: 'culture', emoji: '💃',
+    id: 'e10', placeId: 'union', title: 'Bollywood Night', host: 'Indian Student Association', interest: 'culture', emoji: '💃',
     day: 4, start: '18:00', end: '21:00', place: 'University Union, Ballroom', cost: 0,
     parking: 'Structure 3',
     desc: 'Music, dancing, and food. FREE for Hornets.',
     going: 96, soloFriendly: false, source: 'Sac State Events', open: ['s2', 's9', 's1'], here: [],
   },
   {
-    id: 'e11', title: 'Street Fighter 6 Tournament', host: 'Esports @ Sac State', interest: 'games', emoji: '🕹️',
+    id: 'e11', placeId: 'union', title: 'Street Fighter 6 Tournament', host: 'Esports @ Sac State', interest: 'games', emoji: '🕹️',
     day: 4, start: '13:00', end: '15:00', place: 'University Union, Game Room', cost: 0,
     parking: 'Structure 3',
     desc: 'Bracket for all levels plus casual setups. Bring your own controller if you have one.',
     going: 40, soloFriendly: true, source: 'Sac State Events', open: ['s6', 's10', 's1'], here: [],
   },
   {
-    id: 'e12', title: 'Taco Tuesday Mixer', host: 'Transfer Student Center', interest: 'food', emoji: '🌮',
+    id: 'e12', placeId: 'lassen', title: 'Taco Tuesday Mixer', host: 'Transfer Student Center', interest: 'food', emoji: '🌮',
     day: 5, start: '11:30', end: '13:00', place: 'Lassen Hall Courtyard', cost: 0,
     parking: 'Walk-up',
     desc: 'Free tacos and a low-key way to meet other transfer students. Come alone, leave with friends.',
     going: 33, soloFriendly: true, source: 'Club post', open: ['s1', 's4', 's7', 's10'], here: [],
   },
   {
-    id: 'e13', title: 'Jazz Ensemble Concert', host: 'School of Music', interest: 'music', emoji: '🎷',
+    id: 'e13', placeId: 'capistrano', title: 'Jazz Ensemble Concert', host: 'School of Music', interest: 'music', emoji: '🎷',
     day: 6, start: '19:30', end: '21:00', place: 'Capistrano Concert Hall', cost: 10,
     parking: 'Structure 2. $3 evening permit',
     desc: 'The Sac State Jazz Ensemble plays big band classics and new student work.',
@@ -140,4 +140,31 @@ export const MEET_SPOTS = [
   'Library Quad fountain',
   'The WELL front desk',
   'Outside the event door',
+]
+
+// Crews: small interest groups (3–6 people) that go to things together.
+// Inspired by clans, minus leaderboards and points. No pressure, no ranking.
+export const CREWS = [
+  { id: 'c1', name: 'Transfer Tuesday', emblem: '🧭', color: '#0b5a3e', interest: 'food',
+    about: 'New transfers who grab food before class and try one event a week.',
+    members: ['s1', 's4', 's7', 's10'], plan: { eventId: 'e12', note: 'Meet at Lassen courtyard 11:20' } },
+  { id: 'c2', name: 'Late-Night Gamers', emblem: '🎮', color: '#3a3f7a', interest: 'games',
+    about: 'Board games, fighting games, whatever. We save you a seat.',
+    members: ['s6', 's10', 's4'], plan: { eventId: 'e3', note: 'Grabbing a table at 6:50' } },
+  { id: 'c3', name: 'Open Mic Regulars', emblem: '🎤', color: '#8a3d2a', interest: 'music',
+    about: 'We cheer for everyone. Come perform or just listen.',
+    members: ['s1', 's2', 's3'], plan: { eventId: 'e1', note: 'Front-left tables' } },
+  { id: 'c4', name: 'Trail Hornets', emblem: '🥾', color: '#3d7a2a', interest: 'outdoors',
+    about: 'Weekend hikes and river walks. All paces welcome.',
+    members: ['s5', 's9'], plan: { eventId: 'e5', note: 'Carpool from Lot 7' } },
+]
+
+// "Firsts" are personal milestones, never compared with anyone else.
+export const STAMPS = [
+  { id: 'first-event', label: 'First event', emoji: '🎟️', hint: "Mark yourself going to something" },
+  { id: 'said-hi', label: 'Said hi', emoji: '👋', hint: 'Send someone a first message' },
+  { id: 'meetup', label: 'Made a plan', emoji: '📍', hint: 'Set a meet-up with someone' },
+  { id: 'solo', label: 'Showed up solo', emoji: '✨', hint: 'Join a solo crew chat' },
+  { id: 'crew', label: 'Joined a crew', emoji: '🧭', hint: 'Join a crew' },
+  { id: 'new-thing', label: 'Tried something new', emoji: '🌱', hint: 'Go to an event outside your interests' },
 ]

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Clock, MapPin, DollarSign, Car, Users, Bookmark, BookmarkCheck, Check, ShieldCheck, MessageCircle, UserPlus, Sparkles, ExternalLink, Radio } from 'lucide-react'
 import { studentById, interestById, MEET_SPOTS } from '../data'
-import { Avatar, FitBadge, LiveDot, Sheet, TopBar, useNav } from '../components'
+import { Avatar, Cover, FitBadge, LiveDot, Sheet, TopBar, useGate, useNav } from '../components'
+import { BoardSheet } from './HomeBoard'
 import { useStore } from '../store'
 import { costLabel, dayLabel, fmtRange, fmtTime, isLive } from '../utils'
 
@@ -9,6 +10,8 @@ export default function EventDetail({ id }) {
   const nav = useNav()
   const { state, dispatch, eventById, sendInvite, openDM, showToast } = useStore()
   const [inviteFor, setInviteFor] = useState(null)
+  const [boardOpen, setBoardOpen] = useState(false)
+  const gate = useGate()
   const e = eventById[id]
   if (!e) return <div className="screen"><TopBar title="Event" /><p>Event not found.</p></div>
 
@@ -19,7 +22,7 @@ export default function EventDetail({ id }) {
   const people = (e.open || []).filter((s) => !state.blocked.includes(s)).map((s) => studentById[s])
 
   const setRsvp = (value) => {
-    dispatch({ type: 'RSVP', eventId: e.id, value })
+    dispatch({ type: 'RSVP', eventId: e.id, value, interest: e.interest })
     if (value === 'going') showToast(`You're going to ${e.title} ✓`)
     if (value === 'saved') showToast('Saved for later')
   }
@@ -27,16 +30,17 @@ export default function EventDetail({ id }) {
   return (
     <div className="screen screen-detail">
       <TopBar title="" />
-      <div className="detail-hero">
-        <div className="detail-emoji">{e.emoji}</div>
+      <Cover event={e} className="detail-hero">
+        <div className="detail-hero-inner">
         <div className="event-top">
           <span className="event-tag light">{interestById[e.interest]?.label}</span>
           {live && <LiveDot />}
           {e.soloFriendly && <span className="pill pill-solo"><Sparkles size={12} /> Solo-friendly</span>}
         </div>
         <h1>{e.title}</h1>
-        <p>Hosted by {e.host}</p>
-      </div>
+        <p>Hosted by {e.host}{e.pending ? ' · pending club check' : ''}</p>
+        </div>
+      </Cover>
 
       <div className="detail-body">
         <FitBadge event={e} />
@@ -57,7 +61,7 @@ export default function EventDetail({ id }) {
               <strong>Came alone? You're not the only one.</strong>
               <span>{e.here.length} people here came solo and want to meet people.</span>
             </div>
-            <button className="btn btn-gold" onClick={() => nav.push('here', { id: e.id })}>See who's here</button>
+            <button className="btn btn-gold" onClick={() => gate('student', () => nav.push('here', { id: e.id }), 'Sign in to see who came solo')}>See who's here</button>
           </div>
         )}
 
@@ -82,7 +86,7 @@ export default function EventDetail({ id }) {
               {open && (
                 <div className="stack">
                   {people.map((p) => {
-                    const shared = p.interests.filter((i) => state.user.interests.includes(i))
+                    const shared = p.interests.filter((i) => state.user?.interests?.includes(i))
                     return (
                       <div key={p.id} className="card person">
                         <Avatar person={p} size={44} />
@@ -112,14 +116,15 @@ export default function EventDetail({ id }) {
       </div>
 
       <div className="action-bar">
-        <button className={`btn btn-outline ${rsvp === 'saved' ? 'on' : ''}`} onClick={() => setRsvp(rsvp === 'saved' ? null : 'saved')}>
+        <button className={`btn btn-outline ${rsvp === 'saved' ? 'on' : ''}`} onClick={() => (state.style === 'board' ? setBoardOpen(true) : setRsvp(rsvp === 'saved' ? null : 'saved'))}>
           {rsvp === 'saved' ? <BookmarkCheck size={18} /> : <Bookmark size={18} />} {rsvp === 'saved' ? 'Saved' : 'Save'}
         </button>
-        <button className={`btn ${going ? 'btn-going' : 'btn-gold'} grow`} onClick={() => setRsvp(going ? null : 'going')}>
+        <button className={`btn ${going ? 'btn-going' : 'btn-gold'} grow`} onClick={() => (going ? setRsvp(null) : gate('student', () => setRsvp('going'), 'Sign in so people going can find you (you control what they see)'))}>
           {going ? <><Check size={18} /> Going · tap to undo</> : "I'm going"}
         </button>
       </div>
 
+      <BoardSheet event={e} open={boardOpen} onClose={() => setBoardOpen(false)} />
       <InviteSheet
         person={inviteFor} event={e} onClose={() => setInviteFor(null)}
         onSend={(invite) => {

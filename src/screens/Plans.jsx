@@ -1,12 +1,16 @@
 import { HeartHandshake, Check } from 'lucide-react'
 import { studentById } from '../data'
-import { Avatar, EventCard, Empty, useNav } from '../components'
+import { Avatar, EventCard, Empty, useGate, useNav } from '../components'
+import { BOARDS, Masonry } from './HomeBoard'
+import { Stamps } from './Crews'
 import { useStore } from '../store'
 import { isPast } from '../utils'
 
 export default function Plans() {
   const nav = useNav()
+  const gate = useGate()
   const { state, dispatch, events, eventById, showToast } = useStore()
+  const boardStyle = state.style === 'board'
   const going = events.filter((e) => state.rsvp[e.id] === 'going' && !isPast(e)).sort((a, b) => a.startAt - b.startAt)
   const saved = events.filter((e) => state.rsvp[e.id] === 'saved' && !isPast(e)).sort((a, b) => a.startAt - b.startAt)
 
@@ -30,6 +34,12 @@ export default function Plans() {
   return (
     <div className="screen">
       <h1 className="page-title">My plans</h1>
+      {!state.user && (
+        <div className="card locked">
+          <p><strong>Saved events live here.</strong> Sign in to RSVP, set meet-ups and keep in touch with people.</p>
+          <button className="btn btn-sm btn-primary" onClick={() => gate('student')}>Sign in</button>
+        </div>
+      )}
 
       {meetups.length > 0 && (
         <section>
@@ -58,12 +68,25 @@ export default function Plans() {
           : <div className="stack">{going.map((e) => <EventCard key={e.id} event={e} />)}</div>}
       </section>
 
-      {saved.length > 0 && (
+      {boardStyle && BOARDS.map((b) => {
+        const items = events.filter((e) => state.boards[e.id] === b && !isPast(e))
+        if (!items.length) return null
+        return (
+          <section key={b}>
+            <h2 className="section-title">📌 {b}</h2>
+            <Masonry events={items} />
+          </section>
+        )
+      })}
+
+      {!boardStyle && saved.length > 0 && (
         <section>
           <h2 className="section-title">Saved for later</h2>
           <div className="stack">{saved.map((e) => <EventCard key={e.id} event={e} />)}</div>
         </section>
       )}
+
+      {state.user && state.style === 'crews' && <Stamps />}
 
       {met.length > 0 && (
         <section>

@@ -1,66 +1,139 @@
 import { useState } from 'react'
-import { ShieldCheck, Trash2, Plus } from 'lucide-react'
-import { INTERESTS, SAMPLE_BUSY } from '../data'
-import { Chip, Logo } from '../components'
-import { useStore } from '../store'
+import { ShieldCheck, Trash2, Plus, GraduationCap, Megaphone, Palette } from 'lucide-react'
+import { INTERESTS, SAMPLE_BUSY, EVENTS } from '../data'
+import { Chip, Cover, Logo, StyleSheet, TopBar, useNav } from '../components'
+import { useStore, STYLES } from '../store'
 import { uid } from '../utils'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-export default function Onboarding() {
-  const { dispatch } = useStore()
-  const [step, setStep] = useState(0)
+// ----- First screen: look around first, sign in later -----
+export function Welcome() {
+  const nav = useNav()
+  const { state, dispatch } = useStore()
+  const [styleOpen, setStyleOpen] = useState(false)
+  const cur = STYLES.find((s) => s.id === state.style)
+  const floaters = ['e1', 'e3', 'e4'].map((id) => EVENTS.find((e) => e.id === id))
+
+  return (
+    <div className="onboard">
+      <div className="onboard-hero">
+        <div className="hero-art" aria-hidden="true">
+          <div className="hero-logo">
+            <svg viewBox="0 0 120 80" width="150" height="100">
+              <circle cx="46" cy="40" r="30" fill="none" stroke="#fff" strokeWidth="8" />
+              <circle cx="74" cy="40" r="30" fill="none" stroke="var(--gold)" strokeWidth="8" />
+            </svg>
+          </div>
+          {floaters.map((e, i) => (
+            <div key={e.id} className={`floater floater-${i}`}>
+              <Cover event={e} className="floater-cover" small />
+              <span>{e.title}</span>
+            </div>
+          ))}
+        </div>
+        <Logo size={30} light />
+        <h1>Campus events.<br />People to go with.</h1>
+        <p>Everything happening at Sac State in one place, plus a comfortable way to meet people, even if you show up alone.</p>
+        <button className="btn btn-gold btn-lg" onClick={() => dispatch({ type: 'WELCOMED' })}>Look around</button>
+        <button className="btn btn-ghost-light" onClick={() => { dispatch({ type: 'WELCOMED' }); nav.push('signin', {}) }}>
+          I have an account · Sign in
+        </button>
+        <button className="style-pill light" onClick={() => setStyleOpen(true)}><Palette size={14} /> Style: {cur?.name}</button>
+        <p className="small muted-light">No account needed to browse.</p>
+      </div>
+      <StyleSheet open={styleOpen} onClose={() => setStyleOpen(false)} />
+    </div>
+  )
+}
+
+// ----- Sign in: only shows up when you try something that needs it -----
+export default function SignIn({ role: startRole, reason, then }) {
+  const nav = useNav()
+  const { dispatch, showToast } = useStore()
+  const [role, setRole] = useState(startRole || null)
+  const [step, setStep] = useState(startRole ? 1 : 0)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [org, setOrg] = useState('')
   const [interests, setInterests] = useState([])
   const [busy, setBusy] = useState(SAMPLE_BUSY)
 
   const emailOk = /@csus\.edu$/i.test(email.trim())
   const toggle = (id) => setInterests((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
-  const finish = (useBusy) =>
-    dispatch({ type: 'SIGN_UP', user: { name: name.trim(), email: email.trim(), interests, busy: useBusy ? busy : [] } })
+  const finish = (useBusy) => {
+    dispatch({
+      type: 'SIGN_UP',
+      user: {
+        name: name.trim(), email: email.trim(), role, org: org.trim(),
+        interests: interests.length ? interests : INTERESTS.map((i) => i.id).slice(0, 3),
+        busy: useBusy ? busy : [],
+      },
+    })
+    dispatch({ type: 'WELCOMED' })
+    nav.pop()
+    showToast(`Welcome, ${name.trim()} ✓`)
+    if (then) setTimeout(then, 50)
+  }
+  const isOrg = role === 'organizer'
+  const total = isOrg ? 1 : 3
 
   return (
-    <div className="onboard">
+    <div className="screen">
+      <TopBar title="Sign in" />
+      {reason && <div className="note">🔒 {reason}</div>}
+
       {step === 0 && (
-        <div className="onboard-hero">
-          <Logo size={44} light />
-          <h1>Campus events.<br />People to go with.</h1>
-          <p>Everything happening at Sac State in one place, plus a comfortable way to meet people, even if you show up alone.</p>
-          <button className="btn btn-gold btn-lg" onClick={() => setStep(1)}>Get started</button>
-          <p className="small muted-light">Takes 30 seconds · Sac State students only</p>
+        <div className="onboard-step flat">
+          <h2>How will you use it?</h2>
+          <p className="muted">You only need an account to meet people or post events. Browsing is always open.</p>
+          <button className="card role" onClick={() => { setRole('student'); setStep(1) }}>
+            <GraduationCap size={28} />
+            <span><strong>I'm a student</strong><span>RSVP, find people to go with, chat</span></span>
+          </button>
+          <button className="card role" onClick={() => { setRole('organizer'); setStep(1) }}>
+            <Megaphone size={28} />
+            <span><strong>I run a club or event</strong><span>Post events for your club, ASI or department</span></span>
+          </button>
         </div>
       )}
 
       {step === 1 && (
-        <div className="onboard-step">
-          <Progress step={1} />
-          <h2>Who are you?</h2>
-          <p className="muted">Only your first name is ever shown to other students.</p>
+        <div className="onboard-step flat">
+          <Progress step={1} total={total} />
+          <h2>{isOrg ? 'Organizer sign in' : 'Who are you?'}</h2>
+          <p className="muted">{isOrg ? 'Organizer accounts can publish events right away.' : 'Only your first name is ever shown to other students.'}</p>
           <label className="field">
             <span>First name</span>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Eli" autoFocus />
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Eli" />
           </label>
           <label className="field">
             <span>Sac State email</span>
             <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@csus.edu" inputMode="email" />
             {email && !emailOk && <small className="error">Use your @csus.edu email so everyone here is a real student.</small>}
           </label>
+          {isOrg && (
+            <label className="field">
+              <span>Club or organization</span>
+              <input value={org} onChange={(e) => setOrg(e.target.value)} placeholder="e.g. ACM Sac State" />
+            </label>
+          )}
           <div className="note"><ShieldCheck size={18} /> Verified students only. No public profiles, no follower counts.</div>
-          <button className="btn btn-primary btn-lg" disabled={!name.trim() || !emailOk} onClick={() => setStep(2)}>Continue</button>
+          <button className="btn btn-primary btn-lg" disabled={!name.trim() || !emailOk || (isOrg && !org.trim())}
+            onClick={() => (isOrg ? finish(false) : setStep(2))}>
+            {isOrg ? 'Sign in' : 'Continue'}
+          </button>
         </div>
       )}
 
       {step === 2 && (
-        <div className="onboard-step">
-          <Progress step={2} />
+        <div className="onboard-step flat">
+          <Progress step={2} total={3} />
           <h2>What are you into?</h2>
           <p className="muted">Pick a few. We'll show you events and people that match.</p>
           <div className="chips-wrap">
             {INTERESTS.map((i) => (
-              <Chip key={i.id} active={interests.includes(i.id)} onClick={() => toggle(i.id)}>
-                {i.emoji} {i.label}
-              </Chip>
+              <Chip key={i.id} active={interests.includes(i.id)} onClick={() => toggle(i.id)}>{i.emoji} {i.label}</Chip>
             ))}
           </div>
           <button className="btn btn-primary btn-lg" disabled={interests.length === 0} onClick={() => setStep(3)}>
@@ -70,8 +143,8 @@ export default function Onboarding() {
       )}
 
       {step === 3 && (
-        <div className="onboard-step">
-          <Progress step={3} />
+        <div className="onboard-step flat">
+          <Progress step={3} total={3} />
           <h2>When are you busy?</h2>
           <p className="muted">Optional. We'll tell you which events actually fit around class and work. Stays on your phone.</p>
           <BusyEditor busy={busy} setBusy={setBusy} />
@@ -83,10 +156,10 @@ export default function Onboarding() {
   )
 }
 
-function Progress({ step }) {
+function Progress({ step, total }) {
   return (
-    <div className="progress" aria-label={`Step ${step} of 3`}>
-      {[1, 2, 3].map((n) => <span key={n} className={n <= step ? 'on' : ''} />)}
+    <div className="progress" aria-label={`Step ${step} of ${total}`}>
+      {Array.from({ length: total }, (_, i) => i + 1).map((n) => <span key={n} className={n <= step ? 'on' : ''} />)}
     </div>
   )
 }
