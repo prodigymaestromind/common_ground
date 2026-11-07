@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react'
-import { Camera, Loader2, ShieldCheck, Sparkles, Megaphone, GraduationCap } from 'lucide-react'
-import { INTERESTS } from '../data'
-import { Chip, Empty, useGate, useNav } from '../components'
-import { placeFromText } from '../places'
+import { ImagePlus, Loader2, ShieldCheck, Sparkles, Megaphone, GraduationCap, X } from 'lucide-react'
+import { INTERESTS, EMOJIS } from '../data'
+import { Chip, Empty, EventCard, useGate, useNav } from '../components'
 import { useStore } from '../store'
 import { readFlyer, parseFlyer } from '../flyer'
-import { uid } from '../utils'
+import { placeFromText } from '../places'
+import { uid, withTimes } from '../utils'
 
 const todayStr = () => {
   const d = new Date()
@@ -15,26 +15,48 @@ const todayStr = () => {
 export default function Post() {
   const nav = useNav()
   const gate = useGate()
-  const { state, dispatch, showToast } = useStore()
+  const { state, dispatch } = useStore()
   const fileRef = useRef(null)
+  const [drag, setDrag] = useState(false)
+  const [image, setImage] = useState(null) // small data URL, saved with the event
+  const [file, setFile] = useState(null)
   const [scan, setScan] = useState({ state: 'idle' }) // idle | reading | done | error
-  const [preview, setPreview] = useState(null)
   const [f, setF] = useState({
-    title: '', host: '', date: todayStr(), start: '18:00', end: '20:00',
-    place: '', cost: 0, interest: 'music', desc: '', parking: '', soloFriendly: true,
+    title: '', host: state.user?.org || '', date: todayStr(), start: '18:00', end: '20:00',
+    place: '', cost: 0, interest: 'music', emoji: '🎤', desc: '', parking: '', soloFriendly: true,
   })
   const set = (patch) => setF((x) => ({ ...x, ...patch }))
 
-  const [image, setImage] = useState(null)
-  const onFile = async (file) => {
-    if (!file) return
-    setPreview(URL.createObjectURL(file))
-    shrink(file).then(setImage).catch(() => {})
+  if (!state.user) return (
+    <div className="screen">
+      <h1 className="page-title">Post an event</h1>
+      <Empty icon="📣" title="Share what's happening on campus">Post your club's event, or a flyer you saw so others can find it.</Empty>
+      <button className="card role" onClick={() => gate('organizer')}>
+        <Megaphone size={28} /><span><strong>I run a club or event</strong><span>Organizer posts go live right away</span></span>
+      </button>
+      <button className="card role" onClick={() => gate('student')}>
+        <GraduationCap size={28} /><span><strong>I'm a student</strong><span>Share an event you saw. The host club gives it a quick check</span></span>
+      </button>
+    </div>
+  )
+
+  const isOrg = state.user.role === 'organizer'
+
+  const addPhoto = (picked) => {
+    if (!picked || !picked.type.startsWith('image/')) return
+    setFile(picked)
+    setScan({ state: 'idle' })
+    shrink(picked).then(setImage).catch(() => setImage(null))
+  }
+
+  const readIt = async () => {
     setScan({ state: 'reading', progress: 0 })
     try {
       const text = await readFlyer(file, (p) => setScan({ state: 'reading', progress: p }))
       const got = parseFlyer(text)
-      set(Object.fromEntries(Object.entries(got).filter(([k, v]) => k !== 'found' && v !== undefined && v !== '')))
+      const fill = Object.fromEntries(Object.entries(got).filter(([k, v]) => k !== 'found' && v !== undefined && v !== ''))
+      if (fill.interest) fill.emoji = INTERESTS.find((i) => i.id === fill.interest)?.emoji || f.emoji
+      set(fill)
       setScan({ state: 'done', found: got.found })
     } catch (err) {
       console.error(err)
@@ -42,57 +64,79 @@ export default function Post() {
     }
   }
 
-  const ok = f.title.trim() && f.place.trim() && f.date && f.start && f.end
-  const publish = () => {
+  const build = () => {
     const startAt = new Date(`${f.date}T${f.start}`)
     let endAt = new Date(`${f.date}T${f.end}`)
-    if (endAt <= startAt) endAt = new Date(startAt.getTime() + 2 * 3600000)
-    const interest = INTERESTS.find((i) => i.id === f.interest)
-    const event = {
-      id: `p-${uid()}`, title: f.title.trim(), host: f.host.trim() || 'Student post', interest: f.interest,
-      emoji: interest?.emoji || '📌', place: f.place.trim(), cost: Number(f.cost) || 0,
+    if (isNaN(startAt)) return null
+    if (isNaN(endAt) || endAt <= startAt) endAt = new Date(startAt.getTime() + 2 * 3600000)
+    return {
+      id: `p-${uid()}`, title: f.title.trim() || 'Your event name', host: f.host.trim() || state.user.name,
+      interest: f.interest, emoji: f.emoji, place: f.place.trim() || 'Where is it?', cost: Number(f.cost) || 0,
       parking: f.parking.trim() || 'See host for details', desc: f.desc.trim() || 'Posted on Common Ground.',
       going: 1, soloFriendly: f.soloFriendly, open: [], here: [],
-      source: state.user?.role === 'organizer' ? 'Club post' : 'Student post',
-      pending: state.user?.role !== 'organizer', placeId: placeFromText(f.place), image,
+      source: isOrg ? 'Club post' : 'Student post', pending: !isOrg, mine: true,
+      placeId: placeFromText(f.place), image,
       startAt: startAt.toISOString(), endAt: endAt.toISOString(),
     }
-    dispatch({ type: 'POST_EVENT', event })
-    dispatch({ type: 'RSVP', eventId: event.id, value: 'going' })
-    showToast(state.user?.role === 'organizer' ? 'Event published ✓' : 'Posted ✓ The host club will give it a quick check')
-    nav.tab('home')
-    nav.push('event', { id: event.id })
   }
+  const draft = build()
+  const preview = draft ? withTimes([draft])[0] : null
+  const ok = f.title.trim() && f.place.trim() && draft
 
-  if (!state.user) return (
-    <div className="screen">
-      <h1 className="page-title">Post an event</h1>
-      <Empty icon="📣" title="Share what's happening on campus">Post your club's event, or snap a flyer you saw so others can find it.</Empty>
-      <button className="card role" onClick={() => gate('organizer')}>
-        <Megaphone size={28} /><span><strong>I run a club or event</strong><span>Organizer accounts publish instantly</span></span>
-      </button>
-      <button className="card role" onClick={() => gate('student')}>
-        <GraduationCap size={28} /><span><strong>I'm a student</strong><span>Share a flyer you saw. The host club gives it a quick check</span></span>
-      </button>
-    </div>
-  )
+  const publish = () => {
+    const event = build()
+    dispatch({ type: 'POST_EVENT', event })
+    nav.tab('post')
+    nav.push('posted', { id: event.id })
+  }
 
   return (
     <div className="screen">
       <h1 className="page-title">Post an event</h1>
+      <p className="muted section-sub">{isOrg ? `Posting as ${state.user.org || 'your club'}. Goes live right away.` : 'Student posts get a quick check by the host club.'}</p>
 
-      <button className="card scan" onClick={() => fileRef.current?.click()}>
-        {preview ? <img src={preview} alt="Flyer" /> : <Camera size={28} />}
-        <div>
-          <strong><Sparkles size={16} /> Scan a flyer</strong>
-          <span>Saw a poster on campus? Snap it and we'll fill in the details for you.</span>
-        </div>
-      </button>
-      <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => onFile(e.target.files?.[0])} />
+      {/* Photo: drag & drop on a laptop, tap to pick on a phone */}
+      <div
+        className={`drop ${drag ? 'over' : ''} ${image ? 'has' : ''}`}
+        onDragOver={(e) => { e.preventDefault(); setDrag(true) }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => { e.preventDefault(); setDrag(false); addPhoto(e.dataTransfer.files?.[0]) }}
+        onClick={() => !image && fileRef.current?.click()}
+        role="button" tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()}
+        aria-label="Add a photo or flyer"
+      >
+        {image ? (
+          <>
+            <img src={image} alt="Event" />
+            <button className="drop-x" onClick={(e) => { e.stopPropagation(); setImage(null); setFile(null); setScan({ state: 'idle' }) }} aria-label="Remove photo"><X size={16} /></button>
+          </>
+        ) : (
+          <>
+            <ImagePlus size={30} />
+            <strong>Add a photo or flyer</strong>
+            <span>Drag & drop here, or tap to choose</span>
+          </>
+        )}
+      </div>
+      <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { addPhoto(e.target.files?.[0]); e.target.value = '' }} />
 
+      {file && scan.state === 'idle' && (
+        <button className="btn btn-outline" onClick={readIt}><Sparkles size={16} /> It's a flyer: fill in the details for me</button>
+      )}
       {scan.state === 'reading' && <div className="scan-status"><Loader2 size={16} className="spin" /> Reading flyer… {scan.progress ? `${scan.progress}%` : ''}</div>}
       {scan.state === 'done' && <div className="scan-status ok">✓ Filled in {scan.found.length ? scan.found.join(', ') : 'what we could'}. Double-check below.</div>}
       {scan.state === 'error' && <div className="scan-status err">Couldn't read that one. Fill it in below instead.</div>}
+
+      {!image && (
+        <div className="field"><span>No photo? Pick an icon</span>
+          <div className="emoji-row">
+            {EMOJIS.map((em) => (
+              <button key={em} className={`emoji-btn ${f.emoji === em ? 'on' : ''}`} onClick={() => set({ emoji: em })} aria-label={`Icon ${em}`}>{em}</button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="form">
         <label className="field"><span>Event name</span><input value={f.title} onChange={(e) => set({ title: e.target.value })} placeholder="e.g. Taco Tuesday Mixer" /></label>
@@ -109,23 +153,34 @@ export default function Post() {
         </div>
         <div className="field"><span>Category</span>
           <div className="chips-wrap">
-            {INTERESTS.map((i) => <Chip key={i.id} active={f.interest === i.id} onClick={() => set({ interest: i.id })}>{i.emoji} {i.label}</Chip>)}
+            {INTERESTS.map((i) => <Chip key={i.id} active={f.interest === i.id} onClick={() => set({ interest: i.id, emoji: image ? f.emoji : i.emoji })}>{i.emoji} {i.label}</Chip>)}
           </div>
         </div>
         <label className="field"><span>Description</span><textarea rows={3} value={f.desc} onChange={(e) => set({ desc: e.target.value })} /></label>
         <label className="toggle-row card">
-          <div><strong>Solo-friendly</strong><span>You'll help people who come alone meet others.</span></div>
+          <div>
+            <strong>✨ Welcomes people coming alone</strong>
+            <span>Adds a badge, and students who came solo can find each other at your event. Have a greeter or mixed tables ready.</span>
+          </div>
           <input type="checkbox" className="switch" checked={f.soloFriendly} onChange={(e) => set({ soloFriendly: e.target.checked })} />
         </label>
-        <div className="note"><ShieldCheck size={18} /> Club & ASI accounts publish instantly. Student-scanned flyers get a quick check by the host club first.</div>
-        <button className="btn btn-primary btn-lg" disabled={!ok} onClick={publish}>Publish event</button>
+
+        {preview && (
+          <div className="preview">
+            <span className="label">Preview: how students will see it</span>
+            <EventCard event={preview} preview />
+          </div>
+        )}
+
+        <div className="note"><ShieldCheck size={18} /> {isOrg ? 'Club & ASI accounts publish instantly.' : 'Your post shows "pending club check" until the host club confirms it.'}</div>
+        <button className="btn btn-primary btn-lg" disabled={!ok} onClick={publish}>{isOrg ? 'Publish event' : 'Post event'}</button>
       </div>
     </div>
   )
 }
 
 // Shrink a photo so it fits in browser storage (about 60 KB)
-function shrink(file, max = 640) {
+function shrink(file, max = 720) {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.onload = () => {

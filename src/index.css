@@ -142,7 +142,7 @@ p { margin: 0; }
 .screen-detail .topbar { position: absolute; z-index: 2; margin: 0; padding: 12px; }
 .screen-detail .topbar .icon-btn { background: rgba(255, 255, 255, 0.92); }
 .detail-hero { color: #fff; min-height: 260px; display: flex; align-items: flex-end; }
-.detail-hero-inner { position: relative; z-index: 1; width: 100%; padding: 70px 20px 22px; display: flex; flex-direction: column; gap: 8px; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(2,30,20,0.55) 45%, rgba(2,30,20,0.88) 100%); }
+.detail-hero-inner { position: relative; z-index: 1; width: 100%; padding: 70px 20px 22px; display: flex; flex-direction: column; gap: 8px; background: linear-gradient(180deg, rgba(2,30,20,0.25) 0%, rgba(2,30,20,0.7) 40%, rgba(2,30,20,0.92) 100%); }
 .detail-hero h1 { font-size: 30px; line-height: 1.15; text-shadow: 0 1px 8px rgba(0,0,0,0.3); }
 .detail-hero p { opacity: 0.9; }
 .detail-hero .cover-art { align-items: flex-end; justify-content: flex-start; padding: 58px 24px 0; }
@@ -419,3 +419,35 @@ h1, h2, h3, strong, p, span { overflow-wrap: anywhere; }
 .pin-marker span { transform: rotate(45deg); font-size: 20px; }
 .pin-marker b { position: absolute; top: -6px; right: -6px; transform: rotate(45deg); background: var(--gold); color: var(--green); font-size: 11px; min-width: 18px; height: 18px; border-radius: 999px; display: grid; place-items: center; }
 .pin-marker.is-live { background: #c0392b; }
+
+/* ---------- v3: save button, states, posting ---------- */
+.event-card-wrap { position: relative; padding: 0; }
+.event-card-wrap .event-card { padding: 14px 56px 14px 14px; }
+.card-save { position: absolute; top: 12px; right: 12px; }
+.save { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); background: #fff; border: 1.5px solid var(--line); flex-shrink: 0; }
+.save.on { background: var(--gold); border-color: var(--gold); color: var(--green); }
+.save.going { background: var(--green); border-color: var(--green); color: #fff; }
+.pin-foot { gap: 6px; }
+.pin-foot .save { margin-left: auto; }
+.pill-going { background: var(--green); color: #fff; }
+.pill-saved { background: var(--gold); color: var(--green); }
+.pill-host { background: var(--ink); color: #fff; }
+.week-label { font-size: 15px; font-weight: 800; color: var(--green); margin-top: 4px; }
+.host-card { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 6px; }
+.host-card div { display: flex; flex-direction: column; }
+.host-card strong { font-size: 20px; color: var(--green); }
+.host-card span { font-size: 12px; color: var(--muted); }
+.note > span { line-height: 1.4; }
+
+.drop { border: 2px dashed var(--gold); background: var(--gold-soft); border-radius: 18px; min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--green); text-align: center; cursor: pointer; position: relative; overflow: hidden; transition: background 0.15s, border-color 0.15s; }
+.drop span { font-size: 13px; color: var(--muted); }
+.drop.over { background: var(--green-soft); border-color: var(--green); }
+.drop.has { border-style: solid; cursor: default; min-height: 0; }
+.drop img { width: 100%; max-height: 260px; object-fit: cover; display: block; }
+.drop-x { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.6); color: #fff; display: grid; place-items: center; }
+.emoji-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.emoji-btn { aspect-ratio: 1; border-radius: 12px; background: var(--card); border: 1.5px solid var(--line); font-size: 20px; display: grid; place-items: center; }
+.emoji-btn.on { border-color: var(--green); background: var(--green-soft); box-shadow: 0 0 0 2px var(--green) inset; }
+.preview { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 18px; background: #eceae2; }
+.posted { justify-content: center; }
+.posted-check { width: 72px; height: 72px; border-radius: 50%; background: var(--green); color: #fff; font-size: 36px; font-weight: 900; display: grid; place-items: center; align-self: center; animation: up 0.3s ease-out; }

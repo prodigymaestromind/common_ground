@@ -3,13 +3,13 @@ import { Search, List, Map as MapIcon } from 'lucide-react'
 import { INTERESTS } from '../data'
 import { Chip, EventCard, Empty } from '../components'
 import { useStore } from '../store'
-import { isPast, dayLabel, fitCheck } from '../utils'
+import { isPast, dayLabel, fitCheck, weekBucket } from '../utils'
 import CampusMap from './MapView'
 
 const QUICK = [
   { id: 'free', label: 'Free' },
   { id: 'fits', label: '✓ Fits my day' },
-  { id: 'solo', label: '✨ Solo-friendly' },
+  { id: 'solo', label: '✨ Welcomes solo' },
 ]
 
 export default function Explore() {
@@ -18,10 +18,12 @@ export default function Explore() {
   const [quick, setQuick] = useState([])
   const [interest, setInterest] = useState(null)
   const [view, setView] = useState('list')
+  const [range, setRange] = useState('This week')
 
   const toggleQuick = (id) => setQuick((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
   const list = events
     .filter((e) => !isPast(e))
+    .filter((e) => range === 'All upcoming' || weekBucket(e.startAt) === range)
     .filter((e) => !q || `${e.title} ${e.host} ${e.place}`.toLowerCase().includes(q.toLowerCase()))
     .filter((e) => !interest || e.interest === interest)
     .filter((e) => !quick.includes('free') || !e.cost)
@@ -46,6 +48,11 @@ export default function Explore() {
           <button className={view === 'map' ? 'on' : ''} onClick={() => setView('map')}><MapIcon size={15} /> Map</button>
         </div>
       </div>
+      <div className="seg">
+        {['This week', 'Next week', 'All upcoming'].map((r) => (
+          <button key={r} className={range === r ? 'on' : ''} onClick={() => setRange(r)}>{r}</button>
+        ))}
+      </div>
       <label className="search">
         <Search size={18} />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search events, clubs, places" />
@@ -67,7 +74,7 @@ export default function Explore() {
           <div className="stack">{g.items.map((e) => <EventCard key={e.id} event={e} />)}</div>
         </section>
       ))}
-      {view === 'list' && groups.length > 0 && <p className="end-note">That's every event this week ✓</p>}
+      {view === 'list' && groups.length > 0 && <p className="end-note">That's everything {range === 'All upcoming' ? 'coming up' : range.toLowerCase()} ✓{range === 'This week' && <> · <button className="link" onClick={() => setRange('Next week')}>See next week →</button></>}</p>}
     </div>
   )
 }

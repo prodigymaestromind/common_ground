@@ -1,24 +1,36 @@
 import { HeartHandshake, Check } from 'lucide-react'
 import { studentById } from '../data'
 import { Avatar, EventCard, Empty, useGate, useNav } from '../components'
-import { BOARDS, Masonry } from './HomeBoard'
-import { Stamps } from './Crews'
 import { useStore } from '../store'
-import { isPast } from '../utils'
+import { isPast, weekBucket } from '../utils'
+
+// Group events under "This week" / "Next week" / "Later"
+function ByWeek({ events }) {
+  const groups = ['This week', 'Next week', 'Later']
+    .map((label) => ({ label, items: events.filter((e) => weekBucket(e.startAt) === label) }))
+    .filter((g) => g.items.length)
+  return groups.map((g) => (
+    <div key={g.label} className="stack">
+      <h3 className="week-label">{g.label}</h3>
+      {g.items.map((e) => <EventCard key={e.id} event={e} />)}
+    </div>
+  ))
+}
 
 export default function Plans() {
   const nav = useNav()
   const gate = useGate()
   const { state, dispatch, events, eventById, showToast } = useStore()
-  const boardStyle = state.style === 'board'
-  const going = events.filter((e) => state.rsvp[e.id] === 'going' && !isPast(e)).sort((a, b) => a.startAt - b.startAt)
-  const saved = events.filter((e) => state.rsvp[e.id] === 'saved' && !isPast(e)).sort((a, b) => a.startAt - b.startAt)
+  const upcoming = events.filter((e) => !isPast(e)).sort((a, b) => a.startAt - b.startAt)
+  const going = upcoming.filter((e) => state.rsvp[e.id] === 'going')
+  const saved = upcoming.filter((e) => state.rsvp[e.id] === 'saved')
+  const hosting = upcoming.filter((e) => e.mine)
 
   // Meet-ups = accepted invites in any chat
   const meetups = Object.values(state.chats).flatMap((c) =>
     c.messages.filter((m) => m.kind === 'invite' && m.invite.status === 'accepted').map((m) => ({ chat: c, m })),
   )
-  // People you've actually talked with (they replied)
+  // People you've actually talked with
   const met = [...new Set(Object.values(state.chats).flatMap((c) =>
     c.messages.some((m) => m.from === 'me') ? c.messages.map((m) => m.from).filter((f) => studentById[f]) : [],
   ))].filter((s) => !state.blocked.includes(s))
@@ -36,7 +48,7 @@ export default function Plans() {
       <h1 className="page-title">My plans</h1>
       {!state.user && (
         <div className="card locked">
-          <p><strong>Saved events live here.</strong> Sign in to RSVP, set meet-ups and keep in touch with people.</p>
+          <p><strong>Your saved events live here.</strong> Sign in to RSVP, set meet-ups and keep in touch with people.</p>
           <button className="btn btn-sm btn-primary" onClick={() => gate('student')}>Sign in</button>
         </div>
       )}
@@ -62,31 +74,24 @@ export default function Plans() {
         </section>
       )}
 
-      <section>
-        <h2 className="section-title">Going</h2>
-        {going.length === 0 ? <Empty icon="📅" title="Nothing planned yet">Tap “I'm going” on an event and it shows up here.</Empty>
-          : <div className="stack">{going.map((e) => <EventCard key={e.id} event={e} />)}</div>}
-      </section>
-
-      {boardStyle && BOARDS.map((b) => {
-        const items = events.filter((e) => state.boards[e.id] === b && !isPast(e))
-        if (!items.length) return null
-        return (
-          <section key={b}>
-            <h2 className="section-title">📌 {b}</h2>
-            <Masonry events={items} />
-          </section>
-        )
-      })}
-
-      {!boardStyle && saved.length > 0 && (
+      {hosting.length > 0 && (
         <section>
-          <h2 className="section-title">Saved for later</h2>
-          <div className="stack">{saved.map((e) => <EventCard key={e.id} event={e} />)}</div>
+          <h2 className="section-title">Hosting</h2>
+          <div className="stack">{hosting.map((e) => <EventCard key={e.id} event={e} />)}</div>
         </section>
       )}
 
-      {state.user && state.style === 'crews' && <Stamps />}
+      <section>
+        <h2 className="section-title">✓ Going</h2>
+        {going.length === 0 ? <Empty icon="📅" title="Nothing yet">Tap “I'm going” on an event and it shows up here.</Empty>
+          : <div className="stack"><ByWeek events={going} /></div>}
+      </section>
+
+      <section>
+        <h2 className="section-title">🔖 Saved for later</h2>
+        {saved.length === 0 ? <Empty icon="🔖" title="Nothing saved">Tap the bookmark on any event to save it here.</Empty>
+          : <div className="stack"><ByWeek events={saved} /></div>}
+      </section>
 
       {met.length > 0 && (
         <section>

@@ -1,18 +1,16 @@
 // "Board" style: photo-first grid inspired by Pinterest / Poppin.
 import { useState } from 'react'
-import { Bookmark, BookmarkCheck, Users } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { studentById } from '../data'
-import { Avatar, Cover, LiveDot, Sheet, useNav } from '../components'
-import { useStore } from '../store'
-import { dayLabel, fmtTime, isLive, costLabel } from '../utils'
+import { Avatar, Cover, LiveDot, SaveButton, useNav } from '../components'
+import { dayLabel, fmtTime, isLive, weekBucket } from '../utils'
 import { HomeHeader, CaughtUp, useHomeData } from './Home'
-
-export const BOARDS = ['This weekend', 'With friends', 'Maybe']
 
 const FILTERS = [
   { id: 'now', label: '🔴 Now' },
   { id: 'today', label: 'Today' },
   { id: 'week', label: 'This week' },
+  { id: 'all', label: 'All' },
 ]
 
 export default function HomeBoard() {
@@ -22,6 +20,7 @@ export default function HomeBoard() {
     .filter((e) => {
       if (filter === 'now') return isLive(e)
       if (filter === 'today') return dayLabel(e.startAt) === 'Today'
+      if (filter === 'week') return weekBucket(e.startAt) === 'This week'
       return true
     })
     .sort((a, b) => a.startAt - b.startAt)
@@ -46,10 +45,7 @@ export default function HomeBoard() {
 
 export function BoardCard({ event, tall }) {
   const nav = useNav()
-  const { state } = useStore()
-  const [pick, setPick] = useState(false)
   const live = isLive(event)
-  const saved = state.boards[event.id]
   const faces = (event.open || []).slice(0, 3).map((s) => studentById[s])
   return (
     <div className="pin">
@@ -70,31 +66,9 @@ export function BoardCard({ event, tall }) {
           {faces.map((p) => <Avatar key={p.id} person={p} size={22} />)}
           <span className="muted"><Users size={12} /> {event.going}</span>
         </span>
-        <button className={`save ${saved ? 'on' : ''}`} onClick={() => setPick(true)} aria-label="Save to a board">
-          {saved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-        </button>
+        <SaveButton event={event} />
       </div>
-      <BoardSheet event={event} open={pick} onClose={() => setPick(false)} />
     </div>
-  )
-}
-
-export function BoardSheet({ event, open, onClose }) {
-  const { state, dispatch, showToast } = useStore()
-  const cur = state.boards[event.id]
-  return (
-    <Sheet open={open} onClose={onClose} title="Save to a board">
-      <p className="muted">{event.title} · {costLabel(event.cost)}</p>
-      <div className="stack-sm">
-        {BOARDS.map((b) => (
-          <button key={b} className={`option ${cur === b ? 'on' : ''}`}
-            onClick={() => { dispatch({ type: 'BOARD', eventId: event.id, board: b }); showToast(`Saved to “${b}”`); onClose() }}>
-            📌 {b}
-          </button>
-        ))}
-        {cur && <button className="btn btn-ghost danger" onClick={() => { dispatch({ type: 'BOARD', eventId: event.id, board: null }); onClose() }}>Remove from board</button>}
-      </div>
-    </Sheet>
   )
 }
 

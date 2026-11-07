@@ -31,7 +31,7 @@ export function ChatList() {
           const person = c.type === 'dm' ? studentById[c.studentId] : null
           return (
             <button key={c.id} className="card chat-row" onClick={() => nav.push('chat', { id: c.id })}>
-              {person ? <Avatar person={person} size={46} /> : <span className="group-icon">{c.crewId ? c.title.split(' ')[0] : <Users size={22} />}</span>}
+              {person ? <Avatar person={person} size={46} /> : <span className="group-icon"><Users size={22} /></span>}
               <div className="chat-row-body">
                 <strong>{c.title}</strong>
                 <span className="muted">{preview(last)}</span>

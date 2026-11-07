@@ -81,3 +81,20 @@ export function fitCheck(event, busy = []) {
 export const initials = (name = '?') => name.trim().slice(0, 1).toUpperCase()
 
 export const uid = () => Math.random().toString(36).slice(2, 9)
+
+// Whole days from today (0 = today)
+export function daysFromToday(d) {
+  const a = new Date()
+  a.setHours(0, 0, 0, 0)
+  const b = new Date(d)
+  b.setHours(0, 0, 0, 0)
+  return Math.round((b - a) / 86400000)
+}
+
+// "This week" = next 7 days, "Next week" = the 7 after that, then "Later"
+export function weekBucket(d) {
+  const n = daysFromToday(d)
+  if (n < 7) return 'This week'
+  if (n < 14) return 'Next week'
+  return 'Later'
+}

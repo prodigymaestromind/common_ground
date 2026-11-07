@@ -35,8 +35,8 @@ export function Welcome() {
         <Logo size={30} light />
         <h1>Campus events.<br />People to go with.</h1>
         <p>Everything happening at Sac State in one place, plus a comfortable way to meet people, even if you show up alone.</p>
-        <button className="btn btn-gold btn-lg" onClick={() => dispatch({ type: 'WELCOMED' })}>Look around</button>
-        <button className="btn btn-ghost-light" onClick={() => { dispatch({ type: 'WELCOMED' }); nav.push('signin', {}) }}>
+        <button className="btn btn-gold btn-lg" onClick={() => { nav.tab('home'); dispatch({ type: 'WELCOMED' }) }}>Look around</button>
+        <button className="btn btn-ghost-light" onClick={() => { nav.tab('home'); dispatch({ type: 'WELCOMED' }); nav.push('signin', {}) }}>
           I have an account · Sign in
         </button>
         <button className="style-pill light" onClick={() => setStyleOpen(true)}><Palette size={14} /> Style: {cur?.name}</button>

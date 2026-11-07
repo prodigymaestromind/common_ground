@@ -1,6 +1,6 @@
 // Small shared UI pieces.
 import { createContext, useContext, useState } from 'react'
-import { ChevronLeft, Clock, MapPin, Users, CheckCircle2, AlertTriangle, CalendarPlus, Radio, Sparkles, Palette, Check } from 'lucide-react'
+import { ChevronLeft, Clock, MapPin, Users, CheckCircle2, AlertTriangle, CalendarPlus, Radio, Sparkles, Palette, Check, Bookmark, BookmarkCheck } from 'lucide-react'
 import { interestById } from './data'
 import { PLACES, photoUrl } from './places'
 import { fmtRange, dayLabel, costLabel, fitCheck, isLive, initials } from './utils'
@@ -70,20 +70,59 @@ export function LiveDot() {
   return <span className="live"><span className="live-dot" /> LIVE</span>
 }
 
-export function EventCard({ event }) {
+// Save / Saved / Going: one tap to save, no lists to pick
+export function SaveButton({ event, className = '' }) {
+  const { state, dispatch, showToast } = useStore()
   const nav = useNav()
-  const { state } = useStore()
-  const live = isLive(event)
   const r = state.rsvp[event.id]
+  if (event.mine) return null
+  if (r === 'going') {
+    return (
+      <button className={`save going ${className}`} onClick={() => nav.push('event', { id: event.id })} aria-label="You're going">
+        <Check size={17} strokeWidth={3} />
+      </button>
+    )
+  }
+  const saved = r === 'saved'
   return (
-    <button className="card event-card" onClick={() => nav.push('event', { id: event.id })}>
+    <button
+      className={`save ${saved ? 'on' : ''} ${className}`}
+      aria-pressed={saved}
+      aria-label={saved ? 'Saved. Tap to unsave' : 'Save'}
+      onClick={(ev) => {
+        ev.stopPropagation()
+        dispatch({ type: 'RSVP', eventId: event.id, value: saved ? null : 'saved' })
+        showToast(saved ? 'Removed from saved' : 'Saved 🔖 Find it in Plans')
+      }}
+    >
+      {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
+    </button>
+  )
+}
+
+export function StatusPill({ event }) {
+  const { state } = useStore()
+  if (event.mine) return <span className="pill pill-host">Hosting</span>
+  const r = state.rsvp[event.id]
+  if (r === 'going') return <span className="pill pill-going"><Check size={12} strokeWidth={3} /> Going</span>
+  if (r === 'saved') return <span className="pill pill-saved"><BookmarkCheck size={12} /> Saved</span>
+  return null
+}
+
+export const SoloBadge = () => <span className="pill pill-solo"><Sparkles size={12} /> Welcomes solo</span>
+
+export function EventCard({ event, preview }) {
+  const nav = useNav()
+  const live = isLive(event)
+  return (
+    <div className="card event-card-wrap">
+    <button className="event-card" onClick={() => !preview && nav.push('event', { id: event.id })} tabIndex={preview ? -1 : 0}>
       <Cover event={event} className="event-thumb" small />
       <div className="event-body">
         <div className="event-top">
           <span className="event-tag">{interestById[event.interest]?.label}</span>
           {live && <LiveDot />}
-          {r === 'going' && <span className="pill pill-going">Going</span>}
-          {r === 'saved' && <span className="pill">Saved</span>}
+          <StatusPill event={event} />
         </div>
         <h3 className="event-title">{event.title}</h3>
         <div className="meta"><Clock size={14} /> {live ? `Now · until ${fmtRange(event).split('– ')[1]}` : `${dayLabel(event.startAt)} · ${fmtRange(event)}`}</div>
@@ -91,11 +130,13 @@ export function EventCard({ event }) {
         <div className="event-foot">
           <span className="meta"><Users size={14} /> {event.going} going</span>
           <span className="cost">{costLabel(event.cost)}</span>
-          {event.soloFriendly && <span className="pill pill-solo"><Sparkles size={12} /> Solo-friendly</span>}
+          {event.soloFriendly && <SoloBadge />}
         </div>
-        {!live && <FitBadge event={event} compact />}
+        {!live && !preview && <FitBadge event={event} compact />}
       </div>
     </button>
+    {!preview && <SaveButton event={event} className="card-save" />}
+    </div>
   )
 }
 
@@ -141,13 +182,14 @@ export function Cover({ event, placeId, className = '', small, children }) {
   const id = placeId || event?.placeId || 'union'
   const place = PLACES[id] || PLACES.union
   const src = event?.image || (!missing.has(id) ? photoUrl(id) : null)
-  const [failed, setFailed] = useState(!src)
+  const [failedSrc, setFailedSrc] = useState(null)
+  const failed = !src || failedSrc === src
   const [c1, c2] = place.colors
   return (
     <div className={`cover ${className}`} style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
       {!failed && (
         <img src={src} alt={place.name} loading="lazy"
-          onError={() => { if (!event?.image) missing.add(id); setFailed(true) }} />
+          onError={() => { if (!event?.image) missing.add(id); setFailedSrc(src) }} />
       )}
       {failed && (
         <div className="cover-art" aria-hidden="true">
@@ -212,7 +254,7 @@ export function StyleSheet({ open, onClose }) {
     <Sheet open={open} onClose={onClose} title="Pick a style">
       <p className="muted">Same app, same data, different feel. Switch anytime.</p>
       <StylePicker onPick={() => { onClose(); nav.tab('home') }} />
-      <p className="muted small center">Share a style directly: add <b>?style=board</b> or <b>?style=crews</b> to the link.</p>
+      <p className="muted small center">Share a style directly: add <b>?style=board</b> to the link.</p>
     </Sheet>
   )
 }

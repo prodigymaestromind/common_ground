@@ -8,7 +8,13 @@ export default function Profile() {
   const nav = useNav()
   const { state, dispatch } = useStore()
   const u = state.user
-  if (!u) return <div className="screen"><TopBar title="Profile" /></div>
+  if (!u) return (
+    <div className="screen">
+      <TopBar title="Profile" />
+      <p className="muted center">You're browsing without an account.</p>
+      <button className="btn btn-primary btn-lg" onClick={() => nav.push('signin', {})}>Sign in</button>
+    </div>
+  )
   const update = (patch) => dispatch({ type: 'UPDATE_USER', patch })
   const toggle = (id) => update({ interests: u.interests.includes(id) ? u.interests.filter((i) => i !== id) : [...u.interests, id] })
 

@@ -5,7 +5,7 @@ import { StoreProvider, useStore } from './store'
 import SignIn, { Welcome } from './screens/Onboarding'
 import Home from './screens/Home'
 import HomeBoard from './screens/HomeBoard'
-import HomeCrews, { Crew } from './screens/Crews'
+import Posted from './screens/Posted'
 import Explore from './screens/Explore'
 import EventDetail from './screens/EventDetail'
 import WhoIsHere from './screens/WhoIsHere'
@@ -14,11 +14,11 @@ import Plans from './screens/Plans'
 import Post from './screens/Post'
 import Profile from './screens/Profile'
 
-const HOMES = { classic: Home, board: HomeBoard, crews: HomeCrews }
+const HOMES = { classic: Home, board: HomeBoard }
 
 const SCREENS = {
   explore: Explore, post: Post, plans: Plans, chats: ChatList,
-  event: EventDetail, here: WhoIsHere, chat: Chat, profile: Profile, signin: SignIn, crew: Crew,
+  event: EventDetail, here: WhoIsHere, chat: Chat, profile: Profile, signin: SignIn, posted: Posted,
 }
 
 const TABS = [

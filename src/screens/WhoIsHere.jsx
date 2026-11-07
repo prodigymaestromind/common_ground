@@ -23,7 +23,7 @@ export default function WhoIsHere({ id }) {
         <h2>{solos.length} people came solo</h2>
         <p>They opted in to meet new people at this event. Join the group chat to find each other and walk in together.</p>
         <div className="avatars">{solos.map((p) => <Avatar key={p.id} person={p} size={38} />)}</div>
-        <button className="btn btn-gold btn-lg" onClick={() => nav.push('chat', { id: joinGroup(e.id) })}>Join the solo crew chat</button>
+        <button className="btn btn-gold btn-lg" onClick={() => nav.push('chat', { id: joinGroup(e.id) })}>Join the solo group chat</button>
         <p className="small"><ShieldCheck size={14} /> You'll share your first name + interests. Your exact location is never shown.</p>
       </div>
 

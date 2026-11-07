@@ -1,14 +1,13 @@
 // App state: one reducer, saved to localStorage so the demo survives a refresh.
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { EVENTS, CREWS, studentById, interestById } from './data'
+import { EVENTS, studentById, interestById } from './data'
 import { withTimes, uid } from './utils'
 
 const KEY = 'common-ground-v1'
 
 export const STYLES = [
   { id: 'classic', name: 'Classic', desc: 'Calm list. What\'s happening now, first.', emoji: '📋' },
-  { id: 'board', name: 'Board', desc: 'Photo grid like Pinterest/Poppin. Save to boards.', emoji: '🖼️' },
-  { id: 'crews', name: 'Crews', desc: 'Join a small crew and go to things together.', emoji: '🧭' },
+  { id: 'board', name: 'Board', desc: 'Photo grid like Pinterest/Poppin. Big pictures first.', emoji: '🖼️' },
 ]
 
 function styleFromUrl() {
@@ -23,9 +22,6 @@ function styleFromUrl() {
 const empty = {
   style: 'classic',
   welcomed: false,
-  boards: {}, // eventId -> board name (Board style saves)
-  crews: [], // crew ids I joined
-  stamps: {}, // stamp id -> timestamp
   user: null, // { name, email, role: 'student' | 'organizer', org, interests: [], busy: [] }
   rsvp: {}, // eventId -> 'going' | 'saved'
   company: {}, // eventId -> true  (I'm open to company at this event)
@@ -40,7 +36,8 @@ function load() {
     const raw = localStorage.getItem(KEY)
     const st = raw ? { ...empty, ...JSON.parse(raw) } : empty
     const urlStyle = styleFromUrl()
-    return urlStyle ? { ...st, style: urlStyle } : st
+    if (urlStyle) return { ...st, style: urlStyle }
+    return STYLES.some((x) => x.id === st.style) ? st : { ...st, style: 'classic' }
   } catch {
     return empty
   }
@@ -52,27 +49,14 @@ function upsertChat(state, chat) {
   return { ...state, chats: { ...state.chats, [chat.id]: { messages: [], unread: 0, ...state.chats[chat.id], ...chat } } }
 }
 
-const stamp = (state, id) => (state.stamps[id] ? state : { ...state, stamps: { ...state.stamps, [id]: Date.now() } })
-
 function reducer(state, a) {
   switch (a.type) {
     case 'STYLE':
       return { ...state, style: a.style }
     case 'WELCOMED':
       return { ...state, welcomed: true }
-    case 'BOARD': {
-      const boards = { ...state.boards }
-      const rsvp = { ...state.rsvp }
-      if (a.board) { boards[a.eventId] = a.board; if (rsvp[a.eventId] !== 'going') rsvp[a.eventId] = 'saved' }
-      else { delete boards[a.eventId]; if (rsvp[a.eventId] === 'saved') delete rsvp[a.eventId] }
-      return { ...state, boards, rsvp }
-    }
-    case 'JOIN_CREW':
-      return stamp({ ...state, crews: [...new Set([...state.crews, a.crewId])] }, 'crew')
-    case 'LEAVE_CREW':
-      return { ...state, crews: state.crews.filter((c) => c !== a.crewId) }
-    case 'STAMP':
-      return stamp(state, a.id)
+    case 'DELETE_POST':
+      return { ...state, posted: state.posted.filter((e) => e.id !== a.eventId) }
     case 'SIGN_UP': {
       // Seed one incoming invite so the Accept/Decline flow is visible right away.
       const priya = studentById.s4
@@ -93,12 +77,7 @@ function reducer(state, a) {
       else delete rsvp[a.eventId]
       const company = { ...state.company }
       if (a.value !== 'going') delete company[a.eventId]
-      let next = { ...state, rsvp, company }
-      if (a.value === 'going') {
-        next = stamp(next, 'first-event')
-        if (a.interest && state.user && !state.user.interests.includes(a.interest)) next = stamp(next, 'new-thing')
-      }
-      return next
+      return { ...state, rsvp, company }
     }
     case 'COMPANY':
       return { ...state, company: { ...state.company, [a.eventId]: a.value } }
@@ -108,14 +87,12 @@ function reducer(state, a) {
       const chat = state.chats[a.chatId]
       if (!chat) return state
       const unread = a.message.from === 'me' || a.active ? chat.unread : (chat.unread || 0) + 1
-      const next = { ...state, chats: { ...state.chats, [a.chatId]: { ...chat, unread, messages: [...chat.messages, a.message] } } }
-      return a.message.from === 'me' && chat.type === 'dm' ? stamp(next, 'said-hi') : next
+      return { ...state, chats: { ...state.chats, [a.chatId]: { ...chat, unread, messages: [...chat.messages, a.message] } } }
     }
     case 'INVITE_STATUS': {
       const chat = state.chats[a.chatId]
       const messages = chat.messages.map((m) => (m.id === a.msgId ? { ...m, invite: { ...m.invite, status: a.status } } : m))
-      const next = { ...state, chats: { ...state.chats, [a.chatId]: { ...chat, messages } } }
-      return a.status === 'accepted' ? stamp(next, 'meetup') : next
+      return { ...state, chats: { ...state.chats, [a.chatId]: { ...chat, messages } } }
     }
     case 'READ': {
       const chat = state.chats[a.chatId]
@@ -215,9 +192,7 @@ export function StoreProvider({ children }) {
       const ev = eventById[chat.eventId]
       const pool = chat.members?.length ? chat.members : ev?.here?.length ? ev.here : ['s3']
       const who = studentById[pick(pool)]
-      const lines = chat.crewId
-        ? ['Haha love it', 'Down! 🙌', 'Same, see you there', 'Who\'s bringing snacks lol']
-        : ['Omw! 2 min 🏃', 'Nice, see you there!', 'I\'m wearing a green hoodie lol', 'Yesss more people 🙌']
+      const lines = ['Omw! 2 min 🏃', 'Nice, see you there!', 'I\'m wearing a green hoodie lol', 'Yesss more people 🙌']
       later(1600, () => add(chatId, msg(who.id, pick(lines))))
     }
   }, [add, state.chats, state.user, eventById])
@@ -251,7 +226,7 @@ export function StoreProvider({ children }) {
       dispatch({
         type: 'OPEN_CHAT',
         chat: {
-          id, type: 'group', eventId, title: `Solo crew · ${ev.title}`,
+          id, type: 'group', eventId, title: `Solo group · ${ev.title}`,
           messages: [
             msg('system', 'Everyone here came alone and wants to meet people. Only first names + interests are shared. Your location is never shown.'),
             ...(a ? [msg(a, `Hey all! I'm by the ${ev.place.split(',')[0]} entrance`)] : []),
@@ -260,46 +235,12 @@ export function StoreProvider({ children }) {
         },
       })
     }
-    dispatch({ type: 'STAMP', id: 'solo' })
     return id
   }, [eventById, state.chats])
 
-  const crewChatId = (crewId) => `crew-${crewId}`
-  const joinCrew = useCallback((crewId) => {
-    const crew = CREWS.find((c) => c.id === crewId)
-    const id = crewChatId(crewId)
-    dispatch({ type: 'JOIN_CREW', crewId })
-    if (!state.chats[id]) {
-      const [a, b] = crew.members
-      dispatch({
-        type: 'OPEN_CHAT',
-        chat: {
-          id, type: 'group', crewId, members: crew.members, title: `${crew.emblem} ${crew.name}`,
-          messages: [
-            msg('system', `You joined ${crew.name}. Crews are small (6 max), with no ranks or points. Just people who go to things together.`),
-            msg(a, `Welcome ${state.user?.name || ''}! 👋`),
-            ...(b ? [msg(b, 'Glad you\'re here. We usually pick one thing a week.')] : []),
-          ],
-        },
-      })
-    }
-    return id
-  }, [state.chats, state.user])
-
-  const rallyCrew = useCallback((crewId, eventId) => {
-    const crew = CREWS.find((c) => c.id === crewId)
-    const ev = eventById[eventId]
-    const id = crewChatId(crewId)
-    add(id, msg('me', `📣 Rally: who's down for ${ev.title} (${ev.place.split(',')[0]})?`))
-    crew.members.slice(0, 3).forEach((m, i) =>
-      later(1200 + i * 900, () => add(id, msg(m, pick(["I'm in! 🙌", 'Down', 'Yes, meet before?', 'Count me in', 'Maybe, I get off work at 6']))))
-    )
-    return id
-  }, [add, eventById])
-
   const value = {
     state, dispatch, events, eventById, toast, showToast,
-    openDM, sendText, sendInvite, answerInvite, joinGroup, joinCrew, rallyCrew,
+    openDM, sendText, sendInvite, answerInvite, joinGroup,
     setActiveChat: (id) => { activeChat.current = id },
   }
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
