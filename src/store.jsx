@@ -1,7 +1,7 @@
 // App state: one reducer, saved to localStorage so the demo survives a refresh.
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { EVENTS, studentById, interestById } from './data'
-import { withTimes, uid } from './utils'
+import { EVENTS, DEMO_LIVE, studentById, interestById } from './data'
+import { withTimes, uid, isLive } from './utils'
 
 const KEY = 'common-ground-v1'
 
@@ -70,8 +70,8 @@ function reducer(state, a) {
       const seeded = upsertChat({ ...state, user: a.user }, {
         id: 'dm-s4', type: 'dm', studentId: 's4', title: priya.name, unread: 1,
         messages: [
-          msg('s4', `Hi ${a.user.name}! Saw you're into tech too. Want to go to Hack Night together?`),
-          msg('s4', '', { kind: 'invite', invite: { eventId: 'e9', time: '5:15pm', spot: 'Outside the event door', status: 'pending', fromMe: false } }),
+          msg('s4', `Hi ${a.user.name}! Saw you're into tech too. Want to go to Builders' Hour at the Carlsen Center together?`),
+          msg('s4', '', { kind: 'invite', invite: { eventId: 'r69', time: '4:45pm', spot: 'Outside the event door', status: 'pending', fromMe: false } }),
         ],
       })
       return seeded
@@ -173,7 +173,11 @@ export function StoreProvider({ children }) {
   const later = (ms, fn) => timers.current.push(setTimeout(fn, ms))
   const add = useCallback((chatId, message) => dispatch({ type: 'ADD_MSG', chatId, message, active: activeChat.current === chatId }), [])
 
-  const events = useMemo(() => withTimes([...state.posted, ...EVENTS]), [state.posted])
+  const events = useMemo(() => {
+    const list = withTimes([...state.posted, ...EVENTS])
+    // nothing real happening right now? show the 2 demo "live" events so the demo still works
+    return list.some((e) => isLive(e)) ? list : [...withTimes(DEMO_LIVE), ...list]
+  }, [state.posted])
   const eventById = useMemo(() => Object.fromEntries(events.map((e) => [e.id, e])), [events])
 
   const showToast = useCallback((text) => {

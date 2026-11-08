@@ -13,7 +13,7 @@ export function Welcome() {
   const { state, dispatch } = useStore()
   const [styleOpen, setStyleOpen] = useState(false)
   const cur = STYLES.find((s) => s.id === state.style)
-  const floaters = ['e1', 'e3', 'e4'].map((id) => EVENTS.find((e) => e.id === id))
+  const floaters = ['r34', 'r48', 'r33'].map((id) => EVENTS.find((e) => e.id === id)).filter(Boolean)
 
   return (
     <div className="onboard">

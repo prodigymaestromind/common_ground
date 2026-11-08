@@ -489,3 +489,9 @@ h1, h2, h3, strong, p, span { overflow-wrap: anywhere; }
 .stars button { padding: 2px; }
 .fb-text { width: 100%; border-radius: 12px; border: 1.5px solid var(--line); padding: 10px 12px; background: var(--card); outline: none; resize: vertical; }
 .fb-text:focus { border-color: var(--green-2); }
+.source a { color: var(--green-2); font-weight: 700; }
+.good-to-know { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 14px; background: var(--gold-soft); border-left: 4px solid var(--gold); font-size: 14px; line-height: 1.4; }
+.good-to-know strong { color: var(--green); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+.official { width: 100%; text-decoration: none; }
+/* center the day letters on iPhone Safari */
+.day { display: flex; align-items: center; justify-content: center; padding: 0; text-align: center; line-height: 1; }

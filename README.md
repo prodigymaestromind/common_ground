@@ -30,3 +30,6 @@ React + Vite, deployed to GitHub Pages with GitHub Actions. Flyer OCR runs in th
 npm install
 npm run dev
 ```
+
+## Data
+Events come from the public **Sac State Events** calendar (events.csus.edu, Trumba iCalendar export, Nov 2026), and each one links back to its official page. Attendance counts and the students shown are **demo data**.

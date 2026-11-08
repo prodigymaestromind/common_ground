@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { ImagePlus, Loader2, ShieldCheck, Sparkles, Megaphone, GraduationCap, X } from 'lucide-react'
+import { ImagePlus, Loader2, ShieldCheck, Sparkles, Megaphone, X } from 'lucide-react'
 import { INTERESTS, EMOJIS } from '../data'
 import { Chip, Empty, EventCard, useGate, useNav } from '../components'
 import { useStore } from '../store'
@@ -30,17 +30,29 @@ export default function Post() {
   if (!state.user) return (
     <div className="screen">
       <h1 className="page-title">Post an event</h1>
-      <Empty icon="📣" title="Share what's happening on campus">Post your club's event, or a flyer you saw so others can find it.</Empty>
+      <Empty icon="📣" title="Share your club's event">Organizers can post events, or snap a flyer and we'll fill in the details.</Empty>
       <button className="card role" onClick={() => gate('organizer')}>
         <Megaphone size={28} /><span><strong>I run a club or event</strong><span>Organizer posts go live right away</span></span>
       </button>
-      <button className="card role" onClick={() => gate('student')}>
-        <GraduationCap size={28} /><span><strong>I'm a student</strong><span>Share an event you saw. The host club gives it a quick check</span></span>
-      </button>
+      <p className="muted small center">Posting is for clubs, ASI and departments. Students can browse, save and RSVP without posting.</p>
     </div>
   )
 
   const isOrg = state.user.role === 'organizer'
+
+  // Only club / event organizers can post. Students see why, and how to switch.
+  if (!isOrg) return (
+    <div className="screen">
+      <h1 className="page-title">Post an event</h1>
+      <Empty icon="📣" title="Posting is for clubs & organizers">
+        That keeps the feed real and spam-free. You're signed in as a student, so you can save, RSVP and meet people at any event.
+      </Empty>
+      <button className="card role" onClick={() => { dispatch({ type: 'SIGN_OUT' }); gate('organizer') }}>
+        <Megaphone size={28} /><span><strong>I run a club or event</strong><span>Sign out and sign in as an organizer</span></span>
+      </button>
+      <button className="btn btn-outline btn-lg" onClick={() => nav.tab('explore')}>Browse events instead</button>
+    </div>
+  )
 
   const addPhoto = (picked) => {
     if (!picked || !picked.type.startsWith('image/')) return

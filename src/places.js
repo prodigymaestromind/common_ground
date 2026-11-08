@@ -14,6 +14,9 @@ export const PLACES = {
   nest: { name: 'The Nest', short: 'Nest', lat: 38.5629, lng: -121.4250, colors: ['#7a5a12', '#b58a24'], icon: '🏐' },
   kadema: { name: 'Kadema Hall', short: 'Kadema', lat: 38.5590, lng: -121.4268, colors: ['#8a3d2a', '#c0623f'], icon: '🎨' },
   lassen: { name: 'Lassen Hall', short: 'Lassen', lat: 38.5604, lng: -121.4262, colors: ['#5b3d7a', '#8a5bb0'], icon: '🏫' },
+  shasta: { name: 'Shasta Hall (University Theatre)', short: 'Shasta', lat: 38.5596, lng: -121.4257, colors: ['#4a2d6b', '#7a4aa0'], icon: '🎭' },
+  mendocino: { name: 'Mendocino Hall', short: 'Mendocino', lat: 38.5583, lng: -121.4255, colors: ['#2d5a6b', '#3f8096'], icon: '🏛️' },
+  teb: { name: 'Tschannen Engineering Building', short: 'TEB', lat: 38.5612, lng: -121.4232, colors: ['#3a3f7a', '#5a61b0'], icon: '🛠️' },
   capistrano: { name: 'Capistrano Hall', short: 'Capistrano', lat: 38.5614, lng: -121.4242, colors: ['#6b2d4a', '#a0456f'], icon: '🎷' },
 }
 
@@ -29,6 +32,9 @@ export function placeFromText(text = '') {
   if (t.includes('kadema')) return 'kadema'
   if (t.includes('lassen')) return 'lassen'
   if (t.includes('capistrano')) return 'capistrano'
+  if (t.includes('shasta')) return 'shasta'
+  if (t.includes('mendocino')) return 'mendocino'
+  if (t.includes('tschannen') || t.includes('teb')) return 'teb'
   return 'union'
 }
 

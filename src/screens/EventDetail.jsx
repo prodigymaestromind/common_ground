@@ -49,8 +49,14 @@ export default function EventDetail({ id }) {
           <li><Car size={18} /><div><strong>Parking</strong><span>{e.parking}</span></div></li>
           <li><Users size={18} /><div>{e.hideCount && !e.mine ? <><strong>New event</strong><span>Be one of the first to go</span></> : <><strong>{e.going + (going ? 1 : 0)} going</strong><span>{people.length} open to meeting new people</span></>}</div></li>
         </ul>
-        {e.soloFriendly && <div className="note">✨ <span><b>Welcomes people coming alone.</b> The host will help solo arrivals meet others (a greeter, mixed tables or an icebreaker).</span></div>}
+        {e.soloFriendly && <div className="note">✨ <span><b>Welcomes people coming alone.</b> {e.source === 'Sac State Events' ? 'The organizers invite people to come meet others here, so it is a good one to go to on your own.' : 'The host will help solo arrivals meet others (a greeter, mixed tables or an icebreaker).'}</span></div>}
         <p className="desc">{e.desc}</p>
+        {e.need && <div className="good-to-know"><strong>Good to know</strong><span>{e.need}</span></div>}
+        {e.link && (
+          <a className="btn btn-outline official" href={e.link} target="_blank" rel="noopener noreferrer">
+            <ExternalLink size={16} /> Official page & sign-up
+          </a>
+        )}
         <p className="source"><ExternalLink size={14} /> Source: {e.source === 'Sac State Events' ? 'Sac State Events (events.csus.edu)' : e.source}</p>
 
         {live && (

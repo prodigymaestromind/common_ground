@@ -1,3 +1,4 @@
+import { REAL_EVENTS } from './realEvents'
 // Demo data for Common Ground.
 // Events are placed relative to TODAY so the demo always has
 // "happening now" and "this week" events, whatever day you open it.
@@ -33,8 +34,9 @@ export const STUDENTS = [
 
 export const studentById = Object.fromEntries(STUDENTS.map((s) => [s.id, s]))
 
-// day = days from today (0 = today). live = happening right now (times set at load).
-export const EVENTS = [
+// Made-up demo events. Only the two "live" ones are used, and only when no real
+// Sac State event is happening right now, so the Happening now demo always works.
+export const DEMO_EVENTS = [
   {
     id: 'e1', placeId: 'union', title: 'Open Mic Night', host: 'University Union', interest: 'music', emoji: '🎤',
     live: true, place: 'University Union, Redwood Room', cost: 0,
@@ -136,7 +138,7 @@ export const SAMPLE_BUSY = [
 ]
 
 // More events over the next few weeks (for "Next week" / "All upcoming")
-EVENTS.push(
+DEMO_EVENTS.push(
   { id: 'e14', placeId: 'union', title: 'Karaoke Night', host: 'University Union', interest: 'music', emoji: '🎙️',
     day: 8, start: '19:00', end: '21:30', place: 'University Union, Redwood Room', cost: 0, parking: 'Structure 3',
     desc: 'Sign up for a song or just cheer. Duets encouraged.', going: 44, soloFriendly: true, source: 'Sac State Events', open: ['s1', 's3', 's7'], here: [] },
@@ -162,6 +164,10 @@ EVENTS.push(
     day: 20, start: '18:00', end: '21:00', place: 'University Union, Ballroom', cost: 0, parking: 'Structure 3',
     desc: 'Performances, food and art from student cultural orgs.', going: 120, soloFriendly: true, source: 'Sac State Events', open: ['s2', 's9', 's1'], here: [] },
 )
+
+// The real calendar events (events.csus.edu) are the main list
+export const EVENTS = REAL_EVENTS
+export const DEMO_LIVE = DEMO_EVENTS.filter((e) => e.live).map((e) => ({ ...e, source: 'Demo event' }))
 
 export const EMOJIS = ['🎤', '🎲', '🏀', '🍕', '🎨', '💻', '🌲', '💼', '🎉', '🧘', '🎬', '📚', '☕', '🎮', '⚽', '🎶']
 
