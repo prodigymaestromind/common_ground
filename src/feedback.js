@@ -5,7 +5,7 @@
 // Answers then show up in your Formspree dashboard + your email.
 //
 // Until you add an ID, answers are saved on the tester's phone only.
-export const FORMSPREE_ID = 'abcdwxyz'
+export const FORMSPREE_ID = 'https://formspree.io/f/maeezapg'
 
 export async function sendFeedback(answers) {
   const all = JSON.parse(localStorage.getItem('cg-feedback') || '[]')
