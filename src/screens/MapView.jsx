@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { PLACES, CAMPUS_CENTER } from '../places'
-import { EventCard } from '../components'
+import { EventCard, useNav } from '../components'
 import { isLive } from '../utils'
 
 export default function CampusMap({ events }) {
@@ -11,6 +11,9 @@ export default function CampusMap({ events }) {
   const map = useRef(null)
   const layer = useRef(null)
   const [selected, setSelected] = useState(null)
+  const nav = useNav()
+  const navRef = useRef(nav)
+  useEffect(() => { navRef.current = nav })
 
   // group events by building
   const byPlace = {}
@@ -41,7 +44,8 @@ export default function CampusMap({ events }) {
         iconAnchor: [22, 40],
       })
       L.marker([p.lat, p.lng], { icon, title: p.name })
-        .on('click', () => setSelected(pid))
+        // one event here: open it. Several: show the list for this building
+        .on('click', () => (list.length === 1 ? navRef.current.push('event', { id: list[0].id }) : setSelected(pid)))
         .addTo(layer.current)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -51,7 +55,7 @@ export default function CampusMap({ events }) {
   return (
     <div className="map-wrap">
       <div ref={el} className="map" role="application" aria-label="Campus map of events" />
-      <p className="map-note">Tap a pin · 🔴 = happening now · pins are approximate</p>
+      <p className="map-note">Tap a pin to open the event · 🔴 = happening now · numbers = several events there</p>
       {sel && (
         <div className="map-panel">
           <div className="map-panel-head">

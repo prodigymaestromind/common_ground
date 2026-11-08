@@ -3,6 +3,7 @@ import { INTERESTS } from '../data'
 import { Avatar, Chip, StylePicker, TopBar, useNav } from '../components'
 import { useStore } from '../store'
 import { BusyEditor } from './Onboarding'
+import { CONTACT_TYPES } from './StayInTouch'
 
 export default function Profile() {
   const nav = useNav()
@@ -35,6 +36,18 @@ export default function Profile() {
       <h2 className="section-title">My busy times</h2>
       <p className="muted section-sub">Used only to tell you which events fit. Never shown to anyone.</p>
       <BusyEditor busy={u.busy} setBusy={(fn) => update({ busy: typeof fn === 'function' ? fn(u.busy) : fn })} />
+
+      <h2 className="section-title">Ways to stay in touch</h2>
+      <p className="muted section-sub">Optional. Only shared with someone when you both say yes.</p>
+      <div className="contact-list">
+        {CONTACT_TYPES.map((c) => (
+          <label key={c.id} className="contact-row">
+            <span>{c.label}</span>
+            <input value={u.contacts?.[c.id] || ''} placeholder={c.placeholder}
+              onChange={(e) => update({ contacts: { ...u.contacts, [c.id]: e.target.value } })} />
+          </label>
+        ))}
+      </div>
 
       <h2 className="section-title">App style</h2>
       <StylePicker onPick={() => nav.tab('home')} />

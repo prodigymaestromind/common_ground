@@ -23,7 +23,7 @@ export default function Post() {
   const [scan, setScan] = useState({ state: 'idle' }) // idle | reading | done | error
   const [f, setF] = useState({
     title: '', host: state.user?.org || '', date: todayStr(), start: '18:00', end: '20:00',
-    place: '', cost: 0, interest: 'music', emoji: '🎤', desc: '', parking: '', soloFriendly: true,
+    place: '', cost: 0, interest: 'music', emoji: '🎤', desc: '', parking: '', soloFriendly: true, showCount: true,
   })
   const set = (patch) => setF((x) => ({ ...x, ...patch }))
 
@@ -73,7 +73,7 @@ export default function Post() {
       id: `p-${uid()}`, title: f.title.trim() || 'Your event name', host: f.host.trim() || state.user.name,
       interest: f.interest, emoji: f.emoji, place: f.place.trim() || 'Where is it?', cost: Number(f.cost) || 0,
       parking: f.parking.trim() || 'See host for details', desc: f.desc.trim() || 'Posted on Common Ground.',
-      going: 1, soloFriendly: f.soloFriendly, open: [], here: [],
+      going: 1, soloFriendly: f.soloFriendly, hideCount: !f.showCount, open: [], here: [],
       source: isOrg ? 'Club post' : 'Student post', pending: !isOrg, mine: true,
       placeId: placeFromText(f.place), image,
       startAt: startAt.toISOString(), endAt: endAt.toISOString(),
@@ -163,6 +163,14 @@ export default function Post() {
             <span>Adds a badge, and students who came solo can find each other at your event. Have a greeter or mixed tables ready.</span>
           </div>
           <input type="checkbox" className="switch" checked={f.soloFriendly} onChange={(e) => set({ soloFriendly: e.target.checked })} />
+        </label>
+
+        <label className="toggle-row card">
+          <div>
+            <strong>👥 Show how many people are going</strong>
+            <span>Small events can look empty and scare people off. Turn this off and students see “New event” instead. You'll still see the number.</span>
+          </div>
+          <input type="checkbox" className="switch" checked={f.showCount} onChange={(e) => set({ showCount: e.target.checked })} />
         </label>
 
         {preview && (

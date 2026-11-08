@@ -182,7 +182,7 @@ export function BusyEditor({ busy, setBusy }) {
               </button>
             ))}
           </div>
-          <div className="busy-row">
+          <div className="busy-time">
             <input type="time" value={b.start} onChange={(e) => update(b.id, { start: e.target.value })} aria-label="Start" />
             <span className="muted">to</span>
             <input type="time" value={b.end} onChange={(e) => update(b.id, { end: e.target.value })} aria-label="End" />

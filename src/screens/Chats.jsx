@@ -3,6 +3,7 @@ import { Send, Sparkles, MapPin, Clock, Check, X, Ban, Users } from 'lucide-reac
 import { studentById } from '../data'
 import { Avatar, Empty, TopBar, useGate, useNav } from '../components'
 import { useStore, icebreakers } from '../store'
+import { KeepInTouchButton } from './StayInTouch'
 
 export function ChatList() {
   const nav = useNav()
@@ -93,6 +94,9 @@ export function Chat({ id, eventId }) {
           : <button className="link" onClick={() => { nav.pop(); showToast('You left the group') }}>Leave</button>}
       />
       {person && <p className="chat-sub muted">{person.year} · {person.major}</p>}
+      {person && chat.messages.some((m) => m.from === person.id && m.kind === 'text') && iSent && (
+        <div className="chat-touch"><KeepInTouchButton studentId={person.id} /></div>
+      )}
 
       <div className="messages">
         {chat.messages.map((m) => {

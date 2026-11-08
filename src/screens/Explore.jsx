@@ -12,13 +12,18 @@ const QUICK = [
   { id: 'solo', label: '✨ Welcomes solo' },
 ]
 
+const remembered = { view: 'list', range: 'This week' }
+
 export default function Explore() {
   const { state, events } = useStore()
   const [q, setQ] = useState('')
   const [quick, setQuick] = useState([])
   const [interest, setInterest] = useState(null)
-  const [view, setView] = useState('list')
-  const [range, setRange] = useState('This week')
+  // remember List/Map + week tab when you come back from an event
+  const [view, setViewState] = useState(remembered.view)
+  const [range, setRangeState] = useState(remembered.range)
+  const setView = (v) => { remembered.view = v; setViewState(v) }
+  const setRange = (r) => { remembered.range = r; setRangeState(r) }
 
   const toggleQuick = (id) => setQuick((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
   const list = events

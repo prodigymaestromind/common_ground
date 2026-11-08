@@ -128,7 +128,7 @@ export function EventCard({ event, preview }) {
         <div className="meta"><Clock size={14} /> {live ? `Now · until ${fmtRange(event).split('– ')[1]}` : `${dayLabel(event.startAt)} · ${fmtRange(event)}`}</div>
         <div className="meta"><MapPin size={14} /> {event.place}</div>
         <div className="event-foot">
-          <span className="meta"><Users size={14} /> {event.going} going</span>
+          {event.hideCount ? <span className="pill pill-new">New event</span> : <span className="meta"><Users size={14} /> {event.going} going</span>}
           <span className="cost">{costLabel(event.cost)}</span>
           {event.soloFriendly && <SoloBadge />}
         </div>

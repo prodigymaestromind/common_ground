@@ -6,6 +6,7 @@ import SignIn, { Welcome } from './screens/Onboarding'
 import Home from './screens/Home'
 import HomeBoard from './screens/HomeBoard'
 import Posted from './screens/Posted'
+import { FeedbackButton, FeedbackNudge, FeedbackSheet } from './screens/Feedback'
 import Explore from './screens/Explore'
 import EventDetail from './screens/EventDetail'
 import WhoIsHere from './screens/WhoIsHere'
@@ -32,6 +33,7 @@ const TABS = [
 function Shell() {
   const { state, toast } = useStore()
   const [stack, setStack] = useState([{ name: 'home', params: {} }])
+  const [fbOpen, setFbOpen] = useState(false)
   const scroller = useRef(null)
   const top = stack[stack.length - 1]
 
@@ -60,6 +62,8 @@ function Shell() {
             <main ref={scroller} className={`scroll ${showTabs ? 'with-tabs' : ''}`}>
               <Screen key={screenKey} {...shown} then={then} />
             </main>
+            {showTabs && <FeedbackButton onOpen={() => setFbOpen(true)} />}
+            {showTabs && <FeedbackNudge onOpen={() => setFbOpen(true)} />}
             {showTabs && (
               <nav className="tabbar" aria-label="Main">
                 {TABS.map(({ id, label, Icon, center }) => (
@@ -72,6 +76,7 @@ function Shell() {
             )}
           </>
         )}
+        <FeedbackSheet open={fbOpen} onClose={() => setFbOpen(false)} />
         {toast && <div className="toast" role="status">{toast}</div>}
       </div>
     </NavCtx.Provider>

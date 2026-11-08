@@ -22,6 +22,7 @@ function styleFromUrl() {
 const empty = {
   style: 'classic',
   welcomed: false,
+  feedback: { actions: 0, submitted: false, dismissed: false },
   user: null, // { name, email, role: 'student' | 'organizer', org, interests: [], busy: [] }
   rsvp: {}, // eventId -> 'going' | 'saved'
   company: {}, // eventId -> true  (I'm open to company at this event)
@@ -35,6 +36,7 @@ function load() {
   try {
     const raw = localStorage.getItem(KEY)
     const st = raw ? { ...empty, ...JSON.parse(raw) } : empty
+    st.feedback = { ...empty.feedback, ...st.feedback }
     const urlStyle = styleFromUrl()
     if (urlStyle) return { ...st, style: urlStyle }
     return STYLES.some((x) => x.id === st.style) ? st : { ...st, style: 'classic' }
@@ -49,8 +51,13 @@ function upsertChat(state, chat) {
   return { ...state, chats: { ...state.chats, [chat.id]: { messages: [], unread: 0, ...state.chats[chat.id], ...chat } } }
 }
 
+// counts things people do, so the feedback nudge shows after they've tried the app
+const bump = (state, n) => ({ ...state.feedback, actions: (state.feedback?.actions || 0) + n })
+
 function reducer(state, a) {
   switch (a.type) {
+    case 'FEEDBACK':
+      return { ...state, feedback: { ...state.feedback, ...a.patch } }
     case 'STYLE':
       return { ...state, style: a.style }
     case 'WELCOMED':
@@ -77,7 +84,7 @@ function reducer(state, a) {
       else delete rsvp[a.eventId]
       const company = { ...state.company }
       if (a.value !== 'going') delete company[a.eventId]
-      return { ...state, rsvp, company }
+      return { ...state, rsvp, company, feedback: bump(state, a.value ? 1 : 0) }
     }
     case 'COMPANY':
       return { ...state, company: { ...state.company, [a.eventId]: a.value } }
@@ -87,7 +94,7 @@ function reducer(state, a) {
       const chat = state.chats[a.chatId]
       if (!chat) return state
       const unread = a.message.from === 'me' || a.active ? chat.unread : (chat.unread || 0) + 1
-      return { ...state, chats: { ...state.chats, [a.chatId]: { ...chat, unread, messages: [...chat.messages, a.message] } } }
+      return { ...state, feedback: bump(state, a.message.from === 'me' ? 1 : 0), chats: { ...state.chats, [a.chatId]: { ...chat, unread, messages: [...chat.messages, a.message] } } }
     }
     case 'INVITE_STATUS': {
       const chat = state.chats[a.chatId]
@@ -100,7 +107,7 @@ function reducer(state, a) {
       return { ...state, chats: { ...state.chats, [a.chatId]: { ...chat, unread: 0 } } }
     }
     case 'POST_EVENT':
-      return { ...state, posted: [a.event, ...state.posted] }
+      return { ...state, posted: [a.event, ...state.posted], feedback: bump(state, 1) }
     case 'KEEP_IN_TOUCH':
       return { ...state, keepInTouch: { ...state.keepInTouch, [a.studentId]: a.value } }
     case 'BLOCK':

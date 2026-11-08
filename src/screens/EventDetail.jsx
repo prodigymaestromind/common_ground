@@ -47,7 +47,7 @@ export default function EventDetail({ id }) {
           <li><MapPin size={18} /><div><strong>{e.place}</strong></div></li>
           <li><DollarSign size={18} /><div><strong>{costLabel(e.cost)}</strong>{!e.cost && <span>No ticket needed</span>}</div></li>
           <li><Car size={18} /><div><strong>Parking</strong><span>{e.parking}</span></div></li>
-          <li><Users size={18} /><div><strong>{e.going + (going ? 1 : 0)} going</strong><span>{people.length} open to meeting new people</span></div></li>
+          <li><Users size={18} /><div>{e.hideCount && !e.mine ? <><strong>New event</strong><span>Be one of the first to go</span></> : <><strong>{e.going + (going ? 1 : 0)} going</strong><span>{people.length} open to meeting new people</span></>}</div></li>
         </ul>
         {e.soloFriendly && <div className="note">✨ <span><b>Welcomes people coming alone.</b> The host will help solo arrivals meet others (a greeter, mixed tables or an icebreaker).</span></div>}
         <p className="desc">{e.desc}</p>
@@ -72,6 +72,7 @@ export default function EventDetail({ id }) {
               <div><strong>{people.length}</strong><span>looking for company</span></div>
               <div><strong>{e.pending ? 'Pending' : 'Live'}</strong><span>{e.pending ? 'club check' : 'in the feed'}</span></div>
             </div>
+            {e.hideCount && <p className="muted small center">👥 The going count is hidden from students. They see “New event”.</p>}
             <p className="muted small center">Students who come alone see your event in "Go with someone" and the solo group chat.</p>
           </section>
         )}

@@ -64,7 +64,7 @@ export function BoardCard({ event, tall }) {
       <div className="pin-foot">
         <span className="faces">
           {faces.map((p) => <Avatar key={p.id} person={p} size={22} />)}
-          <span className="muted"><Users size={12} /> {event.going}</span>
+          {!event.hideCount && <span className="muted"><Users size={12} /> {event.going}</span>}
         </span>
         <SaveButton event={event} />
       </div>
