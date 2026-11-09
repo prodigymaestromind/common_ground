@@ -3,7 +3,7 @@ import { Search, List, Map as MapIcon } from 'lucide-react'
 import { INTERESTS } from '../data'
 import { Chip, EventCard, Empty } from '../components'
 import { useStore } from '../store'
-import { isPast, dayLabel, fitCheck, weekBucket } from '../utils'
+import { isGone, dayLabel, fitCheck, weekBucket } from '../utils'
 import CampusMap from './MapView'
 
 const QUICK = [
@@ -27,7 +27,7 @@ export default function Explore() {
 
   const toggleQuick = (id) => setQuick((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
   const list = events
-    .filter((e) => !isPast(e))
+    .filter((e) => !isGone(e))
     .filter((e) => range === 'All upcoming' || weekBucket(e.startAt) === range)
     .filter((e) => !q || `${e.title} ${e.host} ${e.place}`.toLowerCase().includes(q.toLowerCase()))
     .filter((e) => !interest || e.interest === interest)

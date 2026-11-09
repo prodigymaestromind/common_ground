@@ -1,19 +1,25 @@
 import { useState } from 'react'
-import { Clock, MapPin, DollarSign, Car, Users, Bookmark, BookmarkCheck, Check, ShieldCheck, MessageCircle, UserPlus, ExternalLink, Radio, Trash2 } from 'lucide-react'
+import { Clock, MapPin, DollarSign, Car, Users, Bookmark, BookmarkCheck, Check, ShieldCheck, MessageCircle, UserPlus, ExternalLink, Radio, Trash2, CalendarPlus, Navigation, ChevronRight } from 'lucide-react'
 import { studentById, interestById, MEET_SPOTS } from '../data'
-import { Avatar, Cover, FitBadge, LiveDot, Sheet, SoloBadge, TopBar, useGate, useNav } from '../components'
+import { Avatar, Cover, FitBadge, LiveDot, Sheet, SoloBadge, TopBar, useExplain, useGate, useNav } from '../components'
+import { PLACES } from '../places'
 import { useStore } from '../store'
-import { costLabel, dayLabel, fmtRange, fmtTime, isLive } from '../utils'
+import { costLabel, dayLabel, fmtRange, fmtTime, isLive, isPast, downloadIcs, googleCalUrl, appleMapsUrl, googleMapsUrl } from '../utils'
 
 export default function EventDetail({ id }) {
   const nav = useNav()
   const { state, dispatch, eventById, sendInvite, openDM, showToast } = useStore()
   const [inviteFor, setInviteFor] = useState(null)
+  const [calOpen, setCalOpen] = useState(false)
+  const [dirOpen, setDirOpen] = useState(false)
+  const [explain, popup] = useExplain()
   const gate = useGate()
   const e = eventById[id]
   if (!e) return <div className="screen"><TopBar title="Event" /><p>Event not found.</p></div>
 
   const live = isLive(e)
+  const ended = !live && isPast(e)
+  const place = PLACES[e.placeId]
   const rsvp = state.rsvp[e.id]
   const going = rsvp === 'going'
   const open = !!state.company[e.id]
@@ -43,13 +49,23 @@ export default function EventDetail({ id }) {
       <div className="detail-body">
         <FitBadge event={e} />
         <ul className="info">
-          <li><Clock size={18} /><div><strong>{live ? 'Happening now' : dayLabel(e.startAt)}</strong><span>{fmtRange(e)}</span></div></li>
-          <li><MapPin size={18} /><div><strong>{e.place}</strong></div></li>
+          <li><Clock size={18} /><div><strong>{live ? 'Happening now' : ended ? 'Ended today' : dayLabel(e.startAt)}</strong><span>{fmtRange(e)}</span></div></li>
+          <li>
+            <button className="info-link" onClick={() => (place ? nav.push('place', { id: e.id }) : setDirOpen(true))}>
+              <MapPin size={18} /><div><strong>{e.place}</strong><span>Tap to see it on the map</span></div><ChevronRight size={18} />
+            </button>
+          </li>
           <li><DollarSign size={18} /><div><strong>{costLabel(e.cost)}</strong>{!e.cost && <span>No ticket needed</span>}</div></li>
           <li><Car size={18} /><div><strong>Parking</strong><span>{e.parking}</span></div></li>
-          <li><Users size={18} /><div>{e.hideCount && !e.mine ? <><strong>New event</strong><span>Be one of the first to go</span></> : <><strong>{e.going + (going ? 1 : 0)} going</strong><span>{people.length} open to meeting new people</span></>}</div></li>
+          <li><Users size={18} /><div>{e.hideCount && !e.mine ? <><strong>New event</strong><span>Be one of the first to go</span></> : typeof e.going === 'number' ? <><strong>{e.going + (going ? 1 : 0)} going</strong><span>{people.length} open to meeting new people</span></> : <><strong>{people.length} open to meeting new people</strong><span>Tap “I'm going” to find someone to go with</span></>}</div></li>
         </ul>
         {e.soloFriendly && <div className="note">✨ <span><b>Welcomes people coming alone.</b> {e.source === 'Sac State Events' ? 'The organizers invite people to come meet others here, so it is a good one to go to on your own.' : 'The host will help solo arrivals meet others (a greeter, mixed tables or an icebreaker).'}</span></div>}
+        {!ended && (
+          <div className="quick-actions">
+            <button className="btn btn-outline" onClick={() => setCalOpen(true)}><CalendarPlus size={16} /> Add to calendar</button>
+            <button className="btn btn-outline" onClick={() => setDirOpen(true)}><Navigation size={16} /> Directions</button>
+          </div>
+        )}
         <p className="desc">{e.desc}</p>
         {e.need && <div className="good-to-know"><strong>Good to know</strong><span>{e.need}</span></div>}
         {e.link && (
@@ -59,7 +75,7 @@ export default function EventDetail({ id }) {
         )}
         <p className="source"><ExternalLink size={14} /> Source: {e.source === 'Sac State Events' ? 'Sac State Events (events.csus.edu)' : e.source}</p>
 
-        {live && (
+        {live && e.here?.length > 0 && (
           <div className="card here-card">
             <Radio size={22} />
             <div>
@@ -98,7 +114,7 @@ export default function EventDetail({ id }) {
                   <strong>I'm open to company</strong>
                   <span>Others going can see your first name + interests. Off by default.</span>
                 </div>
-                <input type="checkbox" className="switch" checked={open} onChange={(ev) => dispatch({ type: 'COMPANY', eventId: e.id, value: ev.target.checked })} />
+                <input type="checkbox" className="switch" checked={open} onChange={(ev) => { const v = ev.target.checked; if (v) explain('company', () => dispatch({ type: 'COMPANY', eventId: e.id, value: true })); else dispatch({ type: 'COMPANY', eventId: e.id, value: false }) }} />
               </label>
               {!open && <p className="muted center small"><ShieldCheck size={14} /> Turn this on to see who else wants company. It works both ways.</p>}
               {open && (
@@ -119,8 +135,8 @@ export default function EventDetail({ id }) {
                           {shared.length > 0 && <span className="shared">You both like {shared.map((i) => interestById[i].label).join(' & ')}</span>}
                         </div>
                         <div className="person-actions">
-                          <button className="btn btn-sm btn-outline" onClick={() => nav.push('chat', { id: openDM(p.id), eventId: e.id })}><MessageCircle size={14} /> Say hi</button>
-                          <button className="btn btn-sm btn-primary" onClick={() => setInviteFor(p)}><UserPlus size={14} /> Invite</button>
+                          <button className="btn btn-sm btn-outline" onClick={() => explain('chat', () => nav.push('chat', { id: openDM(p.id), eventId: e.id }))}><MessageCircle size={14} /> Say hi</button>
+                          <button className="btn btn-sm btn-primary" onClick={() => explain('chat', () => setInviteFor(p))}><UserPlus size={14} /> Invite</button>
                         </div>
                       </div>
                     )
@@ -146,6 +162,26 @@ export default function EventDetail({ id }) {
           {going ? <><Check size={18} /> Going · tap to undo</> : "I'm going"}
         </button>
       </div>}
+
+      <Sheet open={calOpen} onClose={() => setCalOpen(false)} title="Add to calendar">
+        <p className="muted">Puts {e.title} in your own calendar. Nothing else is shared.</p>
+        <button className="option" onClick={() => { downloadIcs(e); setCalOpen(false) }}><CalendarPlus size={16} /> Apple Calendar / Outlook</button>
+        <a className="option" href={googleCalUrl(e)} target="_blank" rel="noopener noreferrer" onClick={() => setCalOpen(false)}><CalendarPlus size={16} /> Google Calendar</a>
+      </Sheet>
+
+      <Sheet open={dirOpen} onClose={() => setDirOpen(false)} title="Directions">
+        <p className="muted">{e.place}</p>
+        {place ? (
+          <>
+            <a className="option" href={appleMapsUrl(place.lat, place.lng, place.name)} target="_blank" rel="noopener noreferrer"><Navigation size={16} /> Apple Maps</a>
+            <a className="option" href={googleMapsUrl(place.lat, place.lng)} target="_blank" rel="noopener noreferrer"><Navigation size={16} /> Google Maps</a>
+          </>
+        ) : (
+          <a className="option" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${e.place} Sacramento State`)}`} target="_blank" rel="noopener noreferrer"><Navigation size={16} /> Google Maps</a>
+        )}
+      </Sheet>
+
+      {popup}
 
       <InviteSheet
         person={inviteFor} event={e} onClose={() => setInviteFor(null)}

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { ShieldCheck, Trash2, Plus, GraduationCap, Megaphone, Palette } from 'lucide-react'
+import { ShieldCheck, Trash2, Plus, GraduationCap, Megaphone, FlaskConical } from 'lucide-react'
 import { INTERESTS, SAMPLE_BUSY, EVENTS } from '../data'
-import { Chip, Cover, Logo, StyleSheet, TopBar, useNav } from '../components'
-import { useStore, STYLES } from '../store'
+import { Chip, Cover, Logo, TopBar, useNav } from '../components'
+import { useStore } from '../store'
 import { uid } from '../utils'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -10,9 +10,7 @@ const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 // ----- First screen: look around first, sign in later -----
 export function Welcome() {
   const nav = useNav()
-  const { state, dispatch } = useStore()
-  const [styleOpen, setStyleOpen] = useState(false)
-  const cur = STYLES.find((s) => s.id === state.style)
+  const { dispatch } = useStore()
   const floaters = ['r34', 'r48', 'r33'].map((id) => EVENTS.find((e) => e.id === id)).filter(Boolean)
 
   return (
@@ -39,10 +37,8 @@ export function Welcome() {
         <button className="btn btn-ghost-light" onClick={() => { nav.tab('home'); dispatch({ type: 'WELCOMED' }); nav.push('signin', {}) }}>
           I have an account · Sign in
         </button>
-        <button className="style-pill light" onClick={() => setStyleOpen(true)}><Palette size={14} /> Style: {cur?.name}</button>
         <p className="small muted-light">No account needed to browse.</p>
       </div>
-      <StyleSheet open={styleOpen} onClose={() => setStyleOpen(false)} />
     </div>
   )
 }
@@ -103,6 +99,11 @@ export default function SignIn({ role: startRole, reason, then }) {
           <Progress step={1} total={total} />
           <h2>{isOrg ? 'Organizer sign in' : 'Who are you?'}</h2>
           <p className="muted">{isOrg ? 'Organizer accounts can publish events right away.' : 'Only your first name is ever shown to other students.'}</p>
+          <div className="test-login">
+            <FlaskConical size={18} />
+            <span><b>Trying it out?</b> Type your first name, then use <b>test@csus.edu</b> as the email.</span>
+            {email !== 'test@csus.edu' && <button className="link" onClick={() => setEmail('test@csus.edu')}>Fill it in</button>}
+          </div>
           <label className="field">
             <span>First name</span>
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Eli" />

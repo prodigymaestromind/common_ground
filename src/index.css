@@ -495,3 +495,46 @@ h1, h2, h3, strong, p, span { overflow-wrap: anywhere; }
 .official { width: 100%; text-decoration: none; }
 /* center the day letters on iPhone Safari */
 .day { display: flex; align-items: center; justify-content: center; padding: 0; text-align: center; line-height: 1; }
+
+/* ----- Nov 9 cleanup ----- */
+/* events that already ended today */
+.event-card-wrap.ended, .pin.ended { opacity: 0.55; }
+.empty-note { padding: 28px 0; }
+
+/* test login hint on the sign-in screen */
+.test-login { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: #fff7dd; border: 1.5px dashed var(--gold-2, #c9a227); font-size: 13.5px; color: var(--ink, #222); }
+.test-login svg { color: var(--gold-2, #b08a12); flex-shrink: 0; }
+.test-login > span { flex: 1; min-width: 0; line-height: 1.4; }
+.test-login .link { font-weight: 700; }
+
+/* tap-to-map location row */
+.info-link { display: flex; gap: 12px; align-items: center; width: 100%; padding: 0; background: none; border: 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.info-link > div { flex: 1; min-width: 0; }
+.info-link > svg:last-child { color: var(--muted); }
+.quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.quick-actions .btn { justify-content: center; font-size: 14px; padding-left: 8px; padding-right: 8px; }
+a.option { text-decoration: none; color: inherit; }
+.pin-marker.is-focus { background: var(--gold); transform: rotate(-45deg) scale(1.2); z-index: 5; }
+
+/* gentle tutorial pop-up */
+.explain { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding-top: 4px; }
+.explain-icon { font-size: 40px; line-height: 1; }
+.explain h2 { margin: 0; font-size: 22px; color: var(--green); font-family: Georgia, serif; }
+.explain p { margin: 0; font-size: 15px; line-height: 1.45; }
+.explain .explain-demo { margin-top: 4px; font-size: 13px; color: var(--muted); background: var(--green-soft); padding: 8px 10px; border-radius: 10px; }
+.explain .btn { width: 100%; margin-top: 6px; }
+
+/* stay in touch */
+.share-buttons { display: flex; flex-direction: column; gap: 8px; }
+.share-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--card); text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.share-btn:active { background: var(--green-soft); border-color: var(--green); }
+.share-emoji { font-size: 24px; }
+.share-text { display: flex; flex-direction: column; min-width: 0; }
+.share-text small { color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.touch-card { display: flex; flex-direction: column; gap: 6px; width: 100%; padding: 10px 12px; border-radius: 12px; background: var(--green-soft); font-size: 14px; box-sizing: border-box; }
+.touch-head { display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--green); }
+.touch-row { display: flex; justify-content: space-between; gap: 10px; min-width: 0; }
+.touch-row b { color: var(--green); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.person .touch-card { flex-basis: 100%; }
+a.btn { text-decoration: none; }
+.toast { z-index: 15 !important; }

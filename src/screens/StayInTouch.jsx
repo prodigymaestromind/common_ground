@@ -1,87 +1,89 @@
-// Swapping contacts: only happens when BOTH students say yes,
-// and each person picks exactly what they share.
+// "Stay in touch": tap a button to share a social. In the real app the other
+// person gets a request and you only see each other's info if BOTH say yes.
+// For now the other person is a sample student who always says yes, and the
+// handles are placeholders (nothing is a real account).
 import { useState } from 'react'
-import { HeartHandshake, Check, ShieldCheck } from 'lucide-react'
+import { HeartHandshake, Check } from 'lucide-react'
 import { studentById } from '../data'
-import { Sheet } from '../components'
+import { Sheet, useExplain } from '../components'
 import { useStore } from '../store'
 
+// Used by Profile for "Ways to stay in touch"
 export const CONTACT_TYPES = [
-  { id: 'instagram', label: 'Instagram', placeholder: '@yourhandle', hint: 'Most common way students stay in touch' },
-  { id: 'discord', label: 'Discord', placeholder: 'username', hint: 'Good for gaming & class servers' },
-  { id: 'snapchat', label: 'Snapchat', placeholder: 'username', hint: '' },
-  { id: 'phone', label: 'Phone', placeholder: '(916) 555-0123', hint: 'Best saved for after you have met in person' },
+  { id: 'instagram', label: 'Instagram', placeholder: '@yourhandle' },
+  { id: 'discord', label: 'Discord', placeholder: 'username' },
+  { id: 'snapchat', label: 'Snapchat', placeholder: 'username' },
 ]
 
-// Demo students' handles (made up, shown as text only)
-export const demoContacts = (s) => ({
-  instagram: `@${s.name.toLowerCase()}.demo`,
-  discord: `${s.name.toLowerCase()}_demo`,
-})
+const SHARE = [
+  { id: 'instagram', label: 'Instagram', emoji: '📸' },
+  { id: 'discord', label: 'Discord', emoji: '🎮' },
+  { id: 'snapchat', label: 'Snapchat', emoji: '👻' },
+]
+
+const slug = (name = 'you') => name.toLowerCase().replace(/[^a-z0-9]/g, '') || 'you'
+// Placeholder handle (shown as plain text, never a link)
+export const fakeHandle = (name, kind) => (kind === 'instagram' ? `@${slug(name)}.cg` : `${slug(name)}_cg`)
 
 export function KeepInTouchButton({ studentId }) {
   const { state } = useStore()
   const [open, setOpen] = useState(false)
+  const [explain, popup] = useExplain()
   const p = studentById[studentId]
   const st = state.keepInTouch[studentId]
   const status = typeof st === 'string' ? st : st?.status
+
   if (status === 'connected') {
-    const theirs = demoContacts(p)
+    const kind = st?.shared?.[0] || 'instagram'
+    const opt = SHARE.find((s) => s.id === kind) || SHARE[0]
+    const mine = state.user?.contacts?.[kind] || fakeHandle(state.user?.name, kind)
     return (
-      <div className="revealed">
-        <span><Check size={14} /> <b>You and {p.name} both said yes</b></span>
-        <span>Instagram: <b>{theirs.instagram}</b> · Discord: <b>{theirs.discord}</b></span>
-        {st?.shared?.length > 0 && <span className="muted small">You shared: {st.shared.map((k) => CONTACT_TYPES.find((c) => c.id === k)?.label).join(', ')}</span>}
+      <div className="touch-card">
+        <span className="touch-head"><Check size={14} strokeWidth={3} /> You and {p.name} swapped {opt.label}</span>
+        <div className="touch-row"><span>{opt.emoji} {p.name}</span><b>{fakeHandle(p.name, kind)}</b></div>
+        <div className="touch-row"><span>{opt.emoji} You</span><b>{mine}</b></div>
       </div>
     )
   }
   if (status === 'asked') return <span className="status">Waiting for {p.name} to say yes…</span>
   return (
     <>
-      <button className="btn btn-sm btn-primary" onClick={() => setOpen(true)}><HeartHandshake size={14} /> Stay in touch</button>
+      <button className="btn btn-sm btn-primary" onClick={() => explain('stay', () => setOpen(true))}>
+        <HeartHandshake size={14} /> Stay in touch
+      </button>
       <ShareSheet open={open} onClose={() => setOpen(false)} student={p} />
+      {popup}
     </>
   )
 }
 
 function ShareSheet({ open, onClose, student }) {
   const { state, dispatch, showToast } = useStore()
-  const mine = state.user?.contacts || {}
-  const [draft, setDraft] = useState(mine)
-  const [pick, setPick] = useState(() => (mine.instagram ? ['instagram'] : []))
-  const toggle = (id) => setPick((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
 
-  const send = () => {
-    dispatch({ type: 'UPDATE_USER', patch: { contacts: { ...mine, ...draft } } })
-    dispatch({ type: 'KEEP_IN_TOUCH', studentId: student.id, value: { status: 'asked', shared: pick } })
+  const share = (kind) => {
+    dispatch({ type: 'KEEP_IN_TOUCH', studentId: student.id, value: { status: 'asked', shared: [kind] } })
     onClose()
     setTimeout(() => {
-      dispatch({ type: 'KEEP_IN_TOUCH', studentId: student.id, value: { status: 'connected', shared: pick } })
-      showToast(`You and ${student.name} both said yes 🎉`)
-    }, 1800)
+      dispatch({ type: 'KEEP_IN_TOUCH', studentId: student.id, value: { status: 'connected', shared: [kind] } })
+      showToast(`${student.name} said yes 🎉`)
+    }, 1500)
   }
 
   return (
     <Sheet open={open} onClose={onClose} title={`Stay in touch with ${student.name}`}>
-      <p className="muted">Pick what to share. {student.name} only sees it if they say yes too, and you'll see theirs.</p>
-      <div className="stack-sm">
-        {CONTACT_TYPES.map((c) => (
-          <label key={c.id} className="share-opt">
-            <input type="checkbox" checked={pick.includes(c.id)} disabled={!draft[c.id]} onChange={() => toggle(c.id)} />
-            <span style={{ flex: 1 }}>
-              {c.label}
-              <input className="inline-input" value={draft[c.id] || ''} placeholder={c.placeholder}
-                onChange={(e) => { const v = e.target.value; setDraft((d) => ({ ...d, [c.id]: v })); if (v && !pick.includes(c.id) && c.id !== 'phone') setPick((x) => [...x, c.id]); if (!v) setPick((x) => x.filter((i) => i !== c.id)) }} />
-              {c.hint && <small>{c.hint}</small>}
+      <p className="muted">Pick one to share. {student.name} only sees it if they say yes and share back.</p>
+      <div className="share-buttons">
+        {SHARE.map((s) => (
+          <button key={s.id} className="share-btn" onClick={() => share(s.id)}>
+            <span className="share-emoji">{s.emoji}</span>
+            <span className="share-text">
+              <strong>Share {s.label}</strong>
+              <small>{state.user?.contacts?.[s.id] || fakeHandle(state.user?.name, s.id)}</small>
             </span>
-          </label>
+          </button>
         ))}
       </div>
-      <ul className="tips">
-        <li>Most students start with Instagram or Discord. Save your number for after you've met.</li>
-        <li>Nothing is shared unless you both say yes. You can still block anyone.</li>
-      </ul>
-      <button className="btn btn-primary btn-lg" disabled={!pick.length} onClick={send}><ShieldCheck size={16} /> {pick.length ? 'Send request' : 'Add at least one way to reach you'}</button>
+      <p className="muted small center">Tip: save your phone number for after you've met in person.</p>
     </Sheet>
   )
 }

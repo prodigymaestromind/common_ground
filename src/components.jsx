@@ -1,10 +1,10 @@
 // Small shared UI pieces.
 import { createContext, useContext, useState } from 'react'
-import { ChevronLeft, Clock, MapPin, Users, CheckCircle2, AlertTriangle, CalendarPlus, Radio, Sparkles, Palette, Check, Bookmark, BookmarkCheck } from 'lucide-react'
+import { ChevronLeft, Clock, MapPin, Users, CheckCircle2, AlertTriangle, CalendarPlus, Radio, Sparkles, Check, Bookmark, BookmarkCheck } from 'lucide-react'
 import { interestById } from './data'
 import { PLACES, photoUrl } from './places'
-import { fmtRange, dayLabel, costLabel, fitCheck, isLive, initials } from './utils'
-import { useStore, STYLES } from './store'
+import { fmtRange, dayLabel, costLabel, fitCheck, isLive, isPast, initials } from './utils'
+import { useStore } from './store'
 
 // ----- Navigation (a simple screen stack) -----
 export const NavCtx = createContext(null)
@@ -114,8 +114,9 @@ export const SoloBadge = () => <span className="pill pill-solo"><Sparkles size={
 export function EventCard({ event, preview }) {
   const nav = useNav()
   const live = isLive(event)
+  const ended = !live && isPast(event)
   return (
-    <div className="card event-card-wrap">
+    <div className={`card event-card-wrap ${ended ? 'ended' : ''}`}>
     <button className="event-card" onClick={() => !preview && nav.push('event', { id: event.id })} tabIndex={preview ? -1 : 0}>
       <Cover event={event} className="event-thumb" small />
       <div className="event-body">
@@ -125,14 +126,14 @@ export function EventCard({ event, preview }) {
           <StatusPill event={event} />
         </div>
         <h3 className="event-title">{event.title}</h3>
-        <div className="meta"><Clock size={14} /> {live ? `Now · until ${fmtRange(event).split('– ')[1]}` : `${dayLabel(event.startAt)} · ${fmtRange(event)}`}</div>
+        <div className="meta"><Clock size={14} /> {live ? `Now · until ${fmtRange(event).split('– ')[1]}` : ended ? `Ended · ${fmtRange(event)}` : `${dayLabel(event.startAt)} · ${fmtRange(event)}`}</div>
         <div className="meta"><MapPin size={14} /> {event.place}</div>
         <div className="event-foot">
-          {event.hideCount ? <span className="pill pill-new">New event</span> : <span className="meta"><Users size={14} /> {event.going} going</span>}
+          {event.hideCount ? <span className="pill pill-new">New event</span> : typeof event.going === 'number' && <span className="meta"><Users size={14} /> {event.going} going</span>}
           <span className="cost">{costLabel(event.cost)}</span>
           {event.soloFriendly && <SoloBadge />}
         </div>
-        {!live && !preview && <FitBadge event={event} compact />}
+        {!live && !ended && !preview && <FitBadge event={event} compact />}
       </div>
     </button>
     {!preview && <SaveButton event={event} className="card-save" />}
@@ -217,44 +218,63 @@ export function SignInButton() {
   return <button className="btn btn-sm btn-outline" onClick={() => nav.push('signin', {})}>Sign in</button>
 }
 
-// ----- Style switcher -----
-export function StyleButton() {
-  const [open, setOpen] = useState(false)
+// ----- Gentle "how this works" pop-ups (each shows once) -----
+// usage: const explain = useExplain(); explain('group', () => doTheThing())
+export const TIPS = {
+  company: {
+    icon: '👋', title: 'Open to company',
+    lines: [
+      'Turn this on and other people going to this event can see your first name and interests, and you see theirs.',
+      'It only applies to this one event, and you can turn it off anytime.',
+    ],
+  },
+  chat: {
+    icon: '💬', title: 'Say hi / Invite',
+    lines: [
+      'Send a quick message or an invite to meet up at a public spot before the event, so you can walk in together.',
+      'Only people who also turned on “open to company” show up here.',
+    ],
+  },
+  group: {
+    icon: '🫂', title: 'Solo group chat',
+    lines: [
+      'Everyone in this chat came to the event alone and wants to meet people.',
+      'Use it to find each other (“I\'m by the entrance”) and hang out together. Only first names + interests are shared, never your location.',
+    ],
+  },
+  stay: {
+    icon: '🤝', title: 'Stay in touch',
+    lines: [
+      'Pick what to share, like your Instagram. The other person gets a request.',
+      'You only see each other\'s info if you BOTH say yes. Otherwise nothing is shared.',
+    ],
+  },
+}
+
+export function useExplain() {
   const { state } = useStore()
-  const cur = STYLES.find((x) => x.id === state.style)
-  return (
-    <>
-      <button className="style-pill" onClick={() => setOpen(true)} aria-label="Switch style">
-        <Palette size={14} /> {cur?.name}
-      </button>
-      <StyleSheet open={open} onClose={() => setOpen(false)} />
-    </>
-  )
+  const [open, setOpen] = useState(null) // { key, then }
+  const explain = (key, then) => {
+    if (state.tips?.[key]) return then?.()
+    setOpen({ key, then })
+  }
+  const popup = open ? <ExplainSheet tipKey={open.key} onDone={() => { const f = open.then; setOpen(null); f?.() }} /> : null
+  return [explain, popup]
 }
 
-export function StylePicker({ onPick }) {
-  const { state, dispatch } = useStore()
+function ExplainSheet({ tipKey, onDone }) {
+  const { dispatch } = useStore()
+  const tip = TIPS[tipKey]
+  const done = () => { dispatch({ type: 'TIP_SEEN', key: tipKey }); onDone() }
   return (
-    <div className="stack-sm">
-      {STYLES.map((st) => (
-        <button key={st.id} className={`option style-option ${state.style === st.id ? 'on' : ''}`}
-          onClick={() => { dispatch({ type: 'STYLE', style: st.id }); onPick?.(st.id) }}>
-          <span className="style-emoji">{st.emoji}</span>
-          <span className="style-text"><strong>{st.name}</strong><span>{st.desc}</span></span>
-          {state.style === st.id && <Check size={18} />}
-        </button>
-      ))}
-    </div>
-  )
-}
-
-export function StyleSheet({ open, onClose }) {
-  const nav = useNav()
-  return (
-    <Sheet open={open} onClose={onClose} title="Pick a style">
-      <p className="muted">Same app, same data, different feel. Switch anytime.</p>
-      <StylePicker onPick={() => { onClose(); nav.tab('home') }} />
-      <p className="muted small center">Share a style directly: add <b>?style=board</b> to the link.</p>
+    <Sheet open onClose={done} title="">
+      <div className="explain">
+        <div className="explain-icon">{tip.icon}</div>
+        <h2>{tip.title}</h2>
+        {tip.lines.map((l) => <p key={l}>{l}</p>)}
+        <p className="explain-demo">🧪 Preview: the people here are sample students and their replies are automatic for now.</p>
+        <button className="btn btn-primary btn-lg" onClick={done}>Got it</button>
+      </div>
     </Sheet>
   )
 }

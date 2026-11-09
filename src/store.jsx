@@ -1,27 +1,13 @@
 // App state: one reducer, saved to localStorage so the demo survives a refresh.
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { EVENTS, DEMO_LIVE, studentById, interestById } from './data'
-import { withTimes, uid, isLive } from './utils'
+import { EVENTS, studentById, interestById } from './data'
+import { withTimes, uid } from './utils'
 
-const KEY = 'common-ground-v1'
-
-export const STYLES = [
-  { id: 'classic', name: 'Classic', desc: 'Calm list. What\'s happening now, first.', emoji: '📋' },
-  { id: 'board', name: 'Board', desc: 'Photo grid like Pinterest/Poppin. Big pictures first.', emoji: '🖼️' },
-]
-
-function styleFromUrl() {
-  try {
-    const s = new URLSearchParams(window.location.search).get('style')
-    return STYLES.some((x) => x.id === s) ? s : null
-  } catch {
-    return null
-  }
-}
+const KEY = 'common-ground-v2'
 
 const empty = {
-  style: 'classic',
   welcomed: false,
+  tips: {}, // tutorial pop-ups already seen
   feedback: { actions: 0, submitted: false, dismissed: false },
   user: null, // { name, email, role: 'student' | 'organizer', org, interests: [], busy: [] }
   rsvp: {}, // eventId -> 'going' | 'saved'
@@ -37,9 +23,8 @@ function load() {
     const raw = localStorage.getItem(KEY)
     const st = raw ? { ...empty, ...JSON.parse(raw) } : empty
     st.feedback = { ...empty.feedback, ...st.feedback }
-    const urlStyle = styleFromUrl()
-    if (urlStyle) return { ...st, style: urlStyle }
-    return STYLES.some((x) => x.id === st.style) ? st : { ...st, style: 'classic' }
+    st.tips = st.tips || {}
+    return st
   } catch {
     return empty
   }
@@ -58,8 +43,8 @@ function reducer(state, a) {
   switch (a.type) {
     case 'FEEDBACK':
       return { ...state, feedback: { ...state.feedback, ...a.patch } }
-    case 'STYLE':
-      return { ...state, style: a.style }
+    case 'TIP_SEEN':
+      return { ...state, tips: { ...state.tips, [a.key]: true } }
     case 'WELCOMED':
       return { ...state, welcomed: true }
     case 'DELETE_POST':
@@ -113,9 +98,9 @@ function reducer(state, a) {
     case 'BLOCK':
       return { ...state, blocked: [...new Set([...state.blocked, a.studentId])] }
     case 'SIGN_OUT':
-      return { ...empty, style: state.style, welcomed: true }
+      return { ...empty, tips: state.tips, welcomed: true }
     case 'RESET':
-      return { ...empty, style: state.style }
+      return { ...empty }
     default:
       return state
   }
@@ -173,11 +158,8 @@ export function StoreProvider({ children }) {
   const later = (ms, fn) => timers.current.push(setTimeout(fn, ms))
   const add = useCallback((chatId, message) => dispatch({ type: 'ADD_MSG', chatId, message, active: activeChat.current === chatId }), [])
 
-  const events = useMemo(() => {
-    const list = withTimes([...state.posted, ...EVENTS])
-    // nothing real happening right now? show the 2 demo "live" events so the demo still works
-    return list.some((e) => isLive(e)) ? list : [...withTimes(DEMO_LIVE), ...list]
-  }, [state.posted])
+  // Real Sac State events + anything posted in the app. Nothing made up.
+  const events = useMemo(() => withTimes([...state.posted, ...EVENTS]), [state.posted])
   const eventById = useMemo(() => Object.fromEntries(events.map((e) => [e.id, e])), [events])
 
   const showToast = useCallback((text) => {

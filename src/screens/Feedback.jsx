@@ -6,7 +6,6 @@ import { useStore } from '../store'
 import { sendFeedback } from '../feedback'
 
 const USE_IT = ['Yes', 'Maybe', 'No']
-const STYLE = ['Classic', 'Board', "Didn't try both"]
 
 export function FeedbackButton({ onOpen }) {
   return (
@@ -45,7 +44,6 @@ export function FeedbackSheet({ open, onClose }) {
   const { state, dispatch } = useStore()
   const [stars, setStars] = useState(0)
   const [useIt, setUseIt] = useState('')
-  const [style, setStyle] = useState('')
   const [confusing, setConfusing] = useState('')
   const [add, setAdd] = useState('')
   const [sending, setSending] = useState(false)
@@ -55,8 +53,8 @@ export function FeedbackSheet({ open, onClose }) {
   const submit = async () => {
     setSending(true)
     const answers = {
-      rating: stars, would_use: useIt, preferred_style: style, confusing, add_or_change: add,
-      current_style: state.style, signed_in: !!state.user, role: state.user?.role || 'none',
+      rating: stars, would_use: useIt, confusing, add_or_change: add,
+      signed_in: !!state.user, role: state.user?.role || 'none',
       at: new Date().toISOString(), device: navigator.userAgent.includes('iPhone') ? 'iPhone' : navigator.userAgent.includes('Android') ? 'Android' : 'Other',
     }
     try {
@@ -81,7 +79,7 @@ export function FeedbackSheet({ open, onClose }) {
         </>
       ) : (
         <>
-          <p className="muted">5 quick questions · about 1 minute · anonymous</p>
+          <p className="muted">4 quick questions · about 1 minute · anonymous</p>
 
           <h3 className="label">1. How would you rate Common Ground?</h3>
           <div className="stars" role="radiogroup" aria-label="Rating">
@@ -97,15 +95,10 @@ export function FeedbackSheet({ open, onClose }) {
             {USE_IT.map((x) => <button key={x} className={`chip ${useIt === x ? 'chip-on' : ''}`} onClick={() => setUseIt(x)}>{x}</button>)}
           </div>
 
-          <h3 className="label">3. Which style did you like more?</h3>
-          <div className="chips-wrap">
-            {STYLE.map((x) => <button key={x} className={`chip ${style === x ? 'chip-on' : ''}`} onClick={() => setStyle(x)}>{x}</button>)}
-          </div>
-
-          <h3 className="label">4. Was anything confusing or hard to do?</h3>
+          <h3 className="label">3. Was anything confusing or hard to do?</h3>
           <textarea className="fb-text" rows={3} value={confusing} onChange={(e) => setConfusing(e.target.value)} placeholder="e.g. I didn't know what the bookmark did" />
 
-          <h3 className="label">5. What's one thing we should add or change?</h3>
+          <h3 className="label">4. What's one thing we should add or change?</h3>
           <textarea className="fb-text" rows={3} value={add} onChange={(e) => setAdd(e.target.value)} placeholder="Anything goes" />
 
           {sent === 'err' && <p className="error">Couldn't send. Check your connection and try again.</p>}

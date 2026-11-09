@@ -1,7 +1,7 @@
 import { studentById } from '../data'
 import { Avatar, EventCard, Empty, useGate, useNav } from '../components'
 import { useStore } from '../store'
-import { isPast, weekBucket } from '../utils'
+import { isGone, weekBucket } from '../utils'
 import { KeepInTouchButton } from './StayInTouch'
 
 // Group events under "This week" / "Next week" / "Later"
@@ -21,7 +21,7 @@ export default function Plans() {
   const nav = useNav()
   const gate = useGate()
   const { state, events, eventById } = useStore()
-  const upcoming = events.filter((e) => !isPast(e)).sort((a, b) => a.startAt - b.startAt)
+  const upcoming = events.filter((e) => !isGone(e)).sort((a, b) => a.startAt - b.startAt)
   const going = upcoming.filter((e) => state.rsvp[e.id] === 'going')
   const saved = upcoming.filter((e) => state.rsvp[e.id] === 'saved')
   const hosting = upcoming.filter((e) => e.mine)

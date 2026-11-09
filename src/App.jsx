@@ -3,8 +3,8 @@ import { Home as HomeIcon, Compass, Plus, CalendarCheck, MessageCircle } from 'l
 import { NavCtx } from './components'
 import { StoreProvider, useStore } from './store'
 import SignIn, { Welcome } from './screens/Onboarding'
-import Home from './screens/Home'
 import HomeBoard from './screens/HomeBoard'
+import PlaceMap from './screens/PlaceMap'
 import Posted from './screens/Posted'
 import { FeedbackButton, FeedbackNudge, FeedbackSheet } from './screens/Feedback'
 import Explore from './screens/Explore'
@@ -15,11 +15,9 @@ import Plans from './screens/Plans'
 import Post from './screens/Post'
 import Profile from './screens/Profile'
 
-const HOMES = { classic: Home, board: HomeBoard }
-
 const SCREENS = {
   explore: Explore, post: Post, plans: Plans, chats: ChatList,
-  event: EventDetail, here: WhoIsHere, chat: Chat, profile: Profile, signin: SignIn, posted: Posted,
+  event: EventDetail, here: WhoIsHere, chat: Chat, profile: Profile, signin: SignIn, posted: Posted, place: PlaceMap,
 }
 
 const TABS = [
@@ -47,16 +45,16 @@ function Shell() {
     tab: (name) => setStack([{ name, params: {} }]),
   }
 
-  const Screen = top.name === 'home' ? HOMES[state.style] || Home : SCREENS[top.name] || Home
+  const Screen = top.name === 'home' ? HomeBoard : SCREENS[top.name] || HomeBoard
   const rootTab = stack[0].name
   const showTabs = stack.length === 1
   const unread = Object.values(state.chats).reduce((n, c) => n + (c.unread || 0), 0)
   const { then, ...shown } = top.params
-  const screenKey = stack.length + top.name + state.style + JSON.stringify(shown)
+  const screenKey = stack.length + top.name + JSON.stringify(shown)
 
   return (
     <NavCtx.Provider value={nav}>
-      <div className={`phone style-${state.style}`}>
+      <div className="phone style-board">
         {!state.welcomed ? <Welcome /> : (
           <>
             <main ref={scroller} className={`scroll ${showTabs ? 'with-tabs' : ''}`}>

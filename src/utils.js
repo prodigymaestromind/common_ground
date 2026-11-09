@@ -11,15 +11,8 @@ function atTime(dayOffset, hhmm) {
 }
 
 // Give every event real start/end Date objects.
-// "live" events are pinned around the current time so the demo always has something happening now.
 export function withTimes(events) {
-  const now = Date.now()
   return events.map((e) => {
-    if (e.live) {
-      const start = new Date(Math.floor((now - 40 * MIN) / (15 * MIN)) * 15 * MIN)
-      const end = new Date(start.getTime() + 2 * 60 * MIN)
-      return { ...e, startAt: start, endAt: end }
-    }
     if (e.startAt) return { ...e, startAt: new Date(e.startAt), endAt: new Date(e.endAt) }
     return { ...e, startAt: atTime(e.day, e.start), endAt: atTime(e.day, e.end) }
   })
@@ -27,6 +20,12 @@ export function withTimes(events) {
 
 export const isLive = (e, now = Date.now()) => e.startAt <= now && e.endAt > now
 export const isPast = (e, now = Date.now()) => e.endAt <= now
+// Already over AND from an earlier day. Today's events stay listed until midnight (shown as "Ended").
+export const isGone = (e, now = Date.now()) => {
+  const midnight = new Date(now)
+  midnight.setHours(0, 0, 0, 0)
+  return e.endAt <= midnight
+}
 
 export function fmtTime(d) {
   return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(':00', '').replace(' ', '').toLowerCase()
@@ -98,3 +97,38 @@ export function weekBucket(d) {
   if (n < 14) return 'Next week'
   return 'Later'
 }
+
+// ----- Add to calendar (no permissions needed) -----
+const icsDate = (d) => new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+const icsText = (s = '') => s.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/([,;])/g, '\\$1')
+
+// Downloads a .ics file. iPhone opens it in Calendar; laptops open Calendar/Outlook.
+export function downloadIcs(e) {
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Common Ground//EN', 'BEGIN:VEVENT',
+    `UID:${e.id}@commonground`, `DTSTAMP:${icsDate(Date.now())}`,
+    `DTSTART:${icsDate(e.startAt)}`, `DTEND:${icsDate(e.endAt)}`,
+    `SUMMARY:${icsText(e.title)}`, `LOCATION:${icsText(e.place)}`,
+    `DESCRIPTION:${icsText(`${e.desc || ''}${e.link ? `\n\n${e.link}` : ''}`)}`,
+    'END:VEVENT', 'END:VCALENDAR',
+  ]
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `${e.title.replace(/[^\w ]+/g, '').trim() || 'event'}.ics`
+  document.body.appendChild(a)
+  a.click()
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove() }, 1000)
+}
+
+export function googleCalUrl(e) {
+  const p = new URLSearchParams({
+    action: 'TEMPLATE', text: e.title, dates: `${icsDate(e.startAt)}/${icsDate(e.endAt)}`,
+    details: `${e.desc || ''}${e.link ? `\n\n${e.link}` : ''}`, location: e.place,
+  })
+  return `https://calendar.google.com/calendar/render?${p}`
+}
+
+// ----- Directions in the phone's maps app -----
+export const appleMapsUrl = (lat, lng, name) => `https://maps.apple.com/?daddr=${lat},${lng}&q=${encodeURIComponent(name)}`
+export const googleMapsUrl = (lat, lng) => `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`

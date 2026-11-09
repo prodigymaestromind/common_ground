@@ -1,6 +1,6 @@
 import { ShieldCheck, RotateCcw, LogOut } from 'lucide-react'
 import { INTERESTS } from '../data'
-import { Avatar, Chip, StylePicker, TopBar, useNav } from '../components'
+import { Avatar, Chip, TopBar, useNav } from '../components'
 import { useStore } from '../store'
 import { BusyEditor } from './Onboarding'
 import { CONTACT_TYPES } from './StayInTouch'
@@ -49,9 +49,6 @@ export default function Profile() {
         ))}
       </div>
 
-      <h2 className="section-title">App style</h2>
-      <StylePicker onPick={() => nav.tab('home')} />
-
       <h2 className="section-title">Privacy</h2>
       <ul className="privacy">
         <li>Only your first name + interests are ever shown, and only at events where you turn on “open to company.”</li>
@@ -61,8 +58,8 @@ export default function Profile() {
       </ul>
 
       <button className="btn btn-outline" onClick={() => { dispatch({ type: 'SIGN_OUT' }); nav.tab('home') }}><LogOut size={16} /> Sign out</button>
-      <button className="btn btn-ghost danger" onClick={() => { if (confirm('Reset the demo? This clears everything.')) dispatch({ type: 'RESET' }) }}>
-        <RotateCcw size={16} /> Reset demo
+      <button className="btn btn-ghost danger" onClick={() => { if (confirm('Reset the app on this phone? This clears your plans, chats and sign-in.')) dispatch({ type: 'RESET' }) }}>
+        <RotateCcw size={16} /> Reset app
       </button>
     </div>
   )

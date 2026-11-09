@@ -1,7 +1,5 @@
 import { REAL_EVENTS } from './realEvents'
-// Demo data for Common Ground.
-// Events are placed relative to TODAY so the demo always has
-// "happening now" and "this week" events, whatever day you open it.
+// Data for Common Ground: interests, sample students, and the real Sac State events.
 
 export const INTERESTS = [
   { id: 'music', label: 'Music', emoji: '🎵' },
@@ -18,7 +16,7 @@ export const INTERESTS = [
 
 export const interestById = Object.fromEntries(INTERESTS.map((i) => [i.id, i]))
 
-// Fake students (first names only, for privacy).
+// SAMPLE students (made up, first names only) used for the meet-people demo until real accounts exist.
 export const STUDENTS = [
   { id: 's1', name: 'Alex', major: 'Music', year: 'Transfer', interests: ['music', 'games', 'food'], color: '#2f7d5b' },
   { id: 's2', name: 'Maya', major: 'Art', year: 'Junior', interests: ['art', 'music', 'culture'], color: '#b0623a' },
@@ -34,141 +32,16 @@ export const STUDENTS = [
 
 export const studentById = Object.fromEntries(STUDENTS.map((s) => [s.id, s]))
 
-// Made-up demo events. Only the two "live" ones are used, and only when no real
-// Sac State event is happening right now, so the Happening now demo always works.
-export const DEMO_EVENTS = [
-  {
-    id: 'e1', placeId: 'union', title: 'Open Mic Night', host: 'University Union', interest: 'music', emoji: '🎤',
-    live: true, place: 'University Union, Redwood Room', cost: 0,
-    parking: 'Lot 5 / Structure 5. Free after 6 PM',
-    desc: 'Sing, play, read poetry, or try stand-up, or just hang out and enjoy the show. All skill levels welcome.',
-    going: 31, soloFriendly: true, source: 'Sac State Events',
-    open: ['s1', 's2', 's3'], here: ['s3', 's2', 's7'],
-  },
-  {
-    id: 'e2', placeId: 'quad', title: 'Free Jamba Juice Pop-Up', host: 'Drama Club', interest: 'food', emoji: '🥤',
-    live: true, place: 'Library Quad', cost: 0, parking: 'Walk-up, center of campus',
-    desc: 'Come say hi to the Drama Club and grab a free smoothie while they last.',
-    going: 54, soloFriendly: false, source: 'Club post',
-    open: ['s8', 's9'], here: ['s8'],
-  },
-  {
-    id: 'e3', placeId: 'union', title: 'Board Game Night', host: 'Anime & Games Club', interest: 'games', emoji: '🎲',
-    day: 0, start: '19:00', end: '21:30', place: 'University Union, Ballroom', cost: 0,
-    parking: 'Structure 3. $3 evening permit',
-    desc: 'Catan, Codenames, Uno and more. Tables are mixed so you play with new people.',
-    going: 22, soloFriendly: true, source: 'Club post', open: ['s4', 's6', 's10'], here: [],
-  },
-  {
-    id: 'e4', placeId: 'nest', title: 'Hornet Volleyball vs UC San Diego', host: 'Hornet Athletics', interest: 'sports', emoji: '🏐',
-    day: 1, start: '13:00', end: '15:00', place: 'The Nest', cost: 0,
-    parking: 'Lot 9 next to the Nest. Free on weekends',
-    desc: 'Free for students with OneCard. Wear green and gold!',
-    going: 140, soloFriendly: false, source: 'Sac State Events', open: ['s5', 's3', 's8'], here: [],
-  },
-  {
-    id: 'e5', placeId: 'well', title: 'Fall Colors Day Hike', host: 'ASI Peak Adventures', interest: 'outdoors', emoji: '🍂',
-    day: 1, start: '07:00', end: '17:00', place: 'Meet at Peak Adventures (The WELL)', cost: 25,
-    parking: 'Lot 7 near The WELL',
-    desc: 'Guided day hike with transportation included. Spots are limited, so register ahead.',
-    going: 14, soloFriendly: true, source: 'Sac State Events', open: ['s9', 's5'], here: [],
-  },
-  {
-    id: 'e6', placeId: 'kadema', title: 'Intro to Pottery Night', host: 'Department of Art', interest: 'art', emoji: '🏺',
-    day: 2, start: '18:00', end: '20:00', place: 'Kadema Hall, Studio 145', cost: 5,
-    parking: 'Structure 2',
-    desc: 'Hands-on wheel throwing for beginners. All materials provided.',
-    going: 12, soloFriendly: true, source: 'Sac State Events', open: ['s2', 's7'], here: [],
-  },
-  {
-    id: 'e7', placeId: 'lassen', title: 'Resume Review Drop-In', host: 'Career Center', interest: 'career', emoji: '📄',
-    day: 2, start: '12:00', end: '14:00', place: 'Lassen Hall 2nd floor', cost: 0,
-    parking: 'Structure 2',
-    desc: 'Bring a printed or digital resume and get 15-minute feedback from a career advisor.',
-    going: 38, soloFriendly: false, source: 'Sac State Events', open: ['s4', 's8'], here: [],
-  },
-  {
-    id: 'e8', placeId: 'well', title: 'Weekly Dose of Mindfulness', host: 'Student Health & Counseling', interest: 'wellness', emoji: '🧘',
-    day: 3, start: '12:00', end: '12:30', place: 'The WELL, Room 1010', cost: 0,
-    parking: 'Lot 7',
-    desc: 'A 30-minute guided session to reset between classes. No experience needed.',
-    going: 9, soloFriendly: true, source: 'Sac State Events', open: ['s7', 's5'], here: [],
-  },
-  {
-    id: 'e9', placeId: 'riverside', title: 'Hack Night: Build a Discord Bot', host: 'ACM Sac State', interest: 'tech', emoji: '🤖',
-    day: 3, start: '17:30', end: '19:30', place: 'Riverside Hall 1001', cost: 0,
-    parking: 'Structure 5',
-    desc: 'Bring a laptop. Mentors help you build and deploy your first bot. Pizza provided.',
-    going: 27, soloFriendly: true, source: 'Club post', open: ['s4', 's6', 's10'], here: [],
-  },
-  {
-    id: 'e10', placeId: 'union', title: 'Bollywood Night', host: 'Indian Student Association', interest: 'culture', emoji: '💃',
-    day: 4, start: '18:00', end: '21:00', place: 'University Union, Ballroom', cost: 0,
-    parking: 'Structure 3',
-    desc: 'Music, dancing, and food. FREE for Hornets.',
-    going: 96, soloFriendly: false, source: 'Sac State Events', open: ['s2', 's9', 's1'], here: [],
-  },
-  {
-    id: 'e11', placeId: 'union', title: 'Street Fighter 6 Tournament', host: 'Esports @ Sac State', interest: 'games', emoji: '🕹️',
-    day: 4, start: '13:00', end: '15:00', place: 'University Union, Game Room', cost: 0,
-    parking: 'Structure 3',
-    desc: 'Bracket for all levels plus casual setups. Bring your own controller if you have one.',
-    going: 40, soloFriendly: true, source: 'Sac State Events', open: ['s6', 's10', 's1'], here: [],
-  },
-  {
-    id: 'e12', placeId: 'lassen', title: 'Taco Tuesday Mixer', host: 'Transfer Student Center', interest: 'food', emoji: '🌮',
-    day: 5, start: '11:30', end: '13:00', place: 'Lassen Hall Courtyard', cost: 0,
-    parking: 'Walk-up',
-    desc: 'Free tacos and a low-key way to meet other transfer students. Come alone, leave with friends.',
-    going: 33, soloFriendly: true, source: 'Club post', open: ['s1', 's4', 's7', 's10'], here: [],
-  },
-  {
-    id: 'e13', placeId: 'capistrano', title: 'Jazz Ensemble Concert', host: 'School of Music', interest: 'music', emoji: '🎷',
-    day: 6, start: '19:30', end: '21:00', place: 'Capistrano Concert Hall', cost: 10,
-    parking: 'Structure 2. $3 evening permit',
-    desc: 'The Sac State Jazz Ensemble plays big band classics and new student work.',
-    going: 58, soloFriendly: false, source: 'Sac State Events', open: ['s1', 's3'], here: [],
-  },
-]
-
 // Sample busy times for onboarding (0 = Sunday ... 6 = Saturday).
 export const SAMPLE_BUSY = [
   { id: 'b1', label: 'Classes', days: [1, 3], start: '10:00', end: '16:15' },
   { id: 'b2', label: 'Work', days: [2, 4], start: '14:00', end: '18:00' },
 ]
 
-// More events over the next few weeks (for "Next week" / "All upcoming")
-DEMO_EVENTS.push(
-  { id: 'e14', placeId: 'union', title: 'Karaoke Night', host: 'University Union', interest: 'music', emoji: '🎙️',
-    day: 8, start: '19:00', end: '21:30', place: 'University Union, Redwood Room', cost: 0, parking: 'Structure 3',
-    desc: 'Sign up for a song or just cheer. Duets encouraged.', going: 44, soloFriendly: true, source: 'Sac State Events', open: ['s1', 's3', 's7'], here: [] },
-  { id: 'e15', placeId: 'riverside', title: 'Intro to Git & GitHub Workshop', host: 'ACM Sac State', interest: 'tech', emoji: '🧑‍💻',
-    day: 9, start: '17:00', end: '18:30', place: 'Riverside Hall 1001', cost: 0, parking: 'Structure 5',
-    desc: 'Learn branches, commits and pull requests. Bring a laptop.', going: 31, soloFriendly: true, source: 'Club post', open: ['s4', 's6', 's10'], here: [] },
-  { id: 'e16', placeId: 'nest', title: 'Hornet Basketball vs Weber State', host: 'Hornet Athletics', interest: 'sports', emoji: '🏀',
-    day: 10, start: '19:00', end: '21:00', place: 'The Nest', cost: 0, parking: 'Lot 9',
-    desc: 'Free with OneCard. Student section opens at 6:30.', going: 210, soloFriendly: false, source: 'Sac State Events', open: ['s5', 's8', 's3'], here: [] },
-  { id: 'e17', placeId: 'quad', title: 'Fall Night Market', host: 'ASI', interest: 'food', emoji: '🏮',
-    day: 12, start: '17:00', end: '21:00', place: 'Library Quad', cost: 0, parking: 'Structure 2. $3 evening permit',
-    desc: 'Food trucks, student vendors and live music under the lights.', going: 180, soloFriendly: true, source: 'Sac State Events', open: ['s9', 's2', 's8', 's1'], here: [] },
-  { id: 'e18', placeId: 'kadema', title: 'Open Studio: Figure Drawing', host: 'Department of Art', interest: 'art', emoji: '✏️',
-    day: 14, start: '18:00', end: '20:00', place: 'Kadema Hall, Studio 145', cost: 0, parking: 'Structure 2',
-    desc: 'Drop-in drawing session. Paper and charcoal provided.', going: 16, soloFriendly: true, source: 'Sac State Events', open: ['s2', 's7'], here: [] },
-  { id: 'e19', placeId: 'lassen', title: 'Internship Fair Prep Night', host: 'Career Center', interest: 'career', emoji: '💼',
-    day: 16, start: '16:00', end: '18:00', place: 'Lassen Hall 2nd floor', cost: 0, parking: 'Structure 2',
-    desc: 'Practice your pitch, get a headshot, and review your resume.', going: 52, soloFriendly: false, source: 'Sac State Events', open: ['s4', 's8'], here: [] },
-  { id: 'e20', placeId: 'well', title: 'Sunrise Yoga', host: 'The WELL', interest: 'wellness', emoji: '🌅',
-    day: 18, start: '07:30', end: '08:30', place: 'The WELL, Studio 2', cost: 0, parking: 'Lot 7',
-    desc: 'All levels. Mats provided.', going: 19, soloFriendly: true, source: 'Sac State Events', open: ['s7', 's5'], here: [] },
-  { id: 'e21', placeId: 'union', title: 'Día de Cultura Showcase', host: 'Multi-Cultural Center', interest: 'culture', emoji: '🎉',
-    day: 20, start: '18:00', end: '21:00', place: 'University Union, Ballroom', cost: 0, parking: 'Structure 3',
-    desc: 'Performances, food and art from student cultural orgs.', going: 120, soloFriendly: true, source: 'Sac State Events', open: ['s2', 's9', 's1'], here: [] },
-)
-
-// The real calendar events (events.csus.edu) are the main list
-export const EVENTS = REAL_EVENTS
-export const DEMO_LIVE = DEMO_EVENTS.filter((e) => e.live).map((e) => ({ ...e, source: 'Demo event' }))
-
+// Real public events from the Sac State Events calendar (events.csus.edu).
+// The "going" numbers in that file were made up for the hackathon, so they're dropped here.
+// The students on each event (open / here) are SAMPLE students for the meet-people demo.
+export const EVENTS = REAL_EVENTS.map(({ going, ...e }) => e) // eslint-disable-line no-unused-vars
 export const EMOJIS = ['🎤', '🎲', '🏀', '🍕', '🎨', '💻', '🌲', '💼', '🎉', '🧘', '🎬', '📚', '☕', '🎮', '⚽', '🎶']
 
 export const MEET_SPOTS = [
