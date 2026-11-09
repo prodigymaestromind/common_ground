@@ -28,6 +28,19 @@ export default function Profile() {
         <p className="muted">{u.email} · <ShieldCheck size={14} /> {u.role === 'organizer' ? `Organizer · ${u.org}` : 'Verified student'}</p>
       </div>
 
+      {u.role === 'organizer' && (
+        <>
+          <h2 className="section-title">{u.org || 'Your club'} settings</h2>
+          <label className="toggle-row card">
+            <div>
+              <strong>👥 Show how many people are going</strong>
+              <span>Applies to all your events. Off = students see “New event” instead. You always see the number.</span>
+            </div>
+            <input type="checkbox" className="switch" checked={u.showCounts !== false} onChange={(e) => dispatch({ type: 'ORG_COUNTS', value: e.target.checked })} />
+          </label>
+        </>
+      )}
+
       <h2 className="section-title">Interests</h2>
       <div className="chips-wrap">
         {INTERESTS.map((i) => <Chip key={i.id} active={u.interests.includes(i.id)} onClick={() => toggle(i.id)}>{i.emoji} {i.label}</Chip>)}

@@ -24,7 +24,7 @@ Our interviews with Sac State students turned up three things:
 ## What's real vs. preview (honest status)
 - ✅ Events, times, places and links are real (snapshot of the Sac State calendar, Nov 2026).
 - 🧪 There's no backend yet. Accounts, RSVPs, chats and posts are saved only in your browser.
-- 🧪 The students you can meet are **sample students**, and their chat replies, invite answers and "stay in touch" answers are automatic.
+- 🧪 "Going" counts are sample numbers, and the students you can meet are **sample students**, and their chat replies, invite answers and "stay in touch" answers are automatic.
 - 🧪 Sign-in only checks that the email ends in @csus.edu (no email verification yet). To try it: your first name + **test@csus.edu**.
 - Next step: Supabase for real accounts, chat and invites.
 

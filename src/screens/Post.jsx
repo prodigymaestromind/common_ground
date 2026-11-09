@@ -23,7 +23,7 @@ export default function Post() {
   const [scan, setScan] = useState({ state: 'idle' }) // idle | reading | done | error
   const [f, setF] = useState({
     title: '', host: state.user?.org || '', date: todayStr(), start: '18:00', end: '20:00',
-    place: '', cost: 0, interest: 'music', emoji: '🎤', desc: '', parking: '', soloFriendly: true, showCount: true,
+    place: '', cost: 0, interest: 'music', emoji: '🎤', desc: '', parking: '', soloFriendly: true, showCount: state.user?.showCounts !== false,
   })
   const set = (patch) => setF((x) => ({ ...x, ...patch }))
 

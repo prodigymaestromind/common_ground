@@ -39,9 +39,9 @@ export const SAMPLE_BUSY = [
 ]
 
 // Real public events from the Sac State Events calendar (events.csus.edu).
-// The "going" numbers in that file were made up for the hackathon, so they're dropped here.
-// The students on each event (open / here) are SAMPLE students for the meet-people demo.
-export const EVENTS = REAL_EVENTS.map(({ going, ...e }) => e) // eslint-disable-line no-unused-vars
+// "going" counts and the students on each event (open / here) are SAMPLE numbers/people
+// for the preview, until real accounts + RSVPs exist.
+export const EVENTS = REAL_EVENTS
 export const EMOJIS = ['🎤', '🎲', '🏀', '🍕', '🎨', '💻', '🌲', '💼', '🎉', '🧘', '🎬', '📚', '☕', '🎮', '⚽', '🎶']
 
 export const MEET_SPOTS = [

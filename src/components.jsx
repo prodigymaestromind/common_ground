@@ -221,6 +221,14 @@ export function SignInButton() {
 // ----- Gentle "how this works" pop-ups (each shows once) -----
 // usage: const explain = useExplain(); explain('group', () => doTheThing())
 export const TIPS = {
+  count: {
+    icon: '👥', title: 'How many are going',
+    lines: [
+      'This number counts students who tapped “I\'m going” on Common Ground.',
+      'Each club or organizer picks whether to show it. A small number can scare people off, so they can hide it and students see “New event” instead.',
+    ],
+    demo: '🧪 Preview: the numbers are sample counts for now.',
+  },
   company: {
     icon: '👋', title: 'Open to company',
     lines: [
@@ -272,7 +280,7 @@ function ExplainSheet({ tipKey, onDone }) {
         <div className="explain-icon">{tip.icon}</div>
         <h2>{tip.title}</h2>
         {tip.lines.map((l) => <p key={l}>{l}</p>)}
-        <p className="explain-demo">🧪 Preview: the people here are sample students and their replies are automatic for now.</p>
+        <p className="explain-demo">{tip.demo || '🧪 Preview: the people here are sample students and their replies are automatic for now.'}</p>
         <button className="btn btn-primary btn-lg" onClick={done}>Got it</button>
       </div>
     </Sheet>

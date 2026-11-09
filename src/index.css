@@ -538,3 +538,24 @@ a.option { text-decoration: none; color: inherit; }
 .person .touch-card { flex-basis: 100%; }
 a.btn { text-decoration: none; }
 .toast { z-index: 15 !important; }
+
+/* ----- tab switch animation + counts ----- */
+.seg-glide { position: relative; gap: 0; }
+.seg-glide button { position: relative; z-index: 1; background: transparent !important; box-shadow: none !important; transition: color 0.2s; }
+.seg-glider { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / var(--n)); border-radius: 999px; background: #fff; box-shadow: var(--shadow);
+  transform: translateX(calc(var(--i) * 100%)); transition: transform 0.28s cubic-bezier(0.3, 0.9, 0.3, 1); }
+.board-count { margin: -6px 0 0; font-size: 13.5px; font-weight: 600; color: var(--muted); }
+.fade-in { animation: fadeIn 0.25s ease-out; }
+.pop-in { animation: popIn 0.35s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popIn { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pop-in, .fade-in { animation: none; } .seg-glider { transition: none; } }
+
+/* card footer: going count fills the gap next to the faces */
+.pin-going { display: inline-flex; align-items: center; gap: 3px; font-size: 12.5px; font-weight: 700; color: var(--green); white-space: nowrap; margin-left: 2px; }
+.pin-new { font-size: 11px; font-weight: 800; color: var(--green); background: var(--green-soft); padding: 2px 7px; border-radius: 999px; }
+.faces { display: inline-flex; align-items: center; min-width: 0; }
+
+/* easier to read titles on busy flyer photos */
+.pin-shade { padding-top: 36px; background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.82) 100%); }
+.pin-shade strong { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }

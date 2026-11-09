@@ -46,6 +46,9 @@ export function dayLabel(d) {
   return x.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })
 }
 
+// "Mon, Nov 9"
+export const fullDate = (d) => new Date(d).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
+
 export const costLabel = (c) => (!c ? 'Free' : typeof c === 'string' ? c : `$${c}`)
 
 function minutesOfDay(d) {

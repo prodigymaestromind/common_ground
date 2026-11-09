@@ -43,6 +43,8 @@ function reducer(state, a) {
   switch (a.type) {
     case 'FEEDBACK':
       return { ...state, feedback: { ...state.feedback, ...a.patch } }
+    case 'ORG_COUNTS': // organizer setting: show/hide going counts on all their events
+      return { ...state, user: { ...state.user, showCounts: a.value }, posted: state.posted.map((e) => ({ ...e, hideCount: !a.value })) }
     case 'TIP_SEEN':
       return { ...state, tips: { ...state.tips, [a.key]: true } }
     case 'WELCOMED':

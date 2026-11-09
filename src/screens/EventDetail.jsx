@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Clock, MapPin, DollarSign, Car, Users, Bookmark, BookmarkCheck, Check, ShieldCheck, MessageCircle, UserPlus, ExternalLink, Radio, Trash2, CalendarPlus, Navigation, ChevronRight } from 'lucide-react'
 import { studentById, interestById, MEET_SPOTS } from '../data'
 import { Avatar, Cover, FitBadge, LiveDot, Sheet, SoloBadge, TopBar, useExplain, useGate, useNav } from '../components'
 import { PLACES } from '../places'
 import { useStore } from '../store'
-import { costLabel, dayLabel, fmtRange, fmtTime, isLive, isPast, downloadIcs, googleCalUrl, appleMapsUrl, googleMapsUrl } from '../utils'
+import { costLabel, dayLabel, fullDate, fmtRange, fmtTime, isLive, isPast, downloadIcs, googleCalUrl, appleMapsUrl, googleMapsUrl } from '../utils'
 
 export default function EventDetail({ id }) {
   const nav = useNav()
@@ -15,6 +15,11 @@ export default function EventDetail({ id }) {
   const [explain, popup] = useExplain()
   const gate = useGate()
   const e = eventById[id]
+  const showsCount = e && !e.mine && !e.hideCount && typeof e.going === 'number'
+  // first time someone sees a going count, explain it once
+  useEffect(() => {
+    if (showsCount && !state.tips?.count) { const t = setTimeout(() => explain('count'), 500); return () => clearTimeout(t) }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   if (!e) return <div className="screen"><TopBar title="Event" /><p>Event not found.</p></div>
 
   const live = isLive(e)
@@ -49,7 +54,7 @@ export default function EventDetail({ id }) {
       <div className="detail-body">
         <FitBadge event={e} />
         <ul className="info">
-          <li><Clock size={18} /><div><strong>{live ? 'Happening now' : ended ? 'Ended today' : dayLabel(e.startAt)}</strong><span>{fmtRange(e)}</span></div></li>
+          <li><Clock size={18} /><div><strong>{live ? 'Happening now' : ended ? 'Ended today' : dayLabel(e.startAt)}</strong><span>{fullDate(e.startAt)} · {fmtRange(e)}</span></div></li>
           <li>
             <button className="info-link" onClick={() => (place ? nav.push('place', { id: e.id }) : setDirOpen(true))}>
               <MapPin size={18} /><div><strong>{e.place}</strong><span>Tap to see it on the map</span></div><ChevronRight size={18} />

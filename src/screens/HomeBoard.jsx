@@ -26,23 +26,34 @@ export default function HomeBoard() {
     // events that already ended today go to the bottom
     .sort((a, b) => isPast(a) - isPast(b) || a.startAt - b.startAt)
 
+  const idx = FILTERS.findIndex((f) => f.id === filter)
+  const liveN = upcoming.filter((e) => isLive(e)).length
+  const summary = {
+    now: list.length ? `${list.length} happening right now` : '',
+    today: `${list.length} event${list.length === 1 ? '' : 's'} today${liveN ? ` · ${liveN} live now` : ''}`,
+    week: `${list.length} event${list.length === 1 ? '' : 's'} in the next 7 days`,
+    all: `${list.length} upcoming event${list.length === 1 ? '' : 's'}`,
+  }[filter]
+
   return (
     <div className="screen">
       <HomeHeader />
       <div className="greeting">
         <h1>{user ? `Discover, ${user.name}` : 'Discover'}</h1>
       </div>
-      <div className="seg">
+      <div className="seg seg-glide" style={{ '--n': FILTERS.length, '--i': idx }}>
+        <span className="seg-glider" aria-hidden="true" />
         {FILTERS.map((f) => (
-          <button key={f.id} className={filter === f.id ? 'on' : ''} onClick={() => setFilter(f.id)}>{f.label}</button>
+          <button key={f.id} className={filter === f.id ? 'on' : ''} onClick={() => setFilter(f.id)} aria-pressed={filter === f.id}>{f.label}</button>
         ))}
       </div>
+      {summary && <p key={`s-${filter}`} className="board-count fade-in">{summary}</p>}
       {list.length === 0 && (
         <p className="muted center empty-note">
           {filter === 'now' ? 'Nothing is happening right now.' : filter === 'today' ? 'Nothing else on today.' : 'No events here yet.'}
         </p>
       )}
-      <Masonry events={list} />
+      <Masonry key={filter} events={list} />
       {list.length > 0 && <CaughtUp />}
     </div>
   )
@@ -52,7 +63,7 @@ export function BoardCard({ event, tall }) {
   const nav = useNav()
   const live = isLive(event)
   const ended = !live && isPast(event)
-  const faces = (event.open || []).slice(0, 3).map((s) => studentById[s])
+  const faces = (event.open || []).slice(0, 2).map((s) => studentById[s])
   return (
     <div className={`pin ${ended ? 'ended' : ''}`}>
       <button className="pin-main" onClick={() => nav.push('event', { id: event.id })}>
@@ -70,7 +81,7 @@ export function BoardCard({ event, tall }) {
       <div className="pin-foot">
         <span className="faces">
           {faces.map((p) => <Avatar key={p.id} person={p} size={22} />)}
-          {!event.hideCount && typeof event.going === 'number' && <span className="muted"><Users size={12} /> {event.going}</span>}
+          {event.hideCount ? <span className="pin-new">New</span> : typeof event.going === 'number' && <span className="pin-going"><Users size={13} /> {event.going} going</span>}
         </span>
         <SaveButton event={event} />
       </div>
@@ -81,11 +92,13 @@ export function BoardCard({ event, tall }) {
 // Two columns that fill evenly (left, right, left, right…)
 export function Masonry({ events }) {
   const cols = [[], []]
-  events.forEach((e, i) => cols[i % 2].push({ e, tall: i % 4 === 0 || i % 4 === 3 }))
+  events.forEach((e, i) => cols[i % 2].push({ e, i, tall: i % 4 === 0 || i % 4 === 3 }))
   return (
     <div className="masonry">
       {cols.map((c, k) => (
-        <div key={k} className="masonry-col">{c.map(({ e, tall }) => <BoardCard key={e.id} event={e} tall={tall} />)}</div>
+        <div key={k} className="masonry-col">{c.map(({ e, i, tall }) => (
+          <div key={e.id} className="pop-in" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}><BoardCard event={e} tall={tall} /></div>
+        ))}</div>
       ))}
     </div>
   )
