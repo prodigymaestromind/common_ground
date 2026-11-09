@@ -1,29 +1,15 @@
-// "Stay in touch": tap a button to share a social. In the real app the other
-// person gets a request and you only see each other's info if BOTH say yes.
-// For now the other person is a sample student who always says yes, and the
-// handles are placeholders (nothing is a real account).
+// "Stay in touch": tap a button to share one social.
+// How the real version will work: the other person gets a request, and you
+// only see each other's info if BOTH say yes.
+// DEMO: the other person is a sample student who always says yes, and their
+// handle is a placeholder (see demo.js).
 import { useState } from 'react'
 import { HeartHandshake, Check } from 'lucide-react'
-import { studentById } from '../data'
-import { Sheet, useExplain } from '../components'
+import { CONTACT_TYPES } from '../data'
+import { studentById, demoHandle } from '../demo'
+import { DemoTag, Sheet } from '../components'
+import { useExplain } from '../hooks'
 import { useStore } from '../store'
-
-// Used by Profile for "Ways to stay in touch"
-export const CONTACT_TYPES = [
-  { id: 'instagram', label: 'Instagram', placeholder: '@yourhandle' },
-  { id: 'discord', label: 'Discord', placeholder: 'username' },
-  { id: 'snapchat', label: 'Snapchat', placeholder: 'username' },
-]
-
-const SHARE = [
-  { id: 'instagram', label: 'Instagram', emoji: '📸' },
-  { id: 'discord', label: 'Discord', emoji: '🎮' },
-  { id: 'snapchat', label: 'Snapchat', emoji: '👻' },
-]
-
-const slug = (name = 'you') => name.toLowerCase().replace(/[^a-z0-9]/g, '') || 'you'
-// Placeholder handle (shown as plain text, never a link)
-export const fakeHandle = (name, kind) => (kind === 'instagram' ? `@${slug(name)}.cg` : `${slug(name)}_cg`)
 
 export function KeepInTouchButton({ studentId }) {
   const { state } = useStore()
@@ -34,14 +20,13 @@ export function KeepInTouchButton({ studentId }) {
   const status = typeof st === 'string' ? st : st?.status
 
   if (status === 'connected') {
-    const kind = st?.shared?.[0] || 'instagram'
-    const opt = SHARE.find((s) => s.id === kind) || SHARE[0]
-    const mine = state.user?.contacts?.[kind] || fakeHandle(state.user?.name, kind)
+    const kind = CONTACT_TYPES.find((c) => c.id === st?.shared?.[0]) || CONTACT_TYPES[0]
+    const mine = state.user?.contacts?.[kind.id] || demoHandle(state.user?.name, kind.id)
     return (
       <div className="touch-card">
-        <span className="touch-head"><Check size={14} strokeWidth={3} /> You and {p.name} swapped {opt.label}</span>
-        <div className="touch-row"><span>{opt.emoji} {p.name}</span><b>{fakeHandle(p.name, kind)}</b></div>
-        <div className="touch-row"><span>{opt.emoji} You</span><b>{mine}</b></div>
+        <span className="touch-head"><Check size={14} strokeWidth={3} /> You and {p.name} swapped {kind.label} <DemoTag /></span>
+        <div className="touch-row"><span>{kind.emoji} {p.name}</span><b>{demoHandle(p.name, kind.id)}</b></div>
+        <div className="touch-row"><span>{kind.emoji} You</span><b>{mine}</b></div>
       </div>
     )
   }
@@ -73,17 +58,17 @@ function ShareSheet({ open, onClose, student }) {
     <Sheet open={open} onClose={onClose} title={`Stay in touch with ${student.name}`}>
       <p className="muted">Pick one to share. {student.name} only sees it if they say yes and share back.</p>
       <div className="share-buttons">
-        {SHARE.map((s) => (
-          <button key={s.id} className="share-btn" onClick={() => share(s.id)}>
-            <span className="share-emoji">{s.emoji}</span>
+        {CONTACT_TYPES.map((c) => (
+          <button key={c.id} className="share-btn" onClick={() => share(c.id)}>
+            <span className="share-emoji">{c.emoji}</span>
             <span className="share-text">
-              <strong>Share {s.label}</strong>
-              <small>{state.user?.contacts?.[s.id] || fakeHandle(state.user?.name, s.id)}</small>
+              <strong>Share {c.label}</strong>
+              <small>{state.user?.contacts?.[c.id] || `${demoHandle(state.user?.name, c.id)} (demo handle)`}</small>
             </span>
           </button>
         ))}
       </div>
-      <p className="muted small center">Tip: save your phone number for after you've met in person.</p>
+      <p className="muted small center">Add your real handles in Profile. Tip: save your phone number for after you've met in person.</p>
     </Sheet>
   )
 }

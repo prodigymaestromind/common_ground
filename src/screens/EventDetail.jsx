@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Clock, MapPin, DollarSign, Car, Users, Bookmark, BookmarkCheck, Check, ShieldCheck, MessageCircle, UserPlus, ExternalLink, Radio, Trash2, CalendarPlus, Navigation, ChevronRight } from 'lucide-react'
-import { studentById, interestById, MEET_SPOTS } from '../data'
-import { Avatar, Cover, FitBadge, LiveDot, Sheet, SoloBadge, TopBar, useExplain, useGate, useNav } from '../components'
+import { interestById, MEET_SPOTS } from '../data'
+import { studentById } from '../demo'
+import { Avatar, Cover, DemoTag, FitBadge, LiveDot, Sheet, SoloBadge, TopBar } from '../components'
+import { useNav } from '../nav'
+import { useExplain, useGate } from '../hooks'
 import { PLACES } from '../places'
 import { useStore } from '../store'
 import { costLabel, dayLabel, fullDate, fmtRange, fmtTime, isLive, isPast, showGoing, companyText, soloText, COUNT_MIN, downloadIcs, googleCalUrl, appleMapsUrl, googleMapsUrl } from '../utils'
@@ -32,7 +35,7 @@ export default function EventDetail({ id }) {
   const people = (e.open || []).filter((s) => !state.blocked.includes(s)).map((s) => studentById[s])
 
   const setRsvp = (value) => {
-    dispatch({ type: 'RSVP', eventId: e.id, value, interest: e.interest })
+    dispatch({ type: 'RSVP', eventId: e.id, value })
     if (value === 'going') showToast(`You're going to ${e.title} ✓`)
     if (value === 'saved') showToast('Saved 🔖 Find it in Plans')
   }
@@ -48,7 +51,7 @@ export default function EventDetail({ id }) {
           {e.soloFriendly && <SoloBadge />}
         </div>
         <h1>{e.title}</h1>
-        <p>Hosted by {e.host}{e.pending ? ' · pending club check' : ''}</p>
+        <p>Hosted by {e.host}</p>
         </div>
       </Cover>
 
@@ -64,7 +67,7 @@ export default function EventDetail({ id }) {
           <li><DollarSign size={18} /><div><strong>{costLabel(e.cost)}</strong>{!e.cost && <span>No ticket needed</span>}</div></li>
           <li><Car size={18} /><div><strong>Parking</strong><span>{e.parking}</span></div></li>
           <li ref={countRow}><Users size={18} /><div>{e.mine || showsCount
-            ? <><strong>{e.going + (going && !e.mine ? 1 : 0)} going</strong><span>{companyText(people.length)}</span></>
+            ? <><strong>{e.going + (going && !e.mine ? 1 : 0)} going {e.demo && <DemoTag />}</strong><span>{companyText(people.length)}</span></>
             : <><strong>{companyText(people.length)}</strong><span>New event · be one of the first to go</span></>}</div></li>
         </ul>
         {e.soloFriendly && <div className="note">✨ <span><b>Welcomes people coming alone.</b> {e.source === 'Sac State Events' ? 'The organizers invite people to come meet others here, so it is a good one to go to on your own.' : 'The host will help solo arrivals meet others (a greeter, mixed tables or an icebreaker).'}</span></div>}
@@ -87,7 +90,7 @@ export default function EventDetail({ id }) {
           <div className="card here-card">
             <Radio size={22} />
             <div>
-              <strong>{e.here?.length ? 'Came alone? You\'re not the only one.' : 'Came alone? Start the solo group.'}</strong>
+              <strong>{e.here?.length ? 'Came alone? You\'re not the only one.' : 'Came alone? Start the solo group.'} {e.here?.length > 0 && e.demo && <DemoTag />}</strong>
               <span>{e.here?.length ? `${soloText(e.here.length)} and want to meet people.` : 'Others who come solo will see your message and can find you.'}</span>
             </div>
             <button className="btn btn-gold" onClick={() => gate('student', () => nav.push('here', { id: e.id }), 'Sign in to see who came solo')}>See who's here</button>
@@ -100,15 +103,15 @@ export default function EventDetail({ id }) {
             <div className="card host-card">
               <div><strong>{e.going}</strong><span>going</span></div>
               <div><strong>{people.length}</strong><span>looking for company</span></div>
-              <div><strong>{e.pending ? 'Pending' : 'Live'}</strong><span>{e.pending ? 'club check' : 'in the feed'}</span></div>
+              <div><strong>Demo</strong><span>on this device only</span></div>
             </div>
             {(e.hideCount || e.going < COUNT_MIN) && <p className="muted small center">👥 Students see “New event” instead of the number{e.hideCount ? ' (you turned it off)' : ` until ${COUNT_MIN} people are going`}.</p>}
-            <p className="muted small center">Students who come alone see your event in "Go with someone" and the solo group chat.</p>
+            <p className="muted small center">Demo: this event is saved on this device. Other students will see your posts once real accounts launch.</p>
           </section>
         )}
 
         {!e.mine && <section className="company">
-          <h2 className="section-title">Go with someone</h2>
+          <h2 className="section-title">Go with someone {e.demo && <DemoTag>Demo · sample students</DemoTag>}</h2>
           {!going && (
             <div className="card locked">
               <Users size={22} />
@@ -194,27 +197,32 @@ export default function EventDetail({ id }) {
 
       {popup}
 
-      <InviteSheet
-        person={inviteFor} event={e} onClose={() => setInviteFor(null)}
-        onSend={(invite) => {
-          const chatId = sendInvite(inviteFor.id, invite)
-          setInviteFor(null)
-          showToast(`Invite sent to ${inviteFor.name}`)
-          nav.push('chat', { id: chatId })
-        }}
-      />
+      {inviteFor && (
+        <InviteSheet
+          person={inviteFor} event={e} onClose={() => setInviteFor(null)}
+          onSend={(invite) => {
+            const chatId = sendInvite(inviteFor.id, invite)
+            setInviteFor(null)
+            showToast(`Invite sent to ${inviteFor.name}`)
+            nav.push('chat', { id: chatId })
+          }}
+        />
+      )}
     </div>
   )
 }
 
+// Meet-up times to offer: before the start for upcoming events, the next few minutes for live ones.
+function inviteTimes(event) {
+  const live = isLive(event)
+  const base = live ? Math.ceil(Date.now() / 300000) * 300000 : event.startAt.getTime()
+  return (live ? [5, 15, 30] : [-30, -15, 0]).map((m) => fmtTime(new Date(base + m * 60000)))
+}
+
 function InviteSheet({ person, event, onClose, onSend }) {
-  // Before the start for upcoming events; the next few minutes for live ones.
-  const base = isLive(event) ? Math.ceil(Date.now() / 300000) * 300000 : event.startAt.getTime()
-  const offsets = isLive(event) ? [5, 15, 30] : [-30, -15, 0]
-  const times = offsets.map((m) => fmtTime(new Date(base + m * 60000)))
+  const [times] = useState(() => inviteTimes(event))
   const [time, setTime] = useState(1)
   const [spot, setSpot] = useState(0)
-  if (!person) return null
   return (
     <Sheet open onClose={onClose} title={`Invite ${person.name}`}>
       <p className="muted">Pick when and where to meet before {event.title}. Public spots only.</p>

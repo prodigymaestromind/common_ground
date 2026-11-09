@@ -21,12 +21,20 @@ Our interviews with Sac State students turned up three things:
 - **Scan a flyer:** organizers can snap a poster and OCR fills in the event form.
 - **Built to put the phone down:** the feed ends. No likes, followers, or infinite scroll.
 
-## What's real vs. preview (honest status)
-- ✅ Events, times, places and links are real (snapshot of the Sac State calendar, Nov 2026).
-- 🧪 There's no backend yet. Accounts, RSVPs, chats and posts are saved only in your browser.
-- 🧪 "Going" counts are sample numbers, and the students you can meet are **sample students**, and their chat replies, invite answers and "stay in touch" answers are automatic.
-- 🧪 Sign-in only checks that the email ends in @csus.edu (no email verification yet). To try it: your first name + **test@csus.edu**.
-- Next step: Supabase for real accounts, chat and invites.
+## What's real vs. demo (honest status)
+- ✅ **Real:** the events, times, places and links (a snapshot of the Sac State calendar, Nov 2026), the map, directions, add-to-calendar, "fits my day", and the feedback form.
+- 🧪 **Demo:** the students you can meet, the "going" counts, and all chat replies, invite answers and "stay in touch" answers. The app marks these with a **Demo** tag.
+- 🧪 **Demo:** sign-in only checks that the email ends in @csus.edu. Nothing is verified or sent anywhere. To try it: your first name + **test@csus.edu**.
+- 🧪 **Demo:** there is no server yet. Accounts, RSVPs, chats and posted events are saved only in your browser, so other people can't see them.
+- Next step: real accounts, chat and invites (for example with Supabase).
+
+## Code map
+- `src/realEvents.js`: the real Sac State events. Nothing made up lives here.
+- `src/demo.js`: **everything** made up (sample students, counts, automatic replies, placeholder handles). This is the file real accounts will replace.
+- `src/data.js`: interests and option lists. `src/places.js`: campus buildings and map coordinates.
+- `src/store.jsx`: app state, saved in the browser. `src/hooks.jsx`, `src/nav.js`, `src/components.jsx`: shared pieces.
+- `src/screens/`: one file per screen.
+- Version: bump `"version"` in `package.json` (shown in the app). Patch = fixes, minor = new feature, major = relaunch.
 
 ## Run locally
 ```

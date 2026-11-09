@@ -1,5 +1,5 @@
 // Real public events from the Sac State Events calendar (events.csus.edu, Trumba iCalendar export, Nov 2026).
-// Attendance numbers and the students shown are demo data.
+// Only real event info lives in this file. Sample people and counts are added in demo.js.
 export const REAL_EVENTS = [
  {
   "id": "r3",
@@ -15,21 +15,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A student build sprint: pick one of four tracks, team up, and build a fix for a real-world problem, then pitch it to judges.",
-  "going": 59,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D210256752",
-  "image": "https://www.trumba.com/i/DgAnlMGwneySglbFy4Zhevu%2A.jpg",
-  "open": [
-   "s10",
-   "s4",
-   "s6"
-  ],
-  "here": [
-   "s10",
-   "s4",
-   "s6"
-  ]
+  "image": "https://www.trumba.com/i/DgAnlMGwneySglbFy4Zhevu%2A.jpg"
  },
  {
   "id": "r4",
@@ -45,21 +34,10 @@ export const REAL_EVENTS = [
   "cost": "Free w/ OneCard",
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Cheer on the Hornets at Colberg Court in The Nest (Yosemite Hall).",
-  "going": 18,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D206980907",
-  "image": "https://www.trumba.com/i/DgDyp02ovTuueZuIB5C1MVtP.jpg",
-  "open": [
-   "s5",
-   "s3",
-   "s8"
-  ],
-  "here": [
-   "s5",
-   "s3",
-   "s8"
-  ]
+  "image": "https://www.trumba.com/i/DgDyp02ovTuueZuIB5C1MVtP.jpg"
  },
  {
   "id": "r6",
@@ -75,19 +53,10 @@ export const REAL_EVENTS = [
   "cost": "$12-$22",
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Jim Magnuson's take on Euripides' Medea, moved to 19th-century West Africa: colonialism, identity, resistance and revenge.",
-  "going": 55,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D206802784",
-  "image": "https://www.trumba.com/i/DgD53yFcR-3SXNom-Fqs0V%2AD.jpg",
-  "open": [
-   "s7",
-   "s2"
-  ],
-  "here": [
-   "s7",
-   "s2"
-  ]
+  "image": "https://www.trumba.com/i/DgD53yFcR-3SXNom-Fqs0V%2AD.jpg"
  },
  {
   "id": "r10",
@@ -103,21 +72,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Bring your bike and Peak techs walk you through basic maintenance one-on-one. Good for beginners and experienced riders.",
-  "going": 73,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D206765008",
-  "image": "https://www.trumba.com/i/DgAaeLKeGn9PFt84EH9Ix94U.jpg",
-  "open": [
-   "s6",
-   "s5",
-   "s9"
-  ],
-  "here": [
-   "s6",
-   "s5",
-   "s9"
-  ]
+  "image": "https://www.trumba.com/i/DgAaeLKeGn9PFt84EH9Ix94U.jpg"
  },
  {
   "id": "r11",
@@ -133,21 +91,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A student build sprint: pick one of four tracks, team up, and build a fix for a real-world problem, then pitch it to judges.",
-  "going": 20,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D210256753",
-  "image": "https://www.trumba.com/i/DgAnlMGwneySglbFy4Zhevu%2A.jpg",
-  "open": [
-   "s6",
-   "s10",
-   "s4"
-  ],
-  "here": [
-   "s6",
-   "s10",
-   "s4"
-  ]
+  "image": "https://www.trumba.com/i/DgAnlMGwneySglbFy4Zhevu%2A.jpg"
  },
  {
   "id": "r12",
@@ -163,19 +110,10 @@ export const REAL_EVENTS = [
   "cost": "$12-$22",
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Jim Magnuson's take on Euripides' Medea, moved to 19th-century West Africa: colonialism, identity, resistance and revenge.",
-  "going": 62,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D211167957",
-  "image": "https://www.trumba.com/i/DgD53yFcR-3SXNom-Fqs0V%2AD.jpg",
-  "open": [
-   "s2",
-   "s7"
-  ],
-  "here": [
-   "s2",
-   "s7"
-  ]
+  "image": "https://www.trumba.com/i/DgD53yFcR-3SXNom-Fqs0V%2AD.jpg"
  },
  {
   "id": "r19",
@@ -191,19 +129,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Shop handmade goods from student-run businesses. New vendors each week, like nails, stickers and claw clips.",
-  "going": 39,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D206110716",
-  "image": "https://www.trumba.com/i/DgAsz6WLnAF6vewz2TGW0891.jpg",
-  "open": [
-   "s7",
-   "s2"
-  ],
-  "here": [
-   "s7",
-   "s2"
-  ]
+  "image": "https://www.trumba.com/i/DgAsz6WLnAF6vewz2TGW0891.jpg"
  },
  {
   "id": "r20",
@@ -219,19 +148,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Drop in, make a meaningful bracelet, and unwind with cozy vibes.",
-  "going": 79,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D206110245",
-  "image": "https://www.trumba.com/i/DgDCf--3JxUyrDUBr49SISyy.jpg",
-  "open": [
-   "s7",
-   "s2"
-  ],
-  "here": [
-   "s7",
-   "s2"
-  ]
+  "image": "https://www.trumba.com/i/DgDCf--3JxUyrDUBr49SISyy.jpg"
  },
  {
   "id": "r21",
@@ -247,21 +167,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A farmers-market-style resource fair with free groceries for students, first come, first served.",
-  "going": 37,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D207315552",
-  "image": "https://www.trumba.com/i/DgBxoBY8DvTrcBDY61cF4jAb.jpg",
-  "open": [
-   "s3",
-   "s8",
-   "s1"
-  ],
-  "here": [
-   "s3",
-   "s8",
-   "s1"
-  ]
+  "image": "https://www.trumba.com/i/DgBxoBY8DvTrcBDY61cF4jAb.jpg"
  },
  {
   "id": "r24",
@@ -277,19 +186,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A confidential, peer-led drop-in space to talk about self-worth, relationships, identity and wellness with a Peer Wellness Advocate.",
-  "going": 82,
   "soloFriendly": true,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D208859281",
-  "image": "https://www.trumba.com/i/DgCQ6W7y4QCP-49wc3HCN3CF.jpg",
-  "open": [
-   "s7",
-   "s5"
-  ],
-  "here": [
-   "s7",
-   "s5"
-  ]
+  "image": "https://www.trumba.com/i/DgCQ6W7y4QCP-49wc3HCN3CF.jpg"
  },
  {
   "id": "r30",
@@ -305,21 +205,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A free 2-hour class on top-rope belaying: communication, climbing basics, the figure 8 knot and the PBUS belay method.",
-  "going": 15,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D205605230",
-  "image": "https://www.trumba.com/i/DgCaCfR1rlZt-jyPoLG6vEbb.jpg",
-  "open": [
-   "s5",
-   "s6",
-   "s9"
-  ],
-  "here": [
-   "s5",
-   "s6",
-   "s9"
-  ]
+  "image": "https://www.trumba.com/i/DgCaCfR1rlZt-jyPoLG6vEbb.jpg"
  },
  {
   "id": "r31",
@@ -335,21 +224,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Level 10 Construction shares internship and entry-level opportunities for Construction Management and Civil Engineering students.",
-  "going": 80,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D208951476",
-  "image": "",
-  "open": [
-   "s6",
-   "s10",
-   "s4"
-  ],
-  "here": [
-   "s6",
-   "s10",
-   "s4"
-  ]
+  "image": ""
  },
  {
   "id": "r33",
@@ -365,21 +243,10 @@ export const REAL_EVENTS = [
   "cost": "$17 adults",
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Women's basketball in the newly renovated Hornet Pavilion.",
-  "going": 62,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D212757008",
-  "image": "https://www.trumba.com/i/DgAupBGAkLjCFAoAga6u7%2Ae4.jpg",
-  "open": [
-   "s8",
-   "s5",
-   "s3"
-  ],
-  "here": [
-   "s8",
-   "s5",
-   "s3"
-  ]
+  "image": "https://www.trumba.com/i/DgAupBGAkLjCFAoAga6u7%2Ae4.jpg"
  },
  {
   "id": "r34",
@@ -395,21 +262,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Graduate jazz piano recital by Chet Chwalik, a student of Dr. Joe Gilman.",
-  "going": 80,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D204328823",
-  "image": "https://www.trumba.com/i/DgCJ4-D2Ey2NoKk0jaRFpivh.jpg",
-  "open": [
-   "s7",
-   "s10",
-   "s3"
-  ],
-  "here": [
-   "s7",
-   "s10",
-   "s3"
-  ]
+  "image": "https://www.trumba.com/i/DgCJ4-D2Ey2NoKk0jaRFpivh.jpg"
  },
  {
   "id": "r39",
@@ -425,19 +281,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A solo exhibition of recent work by Katya Bal in the student-run Witt Gallery.",
-  "going": 22,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D205460418",
-  "image": "https://www.trumba.com/i/DgDzYk2esW%2ArUbrBG3IlK82s.jpg",
-  "open": [
-   "s7",
-   "s2"
-  ],
-  "here": [
-   "s7",
-   "s2"
-  ]
+  "image": "https://www.trumba.com/i/DgDzYk2esW%2ArUbrBG3IlK82s.jpg"
  },
  {
   "id": "r40",
@@ -453,19 +300,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A forum on human rights violations against immigrant communities and home displacement.",
-  "going": 56,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D212958922",
-  "image": "https://www.trumba.com/i/DgC1SVVT3-lvJdu%2AAzYy3SC7.jpg",
-  "open": [
-   "s9",
-   "s2"
-  ],
-  "here": [
-   "s9",
-   "s2"
-  ]
+  "image": "https://www.trumba.com/i/DgC1SVVT3-lvJdu%2AAzYy3SC7.jpg"
  },
  {
   "id": "r47",
@@ -481,21 +319,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Try wheelchair basketball, a fast-paced sport first played in 1946. Test your passing, shooting and chair skills.",
-  "going": 81,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D205603736",
-  "image": "https://www.trumba.com/i/DgD6Q-TGheeF8fBi7K9mV6jz.jpg",
-  "open": [
-   "s5",
-   "s8",
-   "s3"
-  ],
-  "here": [
-   "s5",
-   "s8",
-   "s3"
-  ]
+  "image": "https://www.trumba.com/i/DgD6Q-TGheeF8fBi7K9mV6jz.jpg"
  },
  {
   "id": "r48",
@@ -511,21 +338,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A Fatal Fury: City of Wolves tournament at the University Union Nexus Gaming Center.",
-  "going": 72,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D205489511",
-  "image": "https://www.trumba.com/i/DgBUOPl8B7cglPUWTPtJ0883.jpg",
-  "open": [
-   "s4",
-   "s10",
-   "s6"
-  ],
-  "here": [
-   "s4",
-   "s10",
-   "s6"
-  ]
+  "image": "https://www.trumba.com/i/DgBUOPl8B7cglPUWTPtJ0883.jpg"
  },
  {
   "id": "r49",
@@ -541,21 +357,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A free workshop on thrifting all the outdoor gear and clothing you need for a trip without the high prices.",
-  "going": 49,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D206804951",
-  "image": "https://www.trumba.com/i/DgAeOyMhNTamHlNoMTgilxKh.jpg",
-  "open": [
-   "s5",
-   "s6",
-   "s9"
-  ],
-  "here": [
-   "s5",
-   "s6",
-   "s9"
-  ]
+  "image": "https://www.trumba.com/i/DgAeOyMhNTamHlNoMTgilxKh.jpg"
  },
  {
   "id": "r50",
@@ -571,21 +376,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Graduate jazz saxophone recital by Alyssa Abbott, a student of Dr. Greg Johnson.",
-  "going": 40,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D204328830",
-  "image": "https://www.trumba.com/i/DgAAtf53BGPbYJ-bClW5L1E3.jpg",
-  "open": [
-   "s1",
-   "s3",
-   "s2"
-  ],
-  "here": [
-   "s1",
-   "s3",
-   "s2"
-  ]
+  "image": "https://www.trumba.com/i/DgAAtf53BGPbYJ-bClW5L1E3.jpg"
  },
  {
   "id": "r58",
@@ -601,19 +395,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Rooted & Rising: the people and milestones behind LGBTQ+ clubs, studies and services at Sac State.",
-  "going": 40,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D209131725",
-  "image": "https://www.trumba.com/i/DgASMXqJ-ddNx5UIRZZ-hUIH.jpg",
-  "open": [
-   "s7",
-   "s2"
-  ],
-  "here": [
-   "s7",
-   "s2"
-  ]
+  "image": "https://www.trumba.com/i/DgASMXqJ-ddNx5UIRZZ-hUIH.jpg"
  },
  {
   "id": "r67",
@@ -629,19 +414,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Snacks and community on the Library Quad, every Wednesday from 3–5 PM. Everyone is welcome.",
-  "going": 82,
   "soloFriendly": true,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D208464399",
-  "image": "",
-  "open": [
-   "s9",
-   "s2"
-  ],
-  "here": [
-   "s9",
-   "s2"
-  ]
+  "image": ""
  },
  {
   "id": "r68",
@@ -657,21 +433,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A free 2-hour intro to rock climbing: a safety orientation, harness fitting, tying in, movement and 1-on-1 coaching.",
-  "going": 52,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D205609552",
-  "image": "https://www.trumba.com/i/DgCaCfR1rlZt-jyPoLG6vEbb.jpg",
-  "open": [
-   "s5",
-   "s9",
-   "s6"
-  ],
-  "here": [
-   "s5",
-   "s9",
-   "s6"
-  ]
+  "image": "https://www.trumba.com/i/DgCaCfR1rlZt-jyPoLG6vEbb.jpg"
  },
  {
   "id": "r69",
@@ -687,21 +452,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Meet other student entrepreneurs and work on your business, website, project, or just an idea. All majors welcome.",
-  "going": 45,
   "soloFriendly": true,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D209670804",
-  "image": "https://www.trumba.com/i/DgA7QPPJYJ66SDjqmttiJtgn.jpg",
-  "open": [
-   "s4",
-   "s6",
-   "s10"
-  ],
-  "here": [
-   "s4",
-   "s6",
-   "s10"
-  ]
+  "image": "https://www.trumba.com/i/DgA7QPPJYJ66SDjqmttiJtgn.jpg"
  },
  {
   "id": "r76",
@@ -717,19 +471,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "FBI Collegiate Citizens Academy session in Hinde Auditorium. Meets Thursdays Nov 5, 12 and 19, 1–3 PM.",
-  "going": 24,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D204555770",
-  "image": "https://www.trumba.com/i/DgDa4GUN0fLj1hTF4HDTW9pd.jpg",
-  "open": [
-   "s8",
-   "s4"
-  ],
-  "here": [
-   "s8",
-   "s4"
-  ]
+  "image": "https://www.trumba.com/i/DgDa4GUN0fLj1hTF4HDTW9pd.jpg"
  },
  {
   "id": "r79",
@@ -745,19 +490,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Opening reception for \"Conversations From the Rack\" by Sacramento artist John Yoyogi Fortes: past and present works side by side.",
-  "going": 30,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D212262510",
-  "image": "https://www.trumba.com/i/DgALr3N9iDGMvtqOL0sUZGy%2A.jpg",
-  "open": [
-   "s2",
-   "s7"
-  ],
-  "here": [
-   "s2",
-   "s7"
-  ]
+  "image": "https://www.trumba.com/i/DgALr3N9iDGMvtqOL0sUZGy%2A.jpg"
  },
  {
   "id": "r80",
@@ -773,19 +509,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Opening reception for Recent Work by Katya Bal at the Witt Gallery.",
-  "going": 28,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D207083694",
-  "image": "https://www.trumba.com/i/DgDzYk2esW%2ArUbrBG3IlK82s.jpg",
-  "open": [
-   "s2",
-   "s7"
-  ],
-  "here": [
-   "s2",
-   "s7"
-  ]
+  "image": "https://www.trumba.com/i/DgDzYk2esW%2ArUbrBG3IlK82s.jpg"
  },
  {
   "id": "r81",
@@ -801,21 +528,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Senior composition recital by Hosna Alacozy, a student of Addie Camsuzou.",
-  "going": 80,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D204328877",
-  "image": "https://www.trumba.com/i/DgCLkcED6KBHNE7enqvkIBEk.gif",
-  "open": [
-   "s2",
-   "s3",
-   "s1"
-  ],
-  "here": [
-   "s2",
-   "s3",
-   "s1"
-  ]
+  "image": "https://www.trumba.com/i/DgCLkcED6KBHNE7enqvkIBEk.gif"
  },
  {
   "id": "r90",
@@ -831,21 +547,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A fun, free group ride around the Sac State area, on a new route every month. Bikes and guides are provided.",
-  "going": 52,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D206765013",
-  "image": "https://www.trumba.com/i/DgAQVIK%2ANg9Q79LfXd6mAdoT.jpg",
-  "open": [
-   "s5",
-   "s6",
-   "s9"
-  ],
-  "here": [
-   "s5",
-   "s6",
-   "s9"
-  ]
+  "image": "https://www.trumba.com/i/DgAQVIK%2ANg9Q79LfXd6mAdoT.jpg"
  },
  {
   "id": "r91",
@@ -861,19 +566,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "An afternoon of nail activities, self-care and community, uplifting the voices of Black women on campus.",
-  "going": 85,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D212816566",
-  "image": "https://www.trumba.com/i/DgC-ygNDgz0hsrRXibqIdUcI.jpg",
-  "open": [
-   "s5",
-   "s7"
-  ],
-  "here": [
-   "s5",
-   "s7"
-  ]
+  "image": "https://www.trumba.com/i/DgC-ygNDgz0hsrRXibqIdUcI.jpg"
  },
  {
   "id": "r93",
@@ -889,21 +585,10 @@ export const REAL_EVENTS = [
   "cost": "$25–99",
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A weekend of doing, not talking: form a team Friday night and turn a brand-new idea into a real business by Sunday.",
-  "going": 17,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D210256811",
-  "image": "https://www.trumba.com/i/DgCUwGNaPXQHvd8oyEu9bJgU.jpg",
-  "open": [
-   "s4",
-   "s10",
-   "s6"
-  ],
-  "here": [
-   "s4",
-   "s10",
-   "s6"
-  ]
+  "image": "https://www.trumba.com/i/DgCUwGNaPXQHvd8oyEu9bJgU.jpg"
  },
  {
   "id": "r99",
@@ -919,21 +604,10 @@ export const REAL_EVENTS = [
   "cost": "$32–47",
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Men's basketball vs UC Davis in the Hornet Pavilion. All seating is reserved.",
-  "going": 69,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D212746799",
-  "image": "https://www.trumba.com/i/DgD4MwXtgdRGnjPHlHTN292S.jpg",
-  "open": [
-   "s8",
-   "s5",
-   "s3"
-  ],
-  "here": [
-   "s8",
-   "s5",
-   "s3"
-  ]
+  "image": "https://www.trumba.com/i/DgD4MwXtgdRGnjPHlHTN292S.jpg"
  },
  {
   "id": "r100",
@@ -949,21 +623,10 @@ export const REAL_EVENTS = [
   "cost": "$5 students",
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Opera Theatre students perform, directed by Ryan Murray, with Aida Elkhanzade on piano.",
-  "going": 82,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D203954172",
-  "image": "https://www.trumba.com/i/DgCTEVVwbkUcZv1ZS-%2As0IcN.jpg",
-  "open": [
-   "s7",
-   "s2",
-   "s3"
-  ],
-  "here": [
-   "s7",
-   "s2",
-   "s3"
-  ]
+  "image": "https://www.trumba.com/i/DgCTEVVwbkUcZv1ZS-%2As0IcN.jpg"
  },
  {
   "id": "r108",
@@ -979,19 +642,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Give blood for the Causeway Classic vs UC Davis. You can also join the Be The Match marrow registry. Runs Nov 16–18.",
-  "going": 45,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D206922717",
-  "image": "https://www.trumba.com/i/DgAhgjrLyPQzssSxxfNb6Qa4.jpg",
-  "open": [
-   "s5",
-   "s7"
-  ],
-  "here": [
-   "s5",
-   "s7"
-  ]
+  "image": "https://www.trumba.com/i/DgAhgjrLyPQzssSxxfNb6Qa4.jpg"
  },
  {
   "id": "r112",
@@ -1007,21 +661,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A farmers-market-style resource fair with free groceries for students, first come, first served.",
-  "going": 11,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D207315553",
-  "image": "https://www.trumba.com/i/DgAdsbhR3M9BwP75kMgCZXiQ.jpg",
-  "open": [
-   "s1",
-   "s3",
-   "s8"
-  ],
-  "here": [
-   "s1",
-   "s3",
-   "s8"
-  ]
+  "image": "https://www.trumba.com/i/DgAdsbhR3M9BwP75kMgCZXiQ.jpg"
  },
  {
   "id": "r117",
@@ -1037,19 +680,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Experience Chado, the Way of Tea, in the Sokiku Nakatani Tea Room and Garden.",
-  "going": 54,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D212901401",
-  "image": "https://www.trumba.com/i/DgDH3G0cZIFFSNvbvlDL0XbU.jpeg",
-  "open": [
-   "s2",
-   "s9"
-  ],
-  "here": [
-   "s2",
-   "s9"
-  ]
+  "image": "https://www.trumba.com/i/DgDH3G0cZIFFSNvbvlDL0XbU.jpeg"
  },
  {
   "id": "r121",
@@ -1065,19 +699,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Hear firsthand stories from students who studied abroad. Part of International Education Week.",
-  "going": 23,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D212809727",
-  "image": "https://www.trumba.com/i/DgBQzooCwyzCk8EPlWVsuHA3.jpg",
-  "open": [
-   "s8",
-   "s4"
-  ],
-  "here": [
-   "s8",
-   "s4"
-  ]
+  "image": "https://www.trumba.com/i/DgBQzooCwyzCk8EPlWVsuHA3.jpg"
  },
  {
   "id": "r124",
@@ -1093,19 +718,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A high-energy dance workout: cardio, bodyweight moves and fun choreography to today's hits. All fitness levels.",
-  "going": 16,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D209510406",
-  "image": "https://www.trumba.com/i/DgD1u90JEPZR%2AneDNAoe8YNt.jpg",
-  "open": [
-   "s5",
-   "s7"
-  ],
-  "here": [
-   "s5",
-   "s7"
-  ]
+  "image": "https://www.trumba.com/i/DgD1u90JEPZR%2AneDNAoe8YNt.jpg"
  },
  {
   "id": "r125",
@@ -1121,21 +737,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Clarinet ensembles perform classical music, directed by Sandra McPherson.",
-  "going": 59,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D203954182",
-  "image": "https://www.trumba.com/i/DgBYyahh1-SoUNGs-RFgwLPe.jpg",
-  "open": [
-   "s10",
-   "s7",
-   "s1"
-  ],
-  "here": [
-   "s10",
-   "s7",
-   "s1"
-  ]
+  "image": "https://www.trumba.com/i/DgBYyahh1-SoUNGs-RFgwLPe.jpg"
  },
  {
   "id": "r132",
@@ -1151,19 +756,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A Cultural Pop-Up with community, music, art and chances to connect with fellow Hornets.",
-  "going": 72,
   "soloFriendly": true,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D207245248",
-  "image": "https://www.trumba.com/i/DgDkKxxbrttG2DtrVcgu6R09.jpg",
-  "open": [
-   "s2",
-   "s9"
-  ],
-  "here": [
-   "s2",
-   "s9"
-  ]
+  "image": "https://www.trumba.com/i/DgDkKxxbrttG2DtrVcgu6R09.jpg"
  },
  {
   "id": "r133",
@@ -1179,19 +775,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A relaxing afternoon of painting, self-expression and connection.",
-  "going": 30,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D210997925",
-  "image": "https://www.trumba.com/i/DgD-OOyRx1v1RLoBJHjH3mmW.jpg",
-  "open": [
-   "s7",
-   "s2"
-  ],
-  "here": [
-   "s7",
-   "s2"
-  ]
+  "image": "https://www.trumba.com/i/DgD-OOyRx1v1RLoBJHjH3mmW.jpg"
  },
  {
   "id": "r139",
@@ -1207,21 +794,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Nature engagement, mindful practices and planting education in the garden behind The WELL.",
-  "going": 79,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D207462189",
-  "image": "https://www.trumba.com/i/DgBFwefpNRFGl76uy9n6xIf3.jpg",
-  "open": [
-   "s5",
-   "s9",
-   "s6"
-  ],
-  "here": [
-   "s5",
-   "s9",
-   "s6"
-  ]
+  "image": "https://www.trumba.com/i/DgBFwefpNRFGl76uy9n6xIf3.jpg"
  },
  {
   "id": "r150",
@@ -1237,21 +813,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A free workshop on real cooking skills for camping trips: menu ideas, tips and some hands-on cooking.",
-  "going": 64,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D206804971",
-  "image": "https://www.trumba.com/i/DgADJZi5ZNnwYk-ROP9wFPz3.jpg",
-  "open": [
-   "s9",
-   "s5",
-   "s6"
-  ],
-  "here": [
-   "s9",
-   "s5",
-   "s6"
-  ]
+  "image": "https://www.trumba.com/i/DgADJZi5ZNnwYk-ROP9wFPz3.jpg"
  },
  {
   "id": "r153",
@@ -1267,21 +832,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Student jazz combos play arrangements and original music.",
-  "going": 54,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D203954184",
-  "image": "https://www.trumba.com/i/DgCGo8ZBkaOcZ2YB5Ijr8MCu.jpg",
-  "open": [
-   "s1",
-   "s2",
-   "s7"
-  ],
-  "here": [
-   "s1",
-   "s2",
-   "s7"
-  ]
+  "image": "https://www.trumba.com/i/DgCGo8ZBkaOcZ2YB5Ijr8MCu.jpg"
  },
  {
   "id": "r170",
@@ -1297,21 +851,10 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "A free noon concert by the modern jazz collective SSRI in the Union's Redwood Room.",
-  "going": 31,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D205489538",
-  "image": "https://www.trumba.com/i/DgDKT1x3cALll-LNv07yl1nF.jpg",
-  "open": [
-   "s10",
-   "s3",
-   "s1"
-  ],
-  "here": [
-   "s10",
-   "s3",
-   "s1"
-  ]
+  "image": "https://www.trumba.com/i/DgDKT1x3cALll-LNv07yl1nF.jpg"
  },
  {
   "id": "r181",
@@ -1327,21 +870,10 @@ export const REAL_EVENTS = [
   "cost": "$5",
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Learn the fundamentals of lead climbing and belaying. This clinic is for advanced climbers.",
-  "going": 38,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D209513915",
-  "image": "https://www.trumba.com/i/DgA-btrn7PWT7kRp412A5R-Z.jpg",
-  "open": [
-   "s6",
-   "s9",
-   "s5"
-  ],
-  "here": [
-   "s6",
-   "s9",
-   "s5"
-  ]
+  "image": "https://www.trumba.com/i/DgA-btrn7PWT7kRp412A5R-Z.jpg"
  },
  {
   "id": "r185",
@@ -1357,20 +889,9 @@ export const REAL_EVENTS = [
   "cost": 0,
   "parking": "See Sac State parking (Structures 1–5)",
   "desc": "Senior piano recital by Rachel Pal, a student of Richard Cionco.",
-  "going": 42,
   "soloFriendly": false,
   "source": "Sac State Events",
   "link": "https://events.csus.edu/?trumbaEmbed=view%3Devent%26eventid%3D204328974",
-  "image": "https://www.trumba.com/i/DgCJ4-D2Ey2NoKk0jaRFpivh.jpg",
-  "open": [
-   "s2",
-   "s10",
-   "s3"
-  ],
-  "here": [
-   "s2",
-   "s10",
-   "s3"
-  ]
+  "image": "https://www.trumba.com/i/DgCJ4-D2Ey2NoKk0jaRFpivh.jpg"
  }
 ]

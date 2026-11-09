@@ -1,7 +1,11 @@
+// Post an event (clubs and organizers only).
+// DEMO: posts are saved on this device only. Other people can't see them yet.
 import { useRef, useState } from 'react'
-import { ImagePlus, Loader2, ShieldCheck, Sparkles, Megaphone, X } from 'lucide-react'
+import { FlaskConical, ImagePlus, Loader2, Sparkles, Megaphone, X } from 'lucide-react'
 import { INTERESTS, EMOJIS } from '../data'
-import { Chip, Empty, EventCard, useGate, useNav } from '../components'
+import { Chip, Empty, EventCard } from '../components'
+import { useNav } from '../nav'
+import { useGate } from '../hooks'
 import { useStore } from '../store'
 import { readFlyer, parseFlyer } from '../flyer'
 import { placeFromText } from '../places'
@@ -32,16 +36,14 @@ export default function Post() {
       <h1 className="page-title">Post an event</h1>
       <Empty icon="📣" title="Share your club's event">Organizers can post events, or snap a flyer and we'll fill in the details.</Empty>
       <button className="card role" onClick={() => gate('organizer')}>
-        <Megaphone size={28} /><span><strong>I run a club or event</strong><span>Organizer posts go live right away</span></span>
+        <Megaphone size={28} /><span><strong>I run a club or event</strong><span>Post events for your club, ASI or department</span></span>
       </button>
       <p className="muted small center">Posting is for clubs, ASI and departments. Students can browse, save and RSVP without posting.</p>
     </div>
   )
 
-  const isOrg = state.user.role === 'organizer'
-
   // Only club / event organizers can post. Students see why, and how to switch.
-  if (!isOrg) return (
+  if (state.user.role !== 'organizer') return (
     <div className="screen">
       <h1 className="page-title">Post an event</h1>
       <Empty icon="📣" title="Posting is for clubs & organizers">
@@ -86,7 +88,7 @@ export default function Post() {
       interest: f.interest, emoji: f.emoji, place: f.place.trim() || 'Where is it?', cost: Number(f.cost) || 0,
       parking: f.parking.trim() || 'See host for details', desc: f.desc.trim() || 'Posted on Common Ground.',
       going: 1, soloFriendly: f.soloFriendly, hideCount: !f.showCount, open: [], here: [],
-      source: isOrg ? 'Club post' : 'Student post', pending: !isOrg, mine: true,
+      source: 'Club post', mine: true,
       placeId: placeFromText(f.place), image,
       startAt: startAt.toISOString(), endAt: endAt.toISOString(),
     }
@@ -105,7 +107,8 @@ export default function Post() {
   return (
     <div className="screen">
       <h1 className="page-title">Post an event</h1>
-      <p className="muted section-sub">{isOrg ? `Posting as ${state.user.org || 'your club'}. Goes live right away.` : 'Student posts get a quick check by the host club.'}</p>
+      <p className="muted section-sub">Posting as {state.user.org || 'your club'}.</p>
+      <div className="demo-note"><FlaskConical size={18} /><span><b>Demo.</b> Your event is saved on this device only. Other students will see posts once real accounts launch.</span></div>
 
       {/* Photo: drag & drop on a laptop, tap to pick on a phone */}
       <div
@@ -192,8 +195,7 @@ export default function Post() {
           </div>
         )}
 
-        <div className="note"><ShieldCheck size={18} /> {isOrg ? 'Club & ASI accounts publish instantly.' : 'Your post shows "pending club check" until the host club confirms it.'}</div>
-        <button className="btn btn-primary btn-lg" disabled={!ok} onClick={publish}>{isOrg ? 'Publish event' : 'Post event'}</button>
+        <button className="btn btn-primary btn-lg" disabled={!ok} onClick={publish}>Save event (demo)</button>
       </div>
     </div>
   )

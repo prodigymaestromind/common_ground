@@ -1,8 +1,13 @@
+// Chats: one-on-one chats and solo group chats.
+// DEMO: the other people are sample students and their replies are automatic (see demo.js).
 import { useEffect, useRef, useState } from 'react'
-import { Send, Sparkles, MapPin, Clock, Check, X, Ban, Users } from 'lucide-react'
-import { studentById } from '../data'
-import { Avatar, Empty, TopBar, useGate, useNav } from '../components'
-import { useStore, icebreakers } from '../store'
+import { Send, Sparkles, MapPin, Clock, Check, Ban, Users } from 'lucide-react'
+import { studentById } from '../demo'
+import { Avatar, DemoTag, Empty, TopBar } from '../components'
+import { useNav } from '../nav'
+import { useGate } from '../hooks'
+import { useStore } from '../store'
+import { icebreakers, GROUP_STARTERS } from '../starters'
 import { KeepInTouchButton } from './StayInTouch'
 
 export function ChatList() {
@@ -13,7 +18,7 @@ export function ChatList() {
     <div className="screen">
       <h1 className="page-title">Chats</h1>
       <Empty icon="💬" title="Chat with people going to the same things">
-        Sign in with your csus.edu email to message students who opted in to meet people.
+        Sign in to message students who opted in to meet people.
       </Empty>
       <button className="btn btn-primary btn-lg" onClick={() => gate('student')}>Sign in as a student</button>
     </div>
@@ -24,18 +29,17 @@ export function ChatList() {
 
   return (
     <div className="screen">
-      <h1 className="page-title">Chats</h1>
+      <h1 className="page-title">Chats <DemoTag /></h1>
       {chats.length === 0 && <Empty icon="💬" title="No chats yet">Say hi to someone going to the same event as you.</Empty>}
       <div className="stack-sm">
         {chats.map((c) => {
-          const last = c.messages.at(-1)
           const person = c.type === 'dm' ? studentById[c.studentId] : null
           return (
             <button key={c.id} className="card chat-row" onClick={() => nav.push('chat', { id: c.id })}>
               {person ? <Avatar person={person} size={46} /> : <span className="group-icon"><Users size={22} /></span>}
               <div className="chat-row-body">
                 <strong>{c.title}</strong>
-                <span className="muted">{preview(last)}</span>
+                <span className="muted">{preview(c.messages.at(-1))}</span>
               </div>
               {c.unread > 0 && <span className="badge">{c.unread}</span>}
             </button>
@@ -48,13 +52,13 @@ export function ChatList() {
 
 function preview(m) {
   if (!m) return ''
-  if (m.kind === 'invite') return m.invite.fromMe ? '📍 You sent an invite' : '📍 Invite to meet up'
+  if (m.kind === 'invite') return '📍 You sent an invite'
   return (m.from === 'me' ? 'You: ' : '') + m.text
 }
 
 export function Chat({ id, eventId }) {
   const nav = useNav()
-  const { state, dispatch, sendText, answerInvite, eventById, setActiveChat, showToast } = useStore()
+  const { state, dispatch, sendText, eventById, setActiveChat, showToast } = useStore()
   const [text, setText] = useState('')
   const endRef = useRef(null)
   const chat = state.chats[id]
@@ -73,7 +77,8 @@ export function Chat({ id, eventId }) {
   if (!chat) return <div className="screen"><TopBar title="Chat" /></div>
 
   const iSent = chat.messages.some((m) => m.from === 'me')
-  const ideas = iSent ? [] : person ? icebreakers(person, state.user, ev) : chat.type === 'group' ? GROUP_STARTERS : []
+  const theyReplied = person && chat.messages.some((m) => m.from === person.id && m.kind === 'text')
+  const ideas = iSent ? [] : person ? icebreakers(person, state.user, ev) : GROUP_STARTERS
   const send = (t) => {
     if (!t.trim()) return
     sendText(id, t.trim())
@@ -81,7 +86,7 @@ export function Chat({ id, eventId }) {
   }
   const block = () => {
     dispatch({ type: 'BLOCK', studentId: person.id })
-    showToast(`${person.name} blocked and reported`)
+    showToast(`${person.name} blocked. (Demo: reports aren't sent to anyone yet.)`)
     nav.pop()
   }
 
@@ -90,25 +95,26 @@ export function Chat({ id, eventId }) {
       <TopBar
         title={chat.title}
         right={person
-          ? <button className="icon-btn" onClick={block} aria-label="Block and report" title="Block & report"><Ban size={18} /></button>
+          ? <button className="icon-btn" onClick={block} aria-label="Block" title="Block"><Ban size={18} /></button>
           : <button className="link" onClick={() => { nav.pop(); showToast('You left the group') }}>Leave</button>}
       />
-      {person && <p className="chat-sub muted">{person.year} · {person.major}</p>}
-      {person && chat.messages.some((m) => m.from === person.id && m.kind === 'text') && iSent && (
-        <div className="chat-touch"><KeepInTouchButton studentId={person.id} /></div>
-      )}
+      <p className="chat-sub muted">
+        {person && <>{person.year} · {person.major}<br /></>}
+        <DemoTag>Demo chat</DemoTag> {person ? `${person.name} is a sample student. Replies are automatic.` : 'Sample students. Replies are automatic.'}
+      </p>
+      {theyReplied && iSent && <div className="chat-touch"><KeepInTouchButton studentId={person.id} /></div>}
 
       <div className="messages">
         {chat.messages.map((m) => {
           if (m.from === 'system') return <div key={m.id} className="sys">{m.text}</div>
+          if (m.kind === 'invite') return <InviteCard key={m.id} invite={m.invite} event={eventById[m.invite.eventId]} />
           const mine = m.from === 'me'
           const who = studentById[m.from]
-          if (m.kind === 'invite') return <InviteCard key={m.id} m={m} mine={mine} ev={eventById[m.invite.eventId]} onAnswer={(s) => answerInvite(id, m, s)} />
           return (
             <div key={m.id} className={`bubble-row ${mine ? 'mine' : ''}`}>
-              {!mine && chat.type === 'group' && <Avatar person={who} size={28} />}
+              {!mine && chat.type === 'group' && who && <Avatar person={who} size={28} />}
               <div className={`bubble ${mine ? 'bubble-me' : ''}`}>
-                {!mine && chat.type === 'group' && <span className="bubble-name">{who.name}</span>}
+                {!mine && chat.type === 'group' && who && <span className="bubble-name">{who.name}</span>}
                 {m.text}
               </div>
             </div>
@@ -132,30 +138,17 @@ export function Chat({ id, eventId }) {
   )
 }
 
-// Starter messages for the solo group chat
-const GROUP_STARTERS = [
-  'Hey! I came solo too 👋',
-  "I'm near the entrance, anyone close?",
-  'Want to grab seats together?',
-]
-
-function InviteCard({ m, mine, ev, onAnswer }) {
-  const { status } = m.invite
+// A meet-up invite you sent
+function InviteCard({ invite, event }) {
   return (
-    <div className={`invite ${mine ? 'mine' : ''}`}>
-      <span className="invite-label">📍 {mine ? 'You sent a meet-up invite' : 'Meet-up invite'}</span>
-      <strong>{ev?.title}</strong>
-      <span className="meta"><Clock size={14} /> Meet at {m.invite.time}</span>
-      <span className="meta"><MapPin size={14} /> {m.invite.spot}</span>
-      {status === 'pending' && !mine && (
-        <div className="invite-actions">
-          <button className="btn btn-sm btn-outline" onClick={() => onAnswer('declined')}><X size={14} /> Decline</button>
-          <button className="btn btn-sm btn-primary" onClick={() => onAnswer('accepted')}><Check size={14} /> Accept</button>
-        </div>
-      )}
-      {status === 'pending' && mine && <span className="status">Waiting for a reply…</span>}
-      {status === 'accepted' && <span className="status ok"><Check size={14} /> Plan set: {m.invite.time} · {m.invite.spot}</span>}
-      {status === 'declined' && <span className="status">Declined. No worries, you can still go solo.</span>}
+    <div className="invite mine">
+      <span className="invite-label">📍 You sent a meet-up invite</span>
+      <strong>{event?.title}</strong>
+      <span className="meta"><Clock size={14} /> Meet at {invite.time}</span>
+      <span className="meta"><MapPin size={14} /> {invite.spot}</span>
+      {invite.status === 'accepted'
+        ? <span className="status ok"><Check size={14} /> Plan set: {invite.time} · {invite.spot}</span>
+        : <span className="status">Waiting for a reply…</span>}
     </div>
   )
 }

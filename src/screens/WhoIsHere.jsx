@@ -1,7 +1,10 @@
 import { ShieldCheck, MessageCircle, Users } from 'lucide-react'
 import { soloText } from '../utils'
-import { studentById, interestById } from '../data'
-import { Avatar, LiveDot, TopBar, useExplain, useNav } from '../components'
+import { interestById } from '../data'
+import { studentById } from '../demo'
+import { Avatar, DemoTag, LiveDot, TopBar } from '../components'
+import { useNav } from '../nav'
+import { useExplain } from '../hooks'
 import { useStore } from '../store'
 
 export default function WhoIsHere({ id }) {
@@ -23,6 +26,7 @@ export default function WhoIsHere({ id }) {
       <div className="card solo-crew">
         <Users size={26} />
         <h2>{soloText(solos.length)}</h2>
+        {solos.length > 0 && e.demo && <DemoTag>Demo · sample students</DemoTag>}
         <p>{solos.length
           ? 'They opted in to meet new people at this event. Join the group chat to find each other and hang out together.'
           : 'Nobody has started the solo group yet. Start it and anyone else who came alone will see your message.'}</p>

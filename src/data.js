@@ -1,5 +1,6 @@
 import { REAL_EVENTS } from './realEvents'
-// Data for Common Ground: interests, sample students, and the real Sac State events.
+// Real data for Common Ground: interests, the Sac State events, and option lists.
+// Anything made up (sample students, counts, chat replies) lives in demo.js.
 
 export const INTERESTS = [
   { id: 'music', label: 'Music', emoji: '🎵' },
@@ -16,32 +17,9 @@ export const INTERESTS = [
 
 export const interestById = Object.fromEntries(INTERESTS.map((i) => [i.id, i]))
 
-// SAMPLE students (made up, first names only) used for the meet-people demo until real accounts exist.
-export const STUDENTS = [
-  { id: 's1', name: 'Alex', major: 'Music', year: 'Transfer', interests: ['music', 'games', 'food'], color: '#2f7d5b' },
-  { id: 's2', name: 'Maya', major: 'Art', year: 'Junior', interests: ['art', 'music', 'culture'], color: '#b0623a' },
-  { id: 's3', name: 'Walter', major: 'Comm Studies', year: 'Senior', interests: ['music', 'sports', 'food'], color: '#3d5a9e' },
-  { id: 's4', name: 'Priya', major: 'Computer Science', year: 'Transfer', interests: ['tech', 'games', 'career'], color: '#7a4aa0' },
-  { id: 's5', name: 'Jordan', major: 'Kinesiology', year: 'Freshman', interests: ['sports', 'outdoors', 'wellness'], color: '#a03d55' },
-  { id: 's6', name: 'Sam', major: 'Mech Engineering', year: 'Sophomore', interests: ['games', 'tech', 'outdoors'], color: '#2b7a8c' },
-  { id: 's7', name: 'Leah', major: 'Psychology', year: 'Transfer', interests: ['wellness', 'art', 'music'], color: '#8c6d1f' },
-  { id: 's8', name: 'Diego', major: 'Business', year: 'Junior', interests: ['career', 'food', 'sports'], color: '#5b6b2f' },
-  { id: 's9', name: 'Kim', major: 'Biology', year: 'Senior', interests: ['outdoors', 'culture', 'food'], color: '#9e3d8a' },
-  { id: 's10', name: 'Marcus', major: 'Electrical Eng', year: 'Transfer', interests: ['tech', 'games', 'music'], color: '#3a6e9e' },
-]
-
-export const studentById = Object.fromEntries(STUDENTS.map((s) => [s.id, s]))
-
-// Sample busy times for onboarding (0 = Sunday ... 6 = Saturday).
-export const SAMPLE_BUSY = [
-  { id: 'b1', label: 'Classes', days: [1, 3], start: '10:00', end: '16:15' },
-  { id: 'b2', label: 'Work', days: [2, 4], start: '14:00', end: '18:00' },
-]
-
 // Real public events from the Sac State Events calendar (events.csus.edu).
-// "going" counts and the students on each event (open / here) are SAMPLE numbers/people
-// for the preview, until real accounts + RSVPs exist.
 export const EVENTS = REAL_EVENTS
+
 export const EMOJIS = ['🎤', '🎲', '🏀', '🍕', '🎨', '💻', '🌲', '💼', '🎉', '🧘', '🎬', '📚', '☕', '🎮', '⚽', '🎶']
 
 export const MEET_SPOTS = [
@@ -51,3 +29,9 @@ export const MEET_SPOTS = [
   'Outside the event door',
 ]
 
+// Ways students can stay in touch (Profile + the Stay in touch sheet)
+export const CONTACT_TYPES = [
+  { id: 'instagram', label: 'Instagram', emoji: '📸', placeholder: '@yourhandle' },
+  { id: 'discord', label: 'Discord', emoji: '🎮', placeholder: 'username' },
+  { id: 'snapchat', label: 'Snapchat', emoji: '👻', placeholder: 'username' },
+]

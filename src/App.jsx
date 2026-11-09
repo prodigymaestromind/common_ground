@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { Home as HomeIcon, Compass, Plus, CalendarCheck, MessageCircle } from 'lucide-react'
-import { NavCtx, Logo } from './components'
+import { Home as HomeIcon, Compass, Plus, CalendarCheck, MessageCircle, MessageSquareHeart } from 'lucide-react'
+import { Logo } from './components'
+import { NavCtx } from './nav'
 import { APP_VERSION, CREDIT } from './version'
 import { StoreProvider, useStore } from './store'
 import SignIn, { Welcome } from './screens/Onboarding'
-import HomeBoard from './screens/HomeBoard'
+import Home from './screens/Home'
 import PlaceMap from './screens/PlaceMap'
 import Posted from './screens/Posted'
-import { FeedbackButton, FeedbackNudge, FeedbackSheet } from './screens/Feedback'
+import { FeedbackNudge, FeedbackSheet } from './screens/Feedback'
 import Explore from './screens/Explore'
 import EventDetail from './screens/EventDetail'
 import WhoIsHere from './screens/WhoIsHere'
@@ -17,7 +18,7 @@ import Post from './screens/Post'
 import Profile from './screens/Profile'
 
 const SCREENS = {
-  home: HomeBoard, explore: Explore, post: Post, plans: Plans, chats: ChatList,
+  home: Home, explore: Explore, post: Post, plans: Plans, chats: ChatList,
   event: EventDetail, here: WhoIsHere, chat: Chat, profile: Profile, signin: SignIn, posted: Posted, place: PlaceMap,
 }
 
@@ -46,7 +47,7 @@ let nextId = 1
 const entry = (name, params = {}) => ({ id: nextId++, name, params })
 
 function ScreenFor({ item }) {
-  const Screen = SCREENS[item.name] || HomeBoard
+  const Screen = SCREENS[item.name] || Home
   const { then, ...shown } = item.params
   return <Screen {...shown} then={then} />
 }
@@ -75,6 +76,7 @@ function Shell() {
     }),
     pop: () => setStack((s) => (s.length > 1 ? s.slice(0, -1) : s)),
     tab: (name) => setStack([entry(name)]),
+    feedback: () => setFbOpen(true),
   }
 
   const rootTab = stack[0].name
@@ -84,7 +86,7 @@ function Shell() {
 
   return (
     <NavCtx.Provider value={nav}>
-      <div className={`phone style-board ${wide ? 'is-wide' : ''} ${panel ? 'has-panel' : ''}`}>
+      <div className={`phone ${wide ? 'is-wide' : ''} ${panel ? 'has-panel' : ''}`}>
         {!state.welcomed ? <Welcome /> : (
           <>
             {showTabs && (
@@ -96,6 +98,7 @@ function Shell() {
                     <span className="tab-label">{center ? 'Post an event' : label}</span>
                   </button>
                 ))}
+                <button className="side-feedback" onClick={nav.feedback}><MessageSquareHeart size={18} /> Give feedback</button>
                 <div className="side-foot">
                   <span>Common Ground v{APP_VERSION}</span>
                   <span>{CREDIT}</span>
@@ -110,8 +113,7 @@ function Shell() {
                 <ScreenFor key={panel.id} item={panel} />
               </aside>
             )}
-            {atRoot && <FeedbackButton onOpen={() => setFbOpen(true)} />}
-            {atRoot && <FeedbackNudge onOpen={() => setFbOpen(true)} />}
+            {atRoot && <FeedbackNudge onOpen={nav.feedback} />}
           </>
         )}
         <FeedbackSheet open={fbOpen} onClose={() => setFbOpen(false)} />

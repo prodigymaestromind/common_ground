@@ -1,8 +1,9 @@
+// Shown right after you post an event.
 import { Eye, Home as HomeIcon, Plus } from 'lucide-react'
-import { EventCard, useNav } from '../components'
+import { EventCard } from '../components'
+import { useNav } from '../nav'
 import { useStore } from '../store'
 
-// Shown right after you post an event
 export default function Posted({ id }) {
   const nav = useNav()
   const { eventById } = useStore()
@@ -10,8 +11,8 @@ export default function Posted({ id }) {
   return (
     <div className="screen posted">
       <div className="posted-check">✓</div>
-      <h1 className="page-title center">{e?.pending ? 'Event posted!' : 'Event published!'}</h1>
-      <p className="muted center">{e?.pending ? 'It shows in the feed now with a “pending club check” tag.' : 'Students can find it in the feed and on the map.'}</p>
+      <h1 className="page-title center">Event saved!</h1>
+      <p className="muted center">Demo: it shows in the feed and on the map on this device only. Other students will see posts once real accounts launch.</p>
       {e && <EventCard event={e} preview />}
       <div className="stack-sm">
         <button className="btn btn-primary btn-lg" onClick={() => nav.push('event', { id })}><Eye size={18} /> View event</button>

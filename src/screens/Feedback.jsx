@@ -1,19 +1,12 @@
-// In-app feedback: an always-there button + one gentle nudge after someone has tried a few things.
+// In-app feedback form + one gentle nudge after someone has tried a few things.
+// (The buttons that open it are in the Home header, the desktop sidebar and Profile.)
 import { useEffect, useState } from 'react'
-import { MessageSquareHeart, Star, X, Loader2 } from 'lucide-react'
+import { Star, X, Loader2 } from 'lucide-react'
 import { Sheet } from '../components'
 import { useStore } from '../store'
 import { sendFeedback } from '../feedback'
 
 const USE_IT = ['Yes', 'Maybe', 'No']
-
-export function FeedbackButton({ onOpen }) {
-  return (
-    <button className="fb-fab" onClick={onOpen} aria-label="Give feedback">
-      <MessageSquareHeart size={18} /> Feedback
-    </button>
-  )
-}
 
 // Small card that slides up once (not a blocking pop-up)
 export function FeedbackNudge({ onOpen }) {

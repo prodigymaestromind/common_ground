@@ -1,17 +1,21 @@
+// Welcome screen + sign in.
+// DEMO: sign-in only checks that the email ends in @csus.edu. Nothing is verified or sent anywhere yet.
 import { useState } from 'react'
-import { ShieldCheck, Trash2, Plus, GraduationCap, Megaphone, FlaskConical } from 'lucide-react'
-import { INTERESTS, SAMPLE_BUSY, EVENTS } from '../data'
-import { Chip, Cover, Logo, TopBar, useNav } from '../components'
+import { Trash2, Plus, GraduationCap, Megaphone, FlaskConical } from 'lucide-react'
+import { INTERESTS } from '../data'
+import { Chip, Cover, Logo, TopBar } from '../components'
+import { useNav } from '../nav'
 import { useStore } from '../store'
-import { uid } from '../utils'
+import { uid, isPast } from '../utils'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 // ----- First screen: look around first, sign in later -----
 export function Welcome() {
   const nav = useNav()
-  const { dispatch } = useStore()
-  const floaters = ['r34', 'r48', 'r33'].map((id) => EVENTS.find((e) => e.id === id)).filter(Boolean)
+  const { dispatch, events } = useStore()
+  // the next three events coming up
+  const [floaters] = useState(() => events.filter((e) => !e.mine && !isPast(e)).sort((a, b) => a.startAt - b.startAt).slice(0, 3))
 
   return (
     <div className="onboard">
@@ -37,7 +41,7 @@ export function Welcome() {
         <button className="btn btn-ghost-light" onClick={() => { nav.tab('home'); dispatch({ type: 'WELCOMED' }); nav.push('signin', {}) }}>
           I have an account · Sign in
         </button>
-        <p className="small muted-light">No account needed to browse.</p>
+        <p className="small muted-light">No account needed · Demo preview with sample people</p>
       </div>
     </div>
   )
@@ -53,17 +57,17 @@ export default function SignIn({ role: startRole, reason, then }) {
   const [email, setEmail] = useState('')
   const [org, setOrg] = useState('')
   const [interests, setInterests] = useState([])
-  const [busy, setBusy] = useState(SAMPLE_BUSY)
+  const [busy, setBusy] = useState([])
 
   const emailOk = /@csus\.edu$/i.test(email.trim())
   const toggle = (id) => setInterests((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
-  const finish = (useBusy) => {
+  const finish = () => {
     dispatch({
       type: 'SIGN_UP',
       user: {
         name: name.trim(), email: email.trim(), role, org: org.trim(),
         interests: interests.length ? interests : INTERESTS.map((i) => i.id).slice(0, 3),
-        busy: useBusy ? busy : [],
+        busy,
       },
     })
     dispatch({ type: 'WELCOMED' })
@@ -98,10 +102,10 @@ export default function SignIn({ role: startRole, reason, then }) {
         <div className="onboard-step flat">
           <Progress step={1} total={total} />
           <h2>{isOrg ? 'Organizer sign in' : 'Who are you?'}</h2>
-          <p className="muted">{isOrg ? 'Organizer accounts can publish events right away.' : 'Only your first name is ever shown to other students.'}</p>
+          <p className="muted">{isOrg ? 'Post events for your club, ASI or department.' : 'Only your first name is ever shown to other students.'}</p>
           <div className="test-login">
             <FlaskConical size={18} />
-            <span><b>Trying it out?</b> Type your first name, then use <b>test@csus.edu</b> as the email.</span>
+            <span><b>Demo sign-in.</b> Type your first name, then use <b>test@csus.edu</b> as the email. Nothing is verified or sent anywhere yet.</span>
             {email !== 'test@csus.edu' && <button className="link" onClick={() => setEmail('test@csus.edu')}>Fill it in</button>}
           </div>
           <label className="field">
@@ -111,7 +115,7 @@ export default function SignIn({ role: startRole, reason, then }) {
           <label className="field">
             <span>Sac State email</span>
             <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@csus.edu" inputMode="email" />
-            {email && !emailOk && <small className="error">Use your @csus.edu email so everyone here is a real student.</small>}
+            {email && !emailOk && <small className="error">Use an @csus.edu email. For the demo, test@csus.edu works.</small>}
           </label>
           {isOrg && (
             <label className="field">
@@ -119,9 +123,8 @@ export default function SignIn({ role: startRole, reason, then }) {
               <input value={org} onChange={(e) => setOrg(e.target.value)} placeholder="e.g. ACM Sac State" />
             </label>
           )}
-          <div className="note"><ShieldCheck size={18} /> Verified students only. No public profiles, no follower counts.</div>
           <button className="btn btn-primary btn-lg" disabled={!name.trim() || !emailOk || (isOrg && !org.trim())}
-            onClick={() => (isOrg ? finish(false) : setStep(2))}>
+            onClick={() => (isOrg ? finish() : setStep(2))}>
             {isOrg ? 'Sign in' : 'Continue'}
           </button>
         </div>
@@ -147,10 +150,9 @@ export default function SignIn({ role: startRole, reason, then }) {
         <div className="onboard-step flat">
           <Progress step={3} total={3} />
           <h2>When are you busy?</h2>
-          <p className="muted">Optional. We'll tell you which events actually fit around class and work. Stays on your phone.</p>
+          <p className="muted">Optional. Add your classes or work, and every event shows whether it fits your day. Stays on your phone.</p>
           <BusyEditor busy={busy} setBusy={setBusy} />
-          <button className="btn btn-primary btn-lg" onClick={() => finish(true)}>Finish</button>
-          <button className="btn btn-ghost" onClick={() => finish(false)}>Skip for now</button>
+          <button className="btn btn-primary btn-lg" onClick={finish}>{busy.length ? 'Finish' : 'Skip for now'}</button>
         </div>
       )}
     </div>
@@ -190,8 +192,8 @@ export function BusyEditor({ busy, setBusy }) {
           </div>
         </div>
       ))}
-      <button className="btn btn-outline" onClick={() => setBusy((b) => [...b, { id: uid(), label: 'Busy', days: [1], start: '09:00', end: '12:00' }])}>
-        <Plus size={16} /> Add a block
+      <button className="btn btn-outline" onClick={() => setBusy((b) => [...b, { id: uid(), label: 'Class', days: [1], start: '09:00', end: '12:00' }])}>
+        <Plus size={16} /> Add class or work time
       </button>
     </div>
   )

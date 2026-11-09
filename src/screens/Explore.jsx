@@ -1,33 +1,35 @@
-import { useState } from 'react'
+// Explore: search and filter every upcoming event, as a list or on the campus map.
+import { lazy, Suspense, useState } from 'react'
 import { Search, List, Map as MapIcon } from 'lucide-react'
 import { INTERESTS } from '../data'
 import { Chip, EventCard, Empty } from '../components'
+import { useNow } from '../hooks'
 import { useStore } from '../store'
 import { isGone, dayLabel, fitCheck, weekBucket } from '../utils'
-import CampusMap from './MapView'
 
+// The map library is big, so it only loads when someone opens the map.
+const CampusMap = lazy(() => import('./MapView'))
+
+const RANGES = ['This week', 'Next week', 'All upcoming']
 const QUICK = [
   { id: 'free', label: 'Free' },
   { id: 'fits', label: '✓ Fits my day' },
   { id: 'solo', label: '✨ Welcomes solo' },
 ]
 
-const remembered = { view: 'list', range: 'This week' }
-
 export default function Explore() {
-  const { state, events } = useStore()
+  const { state, events, explore, setExplore } = useStore()
+  const now = useNow()
   const [q, setQ] = useState('')
   const [quick, setQuick] = useState([])
   const [interest, setInterest] = useState(null)
-  // remember List/Map + week tab when you come back from an event
-  const [view, setViewState] = useState(remembered.view)
-  const [range, setRangeState] = useState(remembered.range)
-  const setView = (v) => { remembered.view = v; setViewState(v) }
-  const setRange = (r) => { remembered.range = r; setRangeState(r) }
+  const { view, range } = explore
+  const setView = (v) => setExplore((x) => ({ ...x, view: v }))
+  const setRange = (r) => setExplore((x) => ({ ...x, range: r }))
 
   const toggleQuick = (id) => setQuick((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
   const list = events
-    .filter((e) => !isGone(e))
+    .filter((e) => !isGone(e, now))
     .filter((e) => range === 'All upcoming' || weekBucket(e.startAt) === range)
     .filter((e) => !q || `${e.title} ${e.host} ${e.place}`.toLowerCase().includes(q.toLowerCase()))
     .filter((e) => !interest || e.interest === interest)
@@ -54,7 +56,7 @@ export default function Explore() {
         </div>
       </div>
       <div className="seg">
-        {['This week', 'Next week', 'All upcoming'].map((r) => (
+        {RANGES.map((r) => (
           <button key={r} className={range === r ? 'on' : ''} onClick={() => setRange(r)}>{r}</button>
         ))}
       </div>
@@ -71,7 +73,11 @@ export default function Explore() {
         ))}
       </div>
 
-      {view === 'map' && <CampusMap events={list} />}
+      {view === 'map' && (
+        <Suspense fallback={<div className="map map-loading">Loading map…</div>}>
+          <CampusMap events={list} />
+        </Suspense>
+      )}
       {view === 'list' && groups.length === 0 && <Empty icon="🔍" title="Nothing matches">Try removing a filter.</Empty>}
       {view === 'list' && groups.map((g) => (
         <section key={g.label}>
@@ -79,7 +85,12 @@ export default function Explore() {
           <div className="stack card-grid">{g.items.map((e) => <EventCard key={e.id} event={e} />)}</div>
         </section>
       ))}
-      {view === 'list' && groups.length > 0 && <p className="end-note">That's everything {range === 'All upcoming' ? 'coming up' : range.toLowerCase()} ✓{range === 'This week' && <> · <button className="link" onClick={() => setRange('Next week')}>See next week →</button></>}</p>}
+      {view === 'list' && groups.length > 0 && (
+        <p className="end-note">
+          That's everything {range === 'All upcoming' ? 'coming up' : range.toLowerCase()} ✓
+          {range === 'This week' && <> · <button className="link" onClick={() => setRange('Next week')}>See next week →</button></>}
+        </p>
+      )}
     </div>
   )
 }

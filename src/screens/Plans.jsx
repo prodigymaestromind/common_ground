@@ -1,5 +1,8 @@
-import { studentById } from '../data'
-import { Avatar, EventCard, Empty, useGate, useNav } from '../components'
+// Plans: what you're going to, what you saved, and the people you've met.
+import { studentById } from '../demo'
+import { Avatar, DemoTag, EventCard, Empty } from '../components'
+import { useNav } from '../nav'
+import { useGate, useNow } from '../hooks'
 import { useStore } from '../store'
 import { isGone, weekBucket } from '../utils'
 import { KeepInTouchButton } from './StayInTouch'
@@ -21,7 +24,8 @@ export default function Plans() {
   const nav = useNav()
   const gate = useGate()
   const { state, events, eventById } = useStore()
-  const upcoming = events.filter((e) => !isGone(e)).sort((a, b) => a.startAt - b.startAt)
+  const now = useNow()
+  const upcoming = events.filter((e) => !isGone(e, now)).sort((a, b) => a.startAt - b.startAt)
   const going = upcoming.filter((e) => state.rsvp[e.id] === 'going')
   const saved = upcoming.filter((e) => state.rsvp[e.id] === 'saved')
   const hosting = upcoming.filter((e) => e.mine)
@@ -47,7 +51,7 @@ export default function Plans() {
 
       {meetups.length > 0 && (
         <section>
-          <h2 className="section-title">Meet-ups set</h2>
+          <h2 className="section-title">Meet-ups set <DemoTag /></h2>
           <div className="stack-sm">
             {meetups.map(({ chat, m }) => {
               const p = studentById[chat.studentId]
@@ -87,8 +91,8 @@ export default function Plans() {
 
       {met.length > 0 && (
         <section>
-          <h2 className="section-title">Stay in touch?</h2>
-          <p className="muted section-sub">Swap Instagram, Discord and more. Only shared if you <b>both</b> say yes.</p>
+          <h2 className="section-title">Stay in touch? <DemoTag /></h2>
+          <p className="muted section-sub">Swap Instagram, Discord or Snapchat. Only shared if you <b>both</b> say yes.</p>
           <div className="stack-sm">
             {met.map((s) => {
               const p = studentById[s]

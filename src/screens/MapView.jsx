@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { PLACES, CAMPUS_CENTER } from '../places'
-import { EventCard, useNav } from '../components'
+import { EventCard } from '../components'
+import { useNav } from '../nav'
 import { isLive } from '../utils'
 
 export default function CampusMap({ events, focus }) {

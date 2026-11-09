@@ -1,9 +1,9 @@
-import { ShieldCheck, RotateCcw, LogOut } from 'lucide-react'
-import { INTERESTS } from '../data'
-import { Avatar, Chip, TopBar, useNav } from '../components'
+import { FlaskConical, MessageSquareHeart, RotateCcw, LogOut } from 'lucide-react'
+import { INTERESTS, CONTACT_TYPES } from '../data'
+import { Avatar, Chip, TopBar } from '../components'
+import { useNav } from '../nav'
 import { useStore } from '../store'
 import { BusyEditor } from './Onboarding'
-import { CONTACT_TYPES } from './StayInTouch'
 import { APP_VERSION, CREDIT } from '../version'
 
 export default function Profile() {
@@ -26,7 +26,8 @@ export default function Profile() {
       <div className="profile-head">
         <Avatar person={{ name: u.name, color: 'var(--green)' }} size={72} />
         <h1>{u.name}</h1>
-        <p className="muted">{u.email} · <ShieldCheck size={14} /> {u.role === 'organizer' ? `Organizer · ${u.org}` : 'Verified student'}</p>
+        <p className="muted">{u.email}{u.role === 'organizer' ? ` · Organizer · ${u.org}` : ''}</p>
+        <p className="muted small"><FlaskConical size={14} /> Demo account. Your email isn't verified yet, and everything stays on this device.</p>
       </div>
 
       {u.role === 'organizer' && (
@@ -68,9 +69,10 @@ export default function Profile() {
         <li>Only your first name + interests are ever shown, and only at events where you turn on “open to company.”</li>
         <li>No follower counts, likes or popularity scores.</li>
         <li>Your location is never shared.</li>
-        <li>You can block and report anyone from a chat.</li>
+        <li>You can block anyone from a chat. (Demo: reports aren't sent to anyone yet.)</li>
       </ul>
 
+      <button className="btn btn-outline" onClick={nav.feedback}><MessageSquareHeart size={16} /> Give feedback</button>
       <button className="btn btn-outline" onClick={() => { dispatch({ type: 'SIGN_OUT' }); nav.tab('home') }}><LogOut size={16} /> Sign out</button>
       <button className="btn btn-ghost danger" onClick={() => { if (confirm('Reset the app on this phone? This clears your plans, chats and sign-in.')) dispatch({ type: 'RESET' }) }}>
         <RotateCcw size={16} /> Reset app

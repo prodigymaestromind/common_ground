@@ -1,6 +1,4 @@
-// Campus places: map pins + cover photos.
-// PHOTOS: drop your own photo into  public/places/<id>.jpg  (e.g. public/places/union.jpg)
-// and it shows up automatically. Until then a colored illustration is used.
+// Campus places: map pins + the tile colors/icons used when an event has no photo.
 // COORDINATES (checked Nov 2026):
 //   from public listings: Capistrano, Riverside, Mendocino, Shasta (Waze place data),
 //   The Nest / Yosemite Hall (Wikipedia), Library (Wikimedia Commons),
@@ -42,5 +40,3 @@ export function placeFromText(text = '') {
   if (t.includes('tschannen') || t.includes('teb')) return 'teb'
   return 'union'
 }
-
-export const photoUrl = (id) => `${import.meta.env.BASE_URL}places/${id}.jpg`
