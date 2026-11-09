@@ -353,7 +353,7 @@ export const REAL_EVENTS = [
  },
  {
   "id": "r33",
-  "placeId": "nest",
+  "placeId": "well",
   "title": "Women's Basketball vs Cal State East Bay",
   "host": "Hornet Athletics",
   "need": "Enter through Gate 2a of Hornet Stadium (not The WELL's front door) · buy tickets ahead",
@@ -907,7 +907,7 @@ export const REAL_EVENTS = [
  },
  {
   "id": "r99",
-  "placeId": "nest",
+  "placeId": "well",
   "title": "Men's Basketball vs UC Davis",
   "host": "Hornet Athletics",
   "need": "Enter through Gate 2a of Hornet Stadium · OneCard offers available",

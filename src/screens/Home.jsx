@@ -4,6 +4,7 @@ import { Compass } from 'lucide-react'
 import { INTERESTS } from '../data'
 import { Avatar, Logo, SignInButton, useNav } from '../components'
 import { useStore } from '../store'
+import { APP_VERSION, CREDIT } from '../version'
 import { isLive, isGone, dayLabel, fitCheck } from '../utils'
 
 // Shared logic for every Home style
@@ -51,6 +52,7 @@ export function CaughtUp() {
       <strong>You're all caught up</strong>
       <p className="muted">That's everything here. Go live your life 🌿</p>
       <button className="btn btn-outline" onClick={() => nav.tab('explore')}><Compass size={16} /> Browse all events</button>
+      <p className="version-tag">v{APP_VERSION} · {CREDIT}</p>
     </div>
   )
 }

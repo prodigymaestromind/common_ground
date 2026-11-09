@@ -4,6 +4,7 @@ import { Avatar, Chip, TopBar, useNav } from '../components'
 import { useStore } from '../store'
 import { BusyEditor } from './Onboarding'
 import { CONTACT_TYPES } from './StayInTouch'
+import { APP_VERSION, CREDIT } from '../version'
 
 export default function Profile() {
   const nav = useNav()
@@ -74,6 +75,7 @@ export default function Profile() {
       <button className="btn btn-ghost danger" onClick={() => { if (confirm('Reset the app on this phone? This clears your plans, chats and sign-in.')) dispatch({ type: 'RESET' }) }}>
         <RotateCcw size={16} /> Reset app
       </button>
+      <p className="version-tag">Common Ground v{APP_VERSION} · {CREDIT}</p>
     </div>
   )
 }

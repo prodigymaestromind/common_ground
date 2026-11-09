@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Home as HomeIcon, Compass, Plus, CalendarCheck, MessageCircle } from 'lucide-react'
 import { NavCtx, Logo } from './components'
+import { APP_VERSION, CREDIT } from './version'
 import { StoreProvider, useStore } from './store'
 import SignIn, { Welcome } from './screens/Onboarding'
 import HomeBoard from './screens/HomeBoard'
@@ -95,6 +96,10 @@ function Shell() {
                     <span className="tab-label">{center ? 'Post an event' : label}</span>
                   </button>
                 ))}
+                <div className="side-foot">
+                  <span>Common Ground v{APP_VERSION}</span>
+                  <span>{CREDIT}</span>
+                </div>
               </nav>
             )}
             <main ref={scroller} className={`scroll ${showTabs ? 'with-tabs' : ''}`}>

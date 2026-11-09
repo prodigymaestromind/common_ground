@@ -632,3 +632,13 @@ a.btn { text-decoration: none; }
 .spot-arrow.bottom { bottom: -8px; }
 @media (prefers-reduced-motion: reduce) { .spot-hole { animation: none; } }
 .phone:has(.spot) .toast { display: none; }
+
+/* version + credit */
+.side-foot { display: none; }
+.version-tag { margin-top: 6px; font-size: 11px; color: #a3aaa5; text-align: center; letter-spacing: 0.02em; }
+@media (min-width: 1024px) {
+  .is-wide .side-foot { display: flex; order: 11; margin-top: auto; flex-direction: column; align-items: flex-end; gap: 2px; padding: 10px 6px 0; font-size: 11px; color: #a3aaa5; text-align: right; letter-spacing: 0.02em; }
+  .is-wide .side-foot span:first-child { font-weight: 700; color: #8f9893; }
+}
+.caught-up .version-tag { align-self: flex-end; margin-top: 14px; }
+@media (min-width: 1024px) { .is-wide .caught-up .version-tag { display: none; } }
