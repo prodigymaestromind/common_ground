@@ -1,9 +1,9 @@
 // "Board" style: photo-first grid inspired by Pinterest / Poppin.
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Users } from 'lucide-react'
 import { studentById } from '../data'
 import { Avatar, Cover, LiveDot, SaveButton, useNav } from '../components'
-import { dayLabel, fmtTime, isLive, isPast, weekBucket } from '../utils'
+import { dayLabel, fmtTime, isLive, isPast, showGoing, weekBucket } from '../utils'
 import { HomeHeader, CaughtUp, useHomeData } from './Home'
 
 const FILTERS = [
@@ -36,7 +36,7 @@ export default function HomeBoard() {
   }[filter]
 
   return (
-    <div className="screen">
+    <div className="screen screen-wide">
       <HomeHeader />
       <div className="greeting">
         <h1>{user ? `Discover, ${user.name}` : 'Discover'}</h1>
@@ -81,7 +81,7 @@ export function BoardCard({ event, tall }) {
       <div className="pin-foot">
         <span className="faces">
           {faces.map((p) => <Avatar key={p.id} person={p} size={22} />)}
-          {event.hideCount ? <span className="pin-new">New</span> : typeof event.going === 'number' && <span className="pin-going"><Users size={13} /> {event.going} going</span>}
+          {showGoing(event) ? <span className="pin-going"><Users size={13} /> {event.going} going</span> : <span className="pin-new">New event</span>}
         </span>
         <SaveButton event={event} />
       </div>
@@ -89,12 +89,27 @@ export function BoardCard({ event, tall }) {
   )
 }
 
-// Two columns that fill evenly (left, right, left, right…)
+// How many columns fit: 2 on phones, 3 on iPad, 4+ on wide screens
+function useColumns(ref, min = 220) {
+  const [n, setN] = useState(2)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setN(Math.max(2, Math.min(5, Math.floor(e.contentRect.width / min)))))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [ref, min])
+  return n
+}
+
+// Columns that fill evenly (left, right, left, right…)
 export function Masonry({ events }) {
-  const cols = [[], []]
-  events.forEach((e, i) => cols[i % 2].push({ e, i, tall: i % 4 === 0 || i % 4 === 3 }))
+  const ref = useRef(null)
+  const n = useColumns(ref)
+  const cols = Array.from({ length: n }, () => [])
+  events.forEach((e, i) => cols[i % n].push({ e, i, tall: (i + Math.floor(i / n)) % 2 === 0 }))
   return (
-    <div className="masonry">
+    <div ref={ref} className="masonry" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
       {cols.map((c, k) => (
         <div key={k} className="masonry-col">{c.map(({ e, i, tall }) => (
           <div key={e.id} className="pop-in" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}><BoardCard event={e} tall={tall} /></div>

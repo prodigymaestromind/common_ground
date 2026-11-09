@@ -73,7 +73,7 @@ export function Chat({ id, eventId }) {
   if (!chat) return <div className="screen"><TopBar title="Chat" /></div>
 
   const iSent = chat.messages.some((m) => m.from === 'me')
-  const ideas = person && !iSent ? icebreakers(person, state.user, ev) : []
+  const ideas = iSent ? [] : person ? icebreakers(person, state.user, ev) : chat.type === 'group' ? GROUP_STARTERS : []
   const send = (t) => {
     if (!t.trim()) return
     sendText(id, t.trim())
@@ -131,6 +131,13 @@ export function Chat({ id, eventId }) {
     </div>
   )
 }
+
+// Starter messages for the solo group chat
+const GROUP_STARTERS = [
+  'Hey! I came solo too 👋',
+  "I'm near the entrance, anyone close?",
+  'Want to grab seats together?',
+]
 
 function InviteCard({ m, mine, ev, onAnswer }) {
   const { status } = m.invite

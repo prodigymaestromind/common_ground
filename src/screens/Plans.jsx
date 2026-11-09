@@ -12,7 +12,7 @@ function ByWeek({ events }) {
   return groups.map((g) => (
     <div key={g.label} className="stack">
       <h3 className="week-label">{g.label}</h3>
-      {g.items.map((e) => <EventCard key={e.id} event={e} />)}
+      <div className="stack card-grid">{g.items.map((e) => <EventCard key={e.id} event={e} />)}</div>
     </div>
   ))
 }
@@ -36,7 +36,7 @@ export default function Plans() {
   ))].filter((s) => !state.blocked.includes(s))
 
   return (
-    <div className="screen">
+    <div className="screen screen-wide">
       <h1 className="page-title">My plans</h1>
       {!state.user && (
         <div className="card locked">
@@ -69,7 +69,7 @@ export default function Plans() {
       {hosting.length > 0 && (
         <section>
           <h2 className="section-title">Hosting</h2>
-          <div className="stack">{hosting.map((e) => <EventCard key={e.id} event={e} />)}</div>
+          <div className="stack card-grid">{hosting.map((e) => <EventCard key={e.id} event={e} />)}</div>
         </section>
       )}
 

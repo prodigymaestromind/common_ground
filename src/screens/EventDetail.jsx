@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Clock, MapPin, DollarSign, Car, Users, Bookmark, BookmarkCheck, Check, ShieldCheck, MessageCircle, UserPlus, ExternalLink, Radio, Trash2, CalendarPlus, Navigation, ChevronRight } from 'lucide-react'
 import { studentById, interestById, MEET_SPOTS } from '../data'
 import { Avatar, Cover, FitBadge, LiveDot, Sheet, SoloBadge, TopBar, useExplain, useGate, useNav } from '../components'
 import { PLACES } from '../places'
 import { useStore } from '../store'
-import { costLabel, dayLabel, fullDate, fmtRange, fmtTime, isLive, isPast, downloadIcs, googleCalUrl, appleMapsUrl, googleMapsUrl } from '../utils'
+import { costLabel, dayLabel, fullDate, fmtRange, fmtTime, isLive, isPast, showGoing, companyText, soloText, COUNT_MIN, downloadIcs, googleCalUrl, appleMapsUrl, googleMapsUrl } from '../utils'
 
 export default function EventDetail({ id }) {
   const nav = useNav()
@@ -15,10 +15,11 @@ export default function EventDetail({ id }) {
   const [explain, popup] = useExplain()
   const gate = useGate()
   const e = eventById[id]
-  const showsCount = e && !e.mine && !e.hideCount && typeof e.going === 'number'
+  const countRow = useRef(null)
+  const showsCount = e && !e.mine && showGoing(e)
   // first time someone sees a going count, explain it once
   useEffect(() => {
-    if (showsCount && !state.tips?.count) { const t = setTimeout(() => explain('count'), 500); return () => clearTimeout(t) }
+    if (showsCount && !state.tips?.count) { const t = setTimeout(() => explain('count', null, countRow.current), 500); return () => clearTimeout(t) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   if (!e) return <div className="screen"><TopBar title="Event" /><p>Event not found.</p></div>
 
@@ -62,7 +63,9 @@ export default function EventDetail({ id }) {
           </li>
           <li><DollarSign size={18} /><div><strong>{costLabel(e.cost)}</strong>{!e.cost && <span>No ticket needed</span>}</div></li>
           <li><Car size={18} /><div><strong>Parking</strong><span>{e.parking}</span></div></li>
-          <li><Users size={18} /><div>{e.hideCount && !e.mine ? <><strong>New event</strong><span>Be one of the first to go</span></> : typeof e.going === 'number' ? <><strong>{e.going + (going ? 1 : 0)} going</strong><span>{people.length} open to meeting new people</span></> : <><strong>{people.length} open to meeting new people</strong><span>Tap “I'm going” to find someone to go with</span></>}</div></li>
+          <li ref={countRow}><Users size={18} /><div>{e.mine || showsCount
+            ? <><strong>{e.going + (going && !e.mine ? 1 : 0)} going</strong><span>{companyText(people.length)}</span></>
+            : <><strong>{companyText(people.length)}</strong><span>New event · be one of the first to go</span></>}</div></li>
         </ul>
         {e.soloFriendly && <div className="note">✨ <span><b>Welcomes people coming alone.</b> {e.source === 'Sac State Events' ? 'The organizers invite people to come meet others here, so it is a good one to go to on your own.' : 'The host will help solo arrivals meet others (a greeter, mixed tables or an icebreaker).'}</span></div>}
         {!ended && (
@@ -80,12 +83,12 @@ export default function EventDetail({ id }) {
         )}
         <p className="source"><ExternalLink size={14} /> Source: {e.source === 'Sac State Events' ? 'Sac State Events (events.csus.edu)' : e.source}</p>
 
-        {live && e.here?.length > 0 && (
+        {live && !e.mine && (
           <div className="card here-card">
             <Radio size={22} />
             <div>
-              <strong>Came alone? You're not the only one.</strong>
-              <span>{e.here.length} people here came solo and want to meet people.</span>
+              <strong>{e.here?.length ? 'Came alone? You\'re not the only one.' : 'Came alone? Start the solo group.'}</strong>
+              <span>{e.here?.length ? `${soloText(e.here.length)} and want to meet people.` : 'Others who come solo will see your message and can find you.'}</span>
             </div>
             <button className="btn btn-gold" onClick={() => gate('student', () => nav.push('here', { id: e.id }), 'Sign in to see who came solo')}>See who's here</button>
           </div>
@@ -99,7 +102,7 @@ export default function EventDetail({ id }) {
               <div><strong>{people.length}</strong><span>looking for company</span></div>
               <div><strong>{e.pending ? 'Pending' : 'Live'}</strong><span>{e.pending ? 'club check' : 'in the feed'}</span></div>
             </div>
-            {e.hideCount && <p className="muted small center">👥 The going count is hidden from students. They see “New event”.</p>}
+            {(e.hideCount || e.going < COUNT_MIN) && <p className="muted small center">👥 Students see “New event” instead of the number{e.hideCount ? ' (you turned it off)' : ` until ${COUNT_MIN} people are going`}.</p>}
             <p className="muted small center">Students who come alone see your event in "Go with someone" and the solo group chat.</p>
           </section>
         )}
@@ -109,7 +112,9 @@ export default function EventDetail({ id }) {
           {!going && (
             <div className="card locked">
               <Users size={22} />
-              <p><strong>{people.length} people going are looking for company.</strong> Tap <b>I'm going</b> to see who.</p>
+              <p>{people.length
+                ? <><strong>{companyText(people.length)}.</strong> Tap <b>I'm going</b> to see who.</>
+                : <><strong>Be the first to look for company.</strong> Tap <b>I'm going</b>, then turn on “open to company” so others going can find you.</>}</p>
             </div>
           )}
           {going && (
@@ -119,7 +124,7 @@ export default function EventDetail({ id }) {
                   <strong>I'm open to company</strong>
                   <span>Others going can see your first name + interests. Off by default.</span>
                 </div>
-                <input type="checkbox" className="switch" checked={open} onChange={(ev) => { const v = ev.target.checked; if (v) explain('company', () => dispatch({ type: 'COMPANY', eventId: e.id, value: true })); else dispatch({ type: 'COMPANY', eventId: e.id, value: false }) }} />
+                <input type="checkbox" className="switch" checked={open} onChange={(ev) => { const v = ev.target.checked; if (v) explain('company', () => dispatch({ type: 'COMPANY', eventId: e.id, value: true }), ev); else dispatch({ type: 'COMPANY', eventId: e.id, value: false }) }} />
               </label>
               {!open && <p className="muted center small"><ShieldCheck size={14} /> Turn this on to see who else wants company. It works both ways.</p>}
               {open && (
@@ -140,12 +145,13 @@ export default function EventDetail({ id }) {
                           {shared.length > 0 && <span className="shared">You both like {shared.map((i) => interestById[i].label).join(' & ')}</span>}
                         </div>
                         <div className="person-actions">
-                          <button className="btn btn-sm btn-outline" onClick={() => explain('chat', () => nav.push('chat', { id: openDM(p.id), eventId: e.id }))}><MessageCircle size={14} /> Say hi</button>
-                          <button className="btn btn-sm btn-primary" onClick={() => explain('chat', () => setInviteFor(p))}><UserPlus size={14} /> Invite</button>
+                          <button className="btn btn-sm btn-outline" onClick={(ev) => explain('chat', () => nav.push('chat', { id: openDM(p.id), eventId: e.id }), ev)}><MessageCircle size={14} /> Say hi</button>
+                          <button className="btn btn-sm btn-primary" onClick={(ev) => explain('chat', () => setInviteFor(p), ev)}><UserPlus size={14} /> Invite</button>
                         </div>
                       </div>
                     )
                   })}
+                  {people.length === 0 && <p className="muted center">No one else yet. You're on the list, so anyone going who wants company will see you.</p>}
                   <p className="muted center small">You choose who to contact. Leave or block any chat at any time.</p>
                 </div>
               )}

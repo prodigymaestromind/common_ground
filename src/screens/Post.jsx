@@ -180,7 +180,7 @@ export default function Post() {
         <label className="toggle-row card">
           <div>
             <strong>👥 Show how many people are going</strong>
-            <span>Small events can look empty and scare people off. Turn this off and students see “New event” instead. You'll still see the number.</span>
+            <span>Under 10 going, students already see “New event” instead. Turn this off to always hide it. You'll still see the number.</span>
           </div>
           <input type="checkbox" className="switch" checked={f.showCount} onChange={(e) => set({ showCount: e.target.checked })} />
         </label>

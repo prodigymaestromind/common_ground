@@ -49,6 +49,16 @@ export function dayLabel(d) {
 // "Mon, Nov 9"
 export const fullDate = (d) => new Date(d).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
 
+// Going counts: hidden when the host turns them off, or automatically when
+// fewer than COUNT_MIN are going (a tiny number makes events look empty).
+// Students then see "New event". Hosts always see the real number.
+export const COUNT_MIN = 10
+export const showGoing = (e) => typeof e.going === 'number' && !e.hideCount && e.going >= COUNT_MIN
+
+// "Open to company" wording that never says "0"
+export const companyText = (n) => (n === 0 ? 'Be the first to look for company' : n === 1 ? '1 person open to meeting new people' : `${n} open to meeting new people`)
+export const soloText = (n) => (n === 0 ? 'Be the first in the solo group' : n === 1 ? '1 person here came solo' : `${n} people here came solo`)
+
 export const costLabel = (c) => (!c ? 'Free' : typeof c === 'string' ? c : `$${c}`)
 
 function minutesOfDay(d) {

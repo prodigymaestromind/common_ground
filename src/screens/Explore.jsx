@@ -45,7 +45,7 @@ export default function Explore() {
   }
 
   return (
-    <div className="screen">
+    <div className="screen screen-wide">
       <div className="title-row">
         <h1 className="page-title">Explore</h1>
         <div className="seg seg-sm">
@@ -76,7 +76,7 @@ export default function Explore() {
       {view === 'list' && groups.map((g) => (
         <section key={g.label}>
           <h2 className="section-title">{g.label}</h2>
-          <div className="stack">{g.items.map((e) => <EventCard key={e.id} event={e} />)}</div>
+          <div className="stack card-grid">{g.items.map((e) => <EventCard key={e.id} event={e} />)}</div>
         </section>
       ))}
       {view === 'list' && groups.length > 0 && <p className="end-note">That's everything {range === 'All upcoming' ? 'coming up' : range.toLowerCase()} ✓{range === 'This week' && <> · <button className="link" onClick={() => setRange('Next week')}>See next week →</button></>}</p>}

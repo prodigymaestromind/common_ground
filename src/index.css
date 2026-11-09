@@ -559,3 +559,76 @@ a.btn { text-decoration: none; }
 /* easier to read titles on busy flyer photos */
 .pin-shade { padding-top: 36px; background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.82) 100%); }
 .pin-shade strong { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+
+/* =========================================================
+   Responsive: phone (default) → iPad (768+) → laptop (1024+)
+   ========================================================= */
+.phone > .tabbar { order: 3; }
+.side-logo { display: none; }
+.tab-center .tab-label { display: none; }
+
+@media (min-width: 768px) {
+  :root { background: var(--bg); }
+  .phone { max-width: none; height: 100dvh; margin: 0; border-radius: 0; box-shadow: none; }
+  .screen { width: 100%; max-width: 720px; margin: 0 auto; padding: 24px 28px 40px; }
+  .screen-wide { max-width: 1240px; }
+  .screen-detail { max-width: 820px; padding: 0; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+  .sheet-wrap { position: fixed; align-items: center; justify-content: center; padding: 24px; }
+  .sheet { width: min(520px, 100%); max-height: 86dvh; border-radius: 24px; padding-bottom: 24px; }
+  .sheet-handle { display: none; }
+  .map { height: 64dvh; }
+  .tabbar { padding-left: 12%; padding-right: 12%; }
+  .onboard-hero > * { max-width: 560px; width: 100%; align-self: center; }
+  .onboard-hero { align-items: center; }
+  .greeting h1, .page-title { font-size: 36px; }
+  .pin-cover { height: 200px; }
+  .pin-cover.tall { height: 280px; }
+  .toast { bottom: 100px; }
+}
+
+@media (min-width: 1024px) {
+  .phone.is-wide { display: grid; grid-template-columns: 240px minmax(0, 1fr); grid-template-rows: 100dvh; }
+  .phone.is-wide.has-panel { grid-template-columns: 240px minmax(0, 1fr) min(460px, 38vw); }
+  .is-wide .onboard { grid-column: 1 / -1; }
+  .is-wide > .tabbar { order: 0; grid-row: 1; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 4px; padding: 22px 14px; border-top: 0; border-right: 1px solid var(--line); }
+  .is-wide .side-logo { display: block; padding: 4px 10px 22px; }
+  .is-wide .tab { flex: 0 0 auto; flex-direction: row; gap: 12px; padding: 11px 12px; border-radius: 12px; font-size: 15px; justify-content: flex-start; }
+  .is-wide .tab:hover { background: #efede6; }
+  .is-wide .tab.on { background: var(--green-soft); }
+  .is-wide .tab-center { order: 10; margin-top: 16px; background: var(--gold); color: var(--green); justify-content: center; }
+  .is-wide .tab-center .tab-label { display: inline; font-weight: 800; }
+  .is-wide .tab-center .tab-icon, .is-wide .tab-center.on .tab-icon { width: auto; height: auto; margin: 0; background: none; box-shadow: none; color: inherit; }
+  .is-wide .tab-center:hover { background: var(--gold-2); }
+  .is-wide .tab-center.on { background: var(--green); color: #fff; }
+  .is-wide .scroll { grid-row: 1; height: 100dvh; }
+  .side-panel { grid-row: 1; height: 100dvh; overflow-y: auto; border-left: 1px solid var(--line); background: var(--bg); box-shadow: -8px 0 30px rgba(0, 0, 0, 0.06); animation: slideIn 0.22s ease-out; }
+  .side-panel .screen-detail { position: relative; max-width: none; min-height: 100%; }
+  .is-wide .home-head .logo { visibility: hidden; }
+  .is-wide .fb-fab { left: auto; right: 24px; bottom: 24px; }
+  .is-wide .fb-nudge { left: auto; right: 24px; bottom: 72px; width: 360px; }
+  .is-wide .toast { bottom: 32px; left: calc(50% + 120px); }
+  .is-wide.has-panel .fb-fab, .is-wide.has-panel .fb-nudge { display: none; }
+  .pin { transition: transform 0.15s, box-shadow 0.15s; }
+  .pin:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(4, 57, 39, 0.12); }
+}
+@keyframes slideIn { from { transform: translateX(24px); opacity: 0; } }
+
+/* =========================================================
+   Spotlight tutorial: dim everything, light up what you tapped
+   ========================================================= */
+.spot { position: fixed; inset: 0; z-index: 60; }
+.spot-dim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); animation: fade 0.2s; }
+.spot-hole { position: fixed; border-radius: 14px; pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55), 0 0 0 3px var(--gold);
+  animation: fade 0.2s, spotPulse 1.6s ease-in-out 0.2s infinite; }
+@keyframes spotPulse { 50% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55), 0 0 0 8px rgba(196, 181, 129, 0.55); } }
+.spot-card { position: fixed; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); background: var(--bg); border-radius: 22px; padding: 20px 20px 18px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); animation: up 0.22s ease-out; max-height: 72dvh; overflow-y: auto; }
+.spot-card.floating { right: auto; bottom: auto; overflow: visible; max-height: none; }
+.spot-wide .spot-card:not(.floating) { left: 50%; top: 50%; right: auto; bottom: auto; width: 420px; transform: translate(-50%, -50%); animation: fade 0.2s; }
+.spot-arrow { position: absolute; width: 18px; height: 18px; background: var(--bg); transform: translateX(-50%) rotate(45deg); border-radius: 3px; }
+.spot-arrow.top { top: -8px; }
+.spot-arrow.bottom { bottom: -8px; }
+@media (prefers-reduced-motion: reduce) { .spot-hole { animation: none; } }
+.phone:has(.spot) .toast { display: none; }

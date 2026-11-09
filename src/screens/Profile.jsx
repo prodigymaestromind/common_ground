@@ -34,7 +34,7 @@ export default function Profile() {
           <label className="toggle-row card">
             <div>
               <strong>👥 Show how many people are going</strong>
-              <span>Applies to all your events. Off = students see “New event” instead. You always see the number.</span>
+              <span>Applies to all your events. Under 10 going it's hidden automatically. Off = always show “New event”. You always see the number.</span>
             </div>
             <input type="checkbox" className="switch" checked={u.showCounts !== false} onChange={(e) => dispatch({ type: 'ORG_COUNTS', value: e.target.checked })} />
           </label>

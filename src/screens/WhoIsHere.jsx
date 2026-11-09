@@ -1,4 +1,5 @@
 import { ShieldCheck, MessageCircle, Users } from 'lucide-react'
+import { soloText } from '../utils'
 import { studentById, interestById } from '../data'
 import { Avatar, LiveDot, TopBar, useExplain, useNav } from '../components'
 import { useStore } from '../store'
@@ -21,14 +22,16 @@ export default function WhoIsHere({ id }) {
 
       <div className="card solo-crew">
         <Users size={26} />
-        <h2>{solos.length} people came solo</h2>
-        <p>They opted in to meet new people at this event. Join the group chat to find each other and walk in together.</p>
-        <div className="avatars">{solos.map((p) => <Avatar key={p.id} person={p} size={38} />)}</div>
-        <button className="btn btn-gold btn-lg" onClick={() => explain('group', () => nav.push('chat', { id: joinGroup(e.id) }))}>Join the solo group chat</button>
+        <h2>{soloText(solos.length)}</h2>
+        <p>{solos.length
+          ? 'They opted in to meet new people at this event. Join the group chat to find each other and hang out together.'
+          : 'Nobody has started the solo group yet. Start it and anyone else who came alone will see your message.'}</p>
+        {solos.length > 0 && <div className="avatars">{solos.map((p) => <Avatar key={p.id} person={p} size={38} />)}</div>}
+        <button className="btn btn-gold btn-lg" onClick={(ev) => explain('group', () => nav.push('chat', { id: joinGroup(e.id) }), ev)}>{solos.length ? 'Join the solo group chat' : 'Start the solo group chat'}</button>
         <p className="small"><ShieldCheck size={14} /> You'll share your first name + interests. Your exact location is never shown.</p>
       </div>
 
-      <h2 className="section-title">Looking for company</h2>
+      {solos.length > 0 && <h2 className="section-title">Looking for company</h2>}
       <div className="stack">
         {solos.map((p) => {
           const shared = p.interests.filter((i) => state.user?.interests?.includes(i))
@@ -40,7 +43,7 @@ export default function WhoIsHere({ id }) {
                 <span>{p.interests.map((i) => interestById[i].label).join(' · ')}</span>
                 {shared.length > 0 && <span className="shared">You both like {interestById[shared[0]].label}</span>}
               </div>
-              <button className="btn btn-sm btn-outline" onClick={() => explain('chat', () => nav.push('chat', { id: openDM(p.id), eventId: e.id }))}><MessageCircle size={14} /> Say hi</button>
+              <button className="btn btn-sm btn-outline" onClick={(ev) => explain('chat', () => nav.push('chat', { id: openDM(p.id), eventId: e.id }), ev)}><MessageCircle size={14} /> Say hi</button>
             </div>
           )
         })}

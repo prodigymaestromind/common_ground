@@ -48,7 +48,7 @@ export function KeepInTouchButton({ studentId }) {
   if (status === 'asked') return <span className="status">Waiting for {p.name} to say yes…</span>
   return (
     <>
-      <button className="btn btn-sm btn-primary" onClick={() => explain('stay', () => setOpen(true))}>
+      <button className="btn btn-sm btn-primary" onClick={(ev) => explain('stay', () => setOpen(true), ev)}>
         <HeartHandshake size={14} /> Stay in touch
       </button>
       <ShareSheet open={open} onClose={() => setOpen(false)} student={p} />

@@ -185,10 +185,16 @@ export function StoreProvider({ children }) {
       later(1400 + Math.random() * 800, () => add(chatId, msg(s.id, replyText(s, state.user, count))))
     } else if (chat.type === 'group') {
       const ev = eventById[chat.eventId]
-      const pool = chat.members?.length ? chat.members : ev?.here?.length ? ev.here : ['s3']
-      const who = studentById[pick(pool)]
+      const pool = chat.members?.length ? chat.members : ev?.here?.length ? ev.here : null
       const lines = ['Omw! 2 min 🏃', 'Nice, see you there!', 'I\'m wearing a green hoodie lol', 'Yesss more people 🙌']
-      later(1600, () => add(chatId, msg(who.id, pick(lines))))
+      if (pool) {
+        later(1600, () => add(chatId, msg(pick(pool), pick(lines))))
+      } else if (!chat.members?.length) {
+        // first one here: a (sample) student joins after your message
+        dispatch({ type: 'OPEN_CHAT', chat: { id: chatId, members: ['s3'] } })
+        later(1800, () => add(chatId, msg('system', `${studentById.s3.name} joined the solo group`)))
+        later(3000, () => add(chatId, msg('s3', 'Hey! Just got here too 🙌 Where are you at?')))
+      }
     }
   }, [add, state.chats, state.user, eventById])
 
@@ -223,8 +229,8 @@ export function StoreProvider({ children }) {
         chat: {
           id, type: 'group', eventId, title: `Solo group · ${ev.title}`,
           messages: [
-            msg('system', 'Everyone here came alone and wants to meet people. Only first names + interests are shared. Your location is never shown.'),
-            ...(a ? [msg(a, `Hey all! I'm by the ${ev.place.split(',')[0]} entrance`)] : []),
+            msg('system', `Welcome to the solo group for ${ev.title} 👋 Everyone here came alone and wants to meet people. Only first names + interests are shared. Your location is never shown.`),
+            ...(a ? [msg(a, `Hey all! I'm by the ${ev.place.split(',')[0]} entrance`)] : [msg('system', 'You\'re the first one here. Say hi, and anyone else who comes solo will see it.')]),
             ...(b ? [msg(b, 'Same, just got here. Anyone want to grab seats together?')] : []),
           ],
         },
