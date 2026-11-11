@@ -612,3 +612,33 @@ a.btn { text-decoration: none; }
   .floater { display: none; }
   .onboard-hero h1 { font-size: 32px; }
 }
+
+/* ---------- v1.6.0: help page, confirm pop-ups, Undo toast, For you ---------- */
+.toast { display: flex; align-items: center; gap: 12px; }
+.toast button { color: var(--gold); font-weight: 800; font-size: 14px; padding: 2px 4px; flex-shrink: 0; }
+.confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-hint { margin: -4px 0 0; font-size: 13px; color: var(--muted); text-align: center; }
+.board-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 26px; margin-top: -6px; }
+.board-bar .board-count { margin: 0; }
+.for-you { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; color: var(--green); cursor: pointer; flex-shrink: 0; }
+.switch-sm { width: 40px; height: 24px; }
+.switch-sm::after { width: 18px; height: 18px; }
+.switch-sm:checked::after { transform: translateX(16px); }
+.fresh-note { font-size: 12px; color: #8f9893; margin: 8px 0 0; }
+.foot-links { font-size: 14px; margin: 4px 0 0; color: var(--muted); }
+.foot-links .link { font-size: 14px; }
+.help-row { display: flex; gap: 12px; align-items: flex-start; padding: 14px; }
+.help-row strong { display: block; margin-bottom: 2px; }
+.help-row p { margin: 0 0 4px; font-size: 14px; color: var(--muted); line-height: 1.45; }
+.help-icon { font-size: 22px; line-height: 1.2; width: 28px; text-align: center; flex-shrink: 0; }
+.blocked-row { grid-template-columns: 1fr auto; padding: 4px 0; }
+.blocked-row > span { font-size: 15px; color: var(--ink); }
+.map-error { margin: 8px 0 0; padding: 10px 12px; border-radius: 12px; background: #fdecea; color: var(--red); font-size: 13.5px; font-weight: 600; }
+.side-links { display: none; }
+@media (min-width: 1024px) {
+  .is-wide .side-links { display: flex; flex-direction: column; gap: 2px; order: 11; margin-top: auto; }
+  .is-wide .side-links button { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; font-size: 14px; font-weight: 600; color: var(--green); text-align: left; }
+  .is-wide .side-links button:hover { background: #efede6; }
+  .is-wide .foot-links { display: none; }
+}

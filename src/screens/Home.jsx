@@ -1,13 +1,14 @@
 // Home: a photo board of events. "Happening now" comes first.
 import { useEffect, useRef, useState } from 'react'
-import { Compass, FlaskConical, MessageSquareHeart, X } from 'lucide-react'
+import { CircleHelp, Compass, FlaskConical, MessageSquareHeart, X } from 'lucide-react'
 import { studentById } from '../demo'
 import { Avatar, Cover, GoingCount, LiveDot, Logo, SaveButton, SignInButton } from '../components'
 import { useNav } from '../nav'
 import { useNow } from '../hooks'
 import { useStore } from '../store'
 import { APP_VERSION, CREDIT } from '../version'
-import { dayLabel, fmtTime, isGone, isLive, isPast, weekBucket } from '../utils'
+import { EVENTS_UPDATED } from '../realEvents'
+import { dayLabel, endedWord, fmtTime, fullDate, isGone, isLive, isPast, weekBucket } from '../utils'
 
 const FILTERS = [
   { id: 'now', label: '🔴 Now' },
@@ -18,11 +19,13 @@ const FILTERS = [
 
 export default function Home() {
   const nav = useNav()
-  const { state, dispatch, events } = useStore()
+  const { state, dispatch, events, forYou, setForYou } = useStore()
   const now = useNow()
   const user = state.user
   // today's events stay until midnight, even after they end
-  const upcoming = events.filter((e) => !isGone(e, now))
+  const likes = user?.role === 'student' ? user.interests || [] : []
+  const mineOnly = forYou && likes.length > 0
+  const upcoming = events.filter((e) => !isGone(e, now)).filter((e) => !mineOnly || e.mine || likes.includes(e.interest))
   const liveCount = upcoming.filter((e) => isLive(e, now)).length
   const [filter, setFilter] = useState(liveCount ? 'now' : 'today')
 
@@ -40,7 +43,7 @@ export default function Home() {
   const summary = {
     now: n ? `${n} happening right now` : '',
     today: `${n} event${n === 1 ? '' : 's'} today${liveCount ? ` · ${liveCount} live now` : ''}`,
-    week: `${n} event${n === 1 ? '' : 's'} in the next 7 days`,
+    week: `${n} event${n === 1 ? '' : 's'} this week`,
     all: `${n} upcoming event${n === 1 ? '' : 's'}`,
   }[filter]
 
@@ -49,6 +52,7 @@ export default function Home() {
       <header className="home-head">
         <Logo />
         <div className="head-actions">
+          <button className="icon-btn head-fb" onClick={() => nav.push('help')} aria-label="How it works" title="How it works"><CircleHelp size={20} /></button>
           <button className="icon-btn head-fb" onClick={nav.feedback} aria-label="Give feedback" title="Give feedback"><MessageSquareHeart size={20} /></button>
           {user ? (
             <button className="avatar-btn" onClick={() => nav.push('profile')} aria-label="Profile">
@@ -75,11 +79,20 @@ export default function Home() {
           <button key={f.id} className={filter === f.id ? 'on' : ''} onClick={() => setFilter(f.id)} aria-pressed={filter === f.id}>{f.label}</button>
         ))}
       </div>
-      {summary && <p key={`s-${filter}`} className="board-count fade-in">{summary}</p>}
+      <div className="board-bar">
+        {summary ? <p key={`s-${filter}`} className="board-count fade-in">{summary}</p> : <span />}
+        {likes.length > 0 && (
+          <label className="for-you" title="Only show events that match your interests">
+            <span>For you</span>
+            <input type="checkbox" className="switch switch-sm" checked={forYou} onChange={(e) => setForYou(e.target.checked)} />
+          </label>
+        )}
+      </div>
 
       {n === 0 && (
         <p className="muted center empty-note">
           {filter === 'now' ? 'Nothing is happening right now.' : filter === 'today' ? 'Nothing else on today.' : 'No events here yet.'}
+          {mineOnly && <><br />“For you” is on, so you only see your interests. <button className="link" onClick={() => setForYou(false)}>Show everything</button></>}
         </p>
       )}
       <Board key={filter} events={list} now={now} />
@@ -93,6 +106,10 @@ export default function Home() {
           </>
         )}
         <button className="btn btn-outline" onClick={() => nav.tab('explore')}><Compass size={16} /> Browse all events</button>
+        <p className="fresh-note">Events from the Sac State calendar · updated {fullDate(`${EVENTS_UPDATED}T12:00:00`)}</p>
+        <p className="foot-links">
+          <button className="link" onClick={() => nav.push('help')}>How it works</button> · <button className="link" onClick={nav.feedback}>Give feedback</button>
+        </p>
         <p className="version-tag">v{APP_VERSION} · {CREDIT}</p>
       </div>
     </div>
@@ -110,12 +127,12 @@ function BoardCard({ event, tall, now }) {
       <button className="pin-main" onClick={() => nav.push('event', { id: event.id })}>
         <Cover event={event} className={`pin-cover ${tall ? 'tall' : ''}`}>
           <div className="pin-top">
-            {live ? <span className="pin-badge"><LiveDot /></span> : <span className="pin-badge">{ended ? 'Ended' : day === 'Today' ? 'Today' : day.split(',')[0]}</span>}
+            {live ? <span className="pin-badge"><LiveDot /></span> : <span className="pin-badge">{ended ? endedWord(event, now) : day === 'Today' ? 'Today' : day.split(',')[0]}</span>}
             {!event.cost && <span className="pin-badge">Free</span>}
           </div>
           <div className="pin-shade">
             <strong>{event.title}</strong>
-            <span>{live ? 'Happening now' : ended ? `Ended ${fmtTime(event.endAt)}` : fmtTime(event.startAt)} · {event.place.split(',')[0]}</span>
+            <span>{live ? 'Happening now' : ended ? `${endedWord(event, now)} ${fmtTime(event.endAt)}` : fmtTime(event.startAt)} · {event.place.split(',')[0]}</span>
           </div>
         </Cover>
       </button>

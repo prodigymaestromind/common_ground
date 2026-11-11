@@ -41,7 +41,7 @@ export default function Plans() {
 
   return (
     <div className="screen screen-wide">
-      <h1 className="page-title">My plans</h1>
+      <h1 className="page-title">Plans</h1>
       {!state.user && (
         <div className="card locked">
           <p><strong>Your saved events live here.</strong> Sign in to RSVP, set meet-ups and keep in touch with people.</p>

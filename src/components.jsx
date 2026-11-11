@@ -6,7 +6,7 @@ import { PLACES } from './places'
 import { TIPS } from './tips'
 import { useNav } from './nav'
 import { useStore } from './store'
-import { fmtRange, dayLabel, costLabel, fitCheck, isLive, isPast, initials, showGoing } from './utils'
+import { fmtRange, costLabel, fitCheck, isLive, isPast, initials, showGoing, endedWord, whenLabel } from './utils'
 
 export function Logo({ size = 28, light = false }) {
   return (
@@ -141,7 +141,7 @@ export function EventCard({ event, preview }) {
             <StatusPill event={event} />
           </div>
           <h3 className="event-title">{event.title}</h3>
-          <div className="meta"><Clock size={14} /> {live ? `Now · until ${fmtRange(event).split('– ')[1]}` : ended ? `Ended · ${fmtRange(event)}` : `${dayLabel(event.startAt)} · ${fmtRange(event)}`}</div>
+          <div className="meta"><Clock size={14} /> {live ? `Now · until ${fmtRange(event).split('– ')[1]}` : ended ? `${endedWord(event)} · ${fmtRange(event)}` : whenLabel(event)}</div>
           <div className="meta"><MapPin size={14} /> {event.place}</div>
           <div className="event-foot">
             <GoingCount event={event} />
@@ -183,6 +183,19 @@ export function Sheet({ open, onClose, title, children }) {
         {children}
       </div>
     </div>
+  )
+}
+
+// "Are you sure?" pop-up for things that are hard to take back.
+export function Confirm({ open, title, children, yes, danger, onYes, onClose }) {
+  return (
+    <Sheet open={open} onClose={onClose} title={title}>
+      <p className="muted">{children}</p>
+      <div className="confirm-actions">
+        <button className="btn btn-outline" onClick={onClose}>Cancel</button>
+        <button className={`btn ${danger ? 'btn-danger' : 'btn-primary'}`} onClick={() => { onClose(); onYes() }}>{yes}</button>
+      </div>
+    </Sheet>
   )
 }
 

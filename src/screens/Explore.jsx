@@ -5,7 +5,8 @@ import { INTERESTS } from '../data'
 import { Chip, EventCard, Empty } from '../components'
 import { useNow } from '../hooks'
 import { useStore } from '../store'
-import { isGone, dayLabel, fitCheck, weekBucket } from '../utils'
+import { EVENTS_UPDATED } from '../realEvents'
+import { isGone, dayLabel, fitCheck, fullDate, weekBucket } from '../utils'
 
 // The map library is big, so it only loads when someone opens the map.
 const CampusMap = lazy(() => import('./MapView'))
@@ -27,6 +28,8 @@ export default function Explore() {
   const setView = (v) => setExplore((x) => ({ ...x, view: v }))
   const setRange = (r) => setExplore((x) => ({ ...x, range: r }))
 
+  const filtered = q || quick.length > 0 || interest
+  const clear = () => { setQ(''); setQuick([]); setInterest(null) }
   const toggleQuick = (id) => setQuick((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
   const list = events
     .filter((e) => !isGone(e, now))
@@ -78,7 +81,16 @@ export default function Explore() {
           <CampusMap events={list} />
         </Suspense>
       )}
-      {view === 'list' && groups.length === 0 && <Empty icon="🔍" title="Nothing matches">Try removing a filter.</Empty>}
+      {view === 'list' && groups.length === 0 && (
+        <>
+          <Empty icon="🔍" title={filtered ? 'Nothing matches' : `Nothing ${range === 'All upcoming' ? 'coming up' : range.toLowerCase()} yet`}>
+            {filtered ? 'Your search or filters are hiding everything.' : 'The calendar has no events here right now.'}
+          </Empty>
+          {filtered
+            ? <button className="btn btn-outline" onClick={clear}>Clear search and filters</button>
+            : range !== 'All upcoming' && <button className="btn btn-outline" onClick={() => setRange('All upcoming')}>See all upcoming</button>}
+        </>
+      )}
       {view === 'list' && groups.map((g) => (
         <section key={g.label}>
           <h2 className="section-title">{g.label}</h2>
@@ -89,6 +101,7 @@ export default function Explore() {
         <p className="end-note">
           That's everything {range === 'All upcoming' ? 'coming up' : range.toLowerCase()} ✓
           {range === 'This week' && <> · <button className="link" onClick={() => setRange('Next week')}>See next week →</button></>}
+          <br /><span className="fresh-note">Events from the Sac State calendar · updated {fullDate(`${EVENTS_UPDATED}T12:00:00`)}</span>
         </p>
       )}
     </div>

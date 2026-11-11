@@ -65,6 +65,8 @@ function reducer(state, a) {
       return { ...state, user: { ...state.user, showCounts: a.value }, posted: state.posted.map((e) => ({ ...e, hideCount: !a.value })) }
     case 'TIP_SEEN':
       return { ...state, tips: { ...state.tips, [a.key]: true } }
+    case 'TIPS_RESET': // "Show the tips again" on the How it works page
+      return { ...state, tips: {} }
     case 'WELCOMED':
       return { ...state, welcomed: true }
     case 'SIGN_UP':
@@ -102,12 +104,23 @@ function reducer(state, a) {
     }
     case 'POST_EVENT':
       return { ...state, posted: [a.event, ...state.posted], feedback: bump(state, 1) }
+    case 'RESTORE_POST': // Undo after deleting
+      return a.event && !state.posted.some((e) => e.id === a.event.id) ? { ...state, posted: [a.event, ...state.posted] } : state
     case 'DELETE_POST':
       return { ...state, posted: state.posted.filter((e) => e.id !== a.eventId) }
     case 'KEEP_IN_TOUCH':
       return { ...state, keepInTouch: { ...state.keepInTouch, [a.studentId]: a.value } }
     case 'BLOCK':
       return { ...state, blocked: [...new Set([...state.blocked, a.studentId])] }
+    case 'UNBLOCK':
+      return { ...state, blocked: state.blocked.filter((id) => id !== a.studentId) }
+    case 'RESTORE_CHAT': // Undo after leaving a group
+      return a.chat ? { ...state, chats: { ...state.chats, [a.chat.id]: a.chat } } : state
+    case 'LEAVE_CHAT': {
+      const chats = { ...state.chats }
+      delete chats[a.chatId]
+      return { ...state, chats }
+    }
     case 'SIGN_OUT':
       return { ...empty, tips: state.tips, welcomed: true }
     case 'RESET':
@@ -124,27 +137,43 @@ export function StoreProvider({ children }) {
   const [toast, setToast] = useState(null)
   // Explore remembers List/Map + the week tab while the app is open
   const [explore, setExplore] = useState({ view: 'list', range: 'This week' })
+  // Home's "For you" switch (only events matching your interests)
+  const [forYou, setForYou] = useState(false)
+  // changes at midnight, so multi-day events move on to the next day's hours
+  const [today, setToday] = useState(() => new Date().toDateString())
   const activeChat = useRef(null)
   const timers = useRef([])
   const toastTimer = useRef(null)
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(state))
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state))
+    } catch {
+      // storage full or turned off (private browsing): the app still works, it just won't remember
+      setTimeout(() => setToast({ text: 'Couldn\'t save on this device. Your changes may be gone after a refresh.' }), 0)
+    }
   }, [state])
   useEffect(() => () => { timers.current.forEach(clearTimeout); clearTimeout(toastTimer.current) }, [])
+  useEffect(() => {
+    const t = setInterval(() => setToday(new Date().toDateString()), 60000)
+    return () => clearInterval(t)
+  }, [])
 
   const later = (ms, fn) => timers.current.push(setTimeout(fn, ms))
   const add = useCallback((chatId, message) => dispatch({ type: 'ADD_MSG', chatId, message, active: activeChat.current === chatId }), [])
 
   // Real Sac State events + anything posted in the app on this device.
-  const events = useMemo(() => withTimes([...state.posted, ...BASE_EVENTS]), [state.posted])
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- "today" is there on purpose, to redo this at midnight
+  const events = useMemo(() => withTimes([...state.posted, ...BASE_EVENTS]), [state.posted, today])
   const eventById = useMemo(() => Object.fromEntries(events.map((e) => [e.id, e])), [events])
 
-  const showToast = useCallback((text) => {
-    setToast(text)
+  // showToast('Saved') or showToast('Maya blocked', { label: 'Undo', onClick: () => ... })
+  const showToast = useCallback((text, action) => {
+    setToast({ text, action })
     clearTimeout(toastTimer.current)
-    toastTimer.current = setTimeout(() => setToast(null), 2400)
+    toastTimer.current = setTimeout(() => setToast(null), action ? 6000 : 2400)
   }, [])
+  const hideToast = useCallback(() => { clearTimeout(toastTimer.current); setToast(null) }, [])
 
   const openDM = useCallback((studentId) => {
     dispatch({ type: 'OPEN_CHAT', chat: { id: `dm-${studentId}`, type: 'dm', studentId, title: studentById[studentId].name } })
@@ -205,8 +234,8 @@ export function StoreProvider({ children }) {
   }, [eventById, state.chats])
 
   const value = {
-    state, dispatch, events, eventById, toast, showToast,
-    explore, setExplore,
+    state, dispatch, events, eventById, toast, showToast, hideToast,
+    explore, setExplore, forYou, setForYou,
     openDM, sendText, sendInvite, joinGroup,
     setActiveChat: (id) => { activeChat.current = id },
   }

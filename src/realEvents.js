@@ -1,5 +1,8 @@
 // Real public events from the Sac State Events calendar (events.csus.edu, Trumba iCalendar export, Nov 2026).
 // Only real event info lives in this file. Sample people and counts are added in demo.js.
+// The day this list was last copied from the Sac State events calendar (shown in the app).
+export const EVENTS_UPDATED = '2026-11-09'
+
 export const REAL_EVENTS = [
  {
   "id": "r3",

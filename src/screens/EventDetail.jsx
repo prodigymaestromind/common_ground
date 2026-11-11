@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { Clock, MapPin, DollarSign, Car, Users, Bookmark, BookmarkCheck, Check, ShieldCheck, MessageCircle, UserPlus, ExternalLink, Radio, Trash2, CalendarPlus, Navigation, ChevronRight } from 'lucide-react'
 import { interestById, MEET_SPOTS } from '../data'
 import { studentById } from '../demo'
-import { Avatar, Cover, DemoTag, FitBadge, LiveDot, Sheet, SoloBadge, TopBar } from '../components'
+import { Avatar, Confirm, Cover, DemoTag, Empty, FitBadge, LiveDot, Sheet, SoloBadge, TopBar } from '../components'
 import { useNav } from '../nav'
 import { useExplain, useGate } from '../hooks'
 import { PLACES } from '../places'
 import { useStore } from '../store'
-import { costLabel, dayLabel, fullDate, fmtRange, fmtTime, isLive, isPast, showGoing, companyText, soloText, COUNT_MIN, downloadIcs, googleCalUrl, appleMapsUrl, googleMapsUrl } from '../utils'
+import { costLabel, dayLabel, fullDate, fmtRange, runsLabel, endedWord, fmtTime, isLive, isPast, showGoing, companyText, soloText, COUNT_MIN, downloadIcs, googleCalUrl, appleMapsUrl, googleMapsUrl } from '../utils'
 
 export default function EventDetail({ id }) {
   const nav = useNav()
@@ -15,6 +15,7 @@ export default function EventDetail({ id }) {
   const [inviteFor, setInviteFor] = useState(null)
   const [calOpen, setCalOpen] = useState(false)
   const [dirOpen, setDirOpen] = useState(false)
+  const [delOpen, setDelOpen] = useState(false)
   const [explain, popup] = useExplain()
   const gate = useGate()
   const e = eventById[id]
@@ -24,11 +25,19 @@ export default function EventDetail({ id }) {
   useEffect(() => {
     if (showsCount && !state.tips?.count) { const t = setTimeout(() => explain('count', null, countRow.current), 500); return () => clearTimeout(t) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  if (!e) return <div className="screen"><TopBar title="Event" /><p>Event not found.</p></div>
+  if (!e) return (
+    <div className="screen">
+      <TopBar title="Event" />
+      <Empty icon="🤔" title="We can't find this event">It may have been deleted, or it already ended and left the list.</Empty>
+      <button className="btn btn-primary btn-lg" onClick={() => nav.tab('explore')}>Browse all events</button>
+    </div>
+  )
 
   const live = isLive(e)
   const ended = !live && isPast(e)
   const place = PLACES[e.placeId]
+  // only show parking when the host gave real info (the calendar's generic line says nothing new)
+  const parking = e.parking && !/^see (sac state parking|host)/i.test(e.parking) ? e.parking : ''
   const rsvp = state.rsvp[e.id]
   const going = rsvp === 'going'
   const open = !!state.company[e.id]
@@ -58,14 +67,14 @@ export default function EventDetail({ id }) {
       <div className="detail-body">
         <FitBadge event={e} />
         <ul className="info">
-          <li><Clock size={18} /><div><strong>{live ? 'Happening now' : ended ? 'Ended today' : dayLabel(e.startAt)}</strong><span>{fullDate(e.startAt)} · {fmtRange(e)}</span></div></li>
+          <li><Clock size={18} /><div><strong>{live ? 'Happening now' : ended ? (endedWord(e) === 'Closed' ? 'Closed for today' : 'Ended today') : dayLabel(e.startAt)}</strong><span>{e.runs ? `${runsLabel(e)} · ${fmtRange(e)} each day` : `${fullDate(e.startAt)} · ${fmtRange(e)}`}</span></div></li>
           <li>
             <button className="info-link" onClick={() => (place ? nav.push('place', { id: e.id }) : setDirOpen(true))}>
               <MapPin size={18} /><div><strong>{e.place}</strong><span>Tap to see it on the map</span></div><ChevronRight size={18} />
             </button>
           </li>
           <li><DollarSign size={18} /><div><strong>{costLabel(e.cost)}</strong>{!e.cost && <span>No ticket needed</span>}</div></li>
-          <li><Car size={18} /><div><strong>Parking</strong><span>{e.parking}</span></div></li>
+          {parking && <li><Car size={18} /><div><strong>Parking</strong><span>{parking}</span></div></li>}
           <li ref={countRow}><Users size={18} /><div>{e.mine || showsCount
             ? <><strong>{e.going + (going && !e.mine ? 1 : 0)} going {e.demo && <DemoTag />}</strong><span>{companyText(people.length)}</span></>
             : <><strong>{companyText(people.length)}</strong><span>New event · be one of the first to go</span></>}</div></li>
@@ -165,11 +174,11 @@ export default function EventDetail({ id }) {
 
       {e.mine ? (
         <div className="action-bar">
-          <button className="btn btn-outline danger" onClick={() => { dispatch({ type: 'DELETE_POST', eventId: e.id }); showToast('Event deleted'); nav.pop() }}><Trash2 size={16} /> Delete</button>
+          <button className="btn btn-outline danger" onClick={() => setDelOpen(true)}><Trash2 size={16} /> Delete</button>
           <button className="btn btn-going grow" disabled><Check size={18} /> You're hosting</button>
         </div>
       ) : <div className="action-bar">
-        <button className={`btn btn-outline ${rsvp === 'saved' ? 'on' : ''}`} disabled={going} onClick={() => setRsvp(rsvp === 'saved' ? null : 'saved')}>
+        <button className={`btn btn-outline ${rsvp === 'saved' ? 'on' : ''}`} disabled={going} title={going ? 'Already in your Plans because you\'re going' : undefined} onClick={() => setRsvp(rsvp === 'saved' ? null : 'saved')}>
           {rsvp === 'saved' ? <BookmarkCheck size={18} /> : <Bookmark size={18} />} {rsvp === 'saved' ? 'Saved' : 'Save'}
         </button>
         <button className={`btn ${going ? 'btn-going' : 'btn-gold'} grow`} onClick={() => (going ? setRsvp(null) : gate('student', () => setRsvp('going'), 'Sign in so people going can find you (you control what they see)'))}>
@@ -194,6 +203,11 @@ export default function EventDetail({ id }) {
           <a className="option" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${e.place} Sacramento State`)}`} target="_blank" rel="noopener noreferrer"><Navigation size={16} /> Google Maps</a>
         )}
       </Sheet>
+
+      <Confirm open={delOpen} onClose={() => setDelOpen(false)} title="Delete this event?" yes="Delete event" danger
+        onYes={() => { nav.pop(); dispatch({ type: 'DELETE_POST', eventId: e.id }); showToast('Event deleted', { label: 'Undo', onClick: () => dispatch({ type: 'RESTORE_POST', event: state.posted.find((x) => x.id === e.id) }) }) }}>
+        “{e.title}” will be removed from the feed and the map.
+      </Confirm>
 
       {popup}
 

@@ -127,6 +127,9 @@ export default function SignIn({ role: startRole, reason, then }) {
             onClick={() => (isOrg ? finish() : setStep(2))}>
             {isOrg ? 'Sign in' : 'Continue'}
           </button>
+          {(!name.trim() || !emailOk || (isOrg && !org.trim())) && (
+            <p className="btn-hint">To continue: {[!name.trim() && 'type your first name', !emailOk && 'use an @csus.edu email (test@csus.edu works)', isOrg && !org.trim() && 'add your club'].filter(Boolean).join(', ')}.</p>
+          )}
         </div>
       )}
 
@@ -190,6 +193,8 @@ export function BusyEditor({ busy, setBusy }) {
             <span className="muted">to</span>
             <input type="time" value={b.end} onChange={(e) => update(b.id, { end: e.target.value })} aria-label="End" />
           </div>
+          {b.end <= b.start && <small className="error">The end time has to be after the start time.</small>}
+          {b.days.length === 0 && <small className="error">Pick at least one day.</small>}
         </div>
       ))}
       <button className="btn btn-outline" onClick={() => setBusy((b) => [...b, { id: uid(), label: 'Class', days: [1], start: '09:00', end: '12:00' }])}>

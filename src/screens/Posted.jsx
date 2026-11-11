@@ -11,8 +11,8 @@ export default function Posted({ id }) {
   return (
     <div className="screen posted">
       <div className="posted-check">✓</div>
-      <h1 className="page-title center">Event saved!</h1>
-      <p className="muted center">Demo: it shows in the feed and on the map on this device only. Other students will see posts once real accounts launch.</p>
+      <h1 className="page-title center">Event posted (demo)</h1>
+      <p className="muted center">It shows in the feed and on the map on this device only. Other students will see posts once real accounts launch.</p>
       {e && <EventCard event={e} preview />}
       <div className="stack-sm">
         <button className="btn btn-primary btn-lg" onClick={() => nav.push('event', { id })}><Eye size={18} /> View event</button>

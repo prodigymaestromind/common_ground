@@ -19,6 +19,9 @@ Our interviews with Sac State students turned up three things:
 - **Solo group chat:** at a live event, join a chat of people who also came alone.
 - **Stay in touch:** swap Instagram/Discord/Snapchat, shared only if both people say yes.
 - **Scan a flyer:** organizers can snap a poster and OCR fills in the event form.
+- **Multi-day events keep daily hours:** a gallery show that runs Tue–Fri, 12–4pm is only "live" during those hours.
+- **For you:** one switch on Home to only see events that match your interests.
+- **How it works:** a short help page (Profile, Home and the desktop sidebar), plus Undo for block, leave and delete, and the browser's Back button works.
 - **Built to put the phone down:** the feed ends. No likes, followers, or infinite scroll.
 
 ## What's real vs. demo (honest status)
@@ -34,6 +37,7 @@ Our interviews with Sac State students turned up three things:
 - `src/data.js`: interests and option lists. `src/places.js`: campus buildings and map coordinates.
 - `src/store.jsx`: app state, saved in the browser. `src/hooks.jsx`, `src/nav.js`, `src/components.jsx`: shared pieces.
 - `src/screens/`: one file per screen.
+- `EVENTS_UPDATED` in `src/realEvents.js`: the date shown in the app as "events updated". Change it when you refresh the events.
 - Version: bump `"version"` in `package.json` (shown in the app). Patch = fixes, minor = new feature, major = relaunch.
 
 ## Run locally

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Send, Sparkles, MapPin, Clock, Check, Ban, Users } from 'lucide-react'
 import { studentById } from '../demo'
-import { Avatar, DemoTag, Empty, TopBar } from '../components'
+import { Avatar, Confirm, DemoTag, Empty, TopBar } from '../components'
 import { useNav } from '../nav'
 import { useGate } from '../hooks'
 import { useStore } from '../store'
@@ -60,6 +60,7 @@ export function Chat({ id, eventId }) {
   const nav = useNav()
   const { state, dispatch, sendText, eventById, setActiveChat, showToast } = useStore()
   const [text, setText] = useState('')
+  const [blockOpen, setBlockOpen] = useState(false)
   const endRef = useRef(null)
   const chat = state.chats[id]
   const person = chat?.type === 'dm' ? studentById[chat.studentId] : null
@@ -74,7 +75,13 @@ export function Chat({ id, eventId }) {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chat?.messages.length, id, dispatch])
 
-  if (!chat) return <div className="screen"><TopBar title="Chat" /></div>
+  if (!chat) return (
+    <div className="screen">
+      <TopBar title="Chat" />
+      <Empty icon="💬" title="This chat isn't here anymore">You may have left it.</Empty>
+      <button className="btn btn-outline btn-lg" onClick={() => nav.tab('chats')}>Back to chats</button>
+    </div>
+  )
 
   const iSent = chat.messages.some((m) => m.from === 'me')
   const theyReplied = person && chat.messages.some((m) => m.from === person.id && m.kind === 'text')
@@ -85,9 +92,14 @@ export function Chat({ id, eventId }) {
     setText('')
   }
   const block = () => {
-    dispatch({ type: 'BLOCK', studentId: person.id })
-    showToast(`${person.name} blocked. (Demo: reports aren't sent to anyone yet.)`)
     nav.pop()
+    dispatch({ type: 'BLOCK', studentId: person.id })
+    showToast(`${person.name} blocked`, { label: 'Undo', onClick: () => dispatch({ type: 'UNBLOCK', studentId: person.id }) })
+  }
+  const leave = () => {
+    nav.pop()
+    dispatch({ type: 'LEAVE_CHAT', chatId: id })
+    showToast('You left the group', { label: 'Undo', onClick: () => dispatch({ type: 'RESTORE_CHAT', chat }) })
   }
 
   return (
@@ -95,8 +107,8 @@ export function Chat({ id, eventId }) {
       <TopBar
         title={chat.title}
         right={person
-          ? <button className="icon-btn" onClick={block} aria-label="Block" title="Block"><Ban size={18} /></button>
-          : <button className="link" onClick={() => { nav.pop(); showToast('You left the group') }}>Leave</button>}
+          ? <button className="icon-btn" onClick={() => setBlockOpen(true)} aria-label={`Block ${person.name}`} title="Block"><Ban size={18} /></button>
+          : <button className="link" onClick={leave}>Leave</button>}
       />
       <p className="chat-sub muted">
         {person && <>{person.year} · {person.major}<br /></>}
@@ -128,6 +140,12 @@ export function Chat({ id, eventId }) {
           <span className="ideas-label"><Sparkles size={14} /> Conversation starters</span>
           {ideas.map((t) => <button key={t} className="idea" onClick={() => send(t)}>{t}</button>)}
         </div>
+      )}
+
+      {person && (
+        <Confirm open={blockOpen} onClose={() => setBlockOpen(false)} title={`Block ${person.name}?`} yes="Block" danger onYes={block}>
+          This chat is hidden and {person.name} won't show up for you at events. You can unblock anyone later in your Profile. (Demo: reports aren't sent to anyone yet.)
+        </Confirm>
       )}
 
       <form className="composer" onSubmit={(e) => { e.preventDefault(); send(text) }}>

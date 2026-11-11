@@ -12,6 +12,7 @@ export default function CampusMap({ events, focus }) {
   const map = useRef(null)
   const layer = useRef(null)
   const [selected, setSelected] = useState(null)
+  const [noTiles, setNoTiles] = useState(false)
   const nav = useNav()
   const navRef = useRef(nav)
   useEffect(() => { navRef.current = nav })
@@ -26,7 +27,7 @@ export default function CampusMap({ events, focus }) {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap contributors',
-    }).addTo(map.current)
+    }).on('tileerror', () => setNoTiles(true)).on('tileload', () => setNoTiles(false)).addTo(map.current)
     L.control.zoom({ position: 'bottomright' }).addTo(map.current)
     layer.current = L.layerGroup().addTo(map.current)
     return () => map.current.remove()
@@ -58,6 +59,7 @@ export default function CampusMap({ events, focus }) {
   return (
     <div className="map-wrap">
       <div ref={el} className="map" role="application" aria-label="Campus map of events" />
+      {noTiles && <p className="map-error">The map picture didn't load. Check your connection and try again. The pins still open events.</p>}
       <p className="map-note">Tap a pin to open the event · 🔴 = happening now · numbers = several events there</p>
       {sel && (
         <div className="map-panel">

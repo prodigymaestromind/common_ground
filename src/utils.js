@@ -2,21 +2,38 @@
 
 const MIN = 60 * 1000
 
-function atTime(dayOffset, hhmm) {
-  const [h, m] = hhmm.split(':').map(Number)
-  const d = new Date()
-  d.setHours(h, m, 0, 0)
-  d.setDate(d.getDate() + dayOffset)
-  return d
-}
+const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }
+const sameClock = (day, clock) => { const x = new Date(day); x.setHours(clock.getHours(), clock.getMinutes(), 0, 0); return x }
 
 // Give every event real start/end Date objects.
-export function withTimes(events) {
+// An event that runs over several days (like a gallery show, Tue to Fri, 12 to 4pm) is open the
+// same hours each day. So startAt/endAt become TODAY's hours (or the next open day's), and
+// "runs" keeps the first and last day for labels like "Tue–Fri".
+export function withTimes(events, now = Date.now()) {
+  const today = startOfDay(now)
   return events.map((e) => {
-    if (e.startAt) return { ...e, startAt: new Date(e.startAt), endAt: new Date(e.endAt) }
-    return { ...e, startAt: atTime(e.day, e.start), endAt: atTime(e.day, e.end) }
+    const first = new Date(e.startAt)
+    const last = new Date(e.endAt)
+    if (startOfDay(first).getTime() === startOfDay(last).getTime()) return { ...e, startAt: first, endAt: last }
+    const lastDay = startOfDay(last)
+    let day = startOfDay(first)
+    if (today > day) day = today > lastDay ? lastDay : today
+    return { ...e, startAt: sameClock(day, first), endAt: sameClock(day, last), runs: { from: startOfDay(first), to: lastDay } }
   })
 }
+
+// "Tue–Fri" for a multi-day event (dates when it runs longer than a week)
+export function runsLabel(e) {
+  if (!e.runs) return ''
+  const days = Math.round((e.runs.to - e.runs.from) / 86400000)
+  const fmt = days < 7 ? { weekday: 'short' } : { month: 'short', day: 'numeric' }
+  return `${e.runs.from.toLocaleDateString([], fmt)}–${e.runs.to.toLocaleDateString([], fmt)}`
+}
+
+// After today's hours: "Closed" if it opens again another day, "Ended" if that was it
+export const endedWord = (e, now = Date.now()) => (e.runs && startOfDay(now) < e.runs.to ? 'Closed' : 'Ended')
+// "Tue–Fri · 12pm – 4pm" for multi-day events, "Today · 6pm – 8pm" for the rest
+export const whenLabel = (e) => `${e.runs ? runsLabel(e) : dayLabel(e.startAt)} · ${fmtRange(e)}`
 
 export const isLive = (e, now = Date.now()) => e.startAt <= now && e.endAt > now
 export const isPast = (e, now = Date.now()) => e.endAt <= now

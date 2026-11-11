@@ -1,6 +1,8 @@
-import { FlaskConical, MessageSquareHeart, RotateCcw, LogOut } from 'lucide-react'
+import { useState } from 'react'
+import { CircleHelp, FlaskConical, MessageSquareHeart, RotateCcw, LogOut } from 'lucide-react'
 import { INTERESTS, CONTACT_TYPES } from '../data'
-import { Avatar, Chip, TopBar } from '../components'
+import { studentById } from '../demo'
+import { Avatar, Chip, Confirm, TopBar } from '../components'
 import { useNav } from '../nav'
 import { useStore } from '../store'
 import { BusyEditor } from './Onboarding'
@@ -8,13 +10,15 @@ import { APP_VERSION, CREDIT } from '../version'
 
 export default function Profile() {
   const nav = useNav()
-  const { state, dispatch } = useStore()
+  const { state, dispatch, showToast } = useStore()
+  const [ask, setAsk] = useState(null) // 'out' | 'reset'
   const u = state.user
   if (!u) return (
     <div className="screen">
       <TopBar title="Profile" />
       <p className="muted center">You're browsing without an account.</p>
       <button className="btn btn-primary btn-lg" onClick={() => nav.push('signin', {})}>Sign in</button>
+      <button className="btn btn-outline" onClick={() => nav.push('help')}><CircleHelp size={16} /> How it works</button>
     </div>
   )
   const update = (patch) => dispatch({ type: 'UPDATE_USER', patch })
@@ -72,12 +76,36 @@ export default function Profile() {
         <li>You can block anyone from a chat. (Demo: reports aren't sent to anyone yet.)</li>
       </ul>
 
+      {state.blocked.length > 0 && (
+        <>
+          <h2 className="section-title">Blocked</h2>
+          <div className="contact-list">
+            {state.blocked.map((id) => (
+              <div key={id} className="contact-row blocked-row">
+                <span>{studentById[id]?.name || 'Student'}</span>
+                <button className="link" onClick={() => { dispatch({ type: 'UNBLOCK', studentId: id }); showToast(`${studentById[id]?.name || 'Student'} unblocked`) }}>Unblock</button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <button className="btn btn-outline" onClick={() => nav.push('help')}><CircleHelp size={16} /> How it works</button>
       <button className="btn btn-outline" onClick={nav.feedback}><MessageSquareHeart size={16} /> Give feedback</button>
-      <button className="btn btn-outline" onClick={() => { dispatch({ type: 'SIGN_OUT' }); nav.tab('home') }}><LogOut size={16} /> Sign out</button>
-      <button className="btn btn-ghost danger" onClick={() => { if (confirm('Reset the app on this phone? This clears your plans, chats and sign-in.')) dispatch({ type: 'RESET' }) }}>
+      <button className="btn btn-outline" onClick={() => setAsk('out')}><LogOut size={16} /> Sign out</button>
+      <button className="btn btn-ghost danger" onClick={() => setAsk('reset')}>
         <RotateCcw size={16} /> Reset app
       </button>
       <p className="version-tag">Common Ground v{APP_VERSION} · {CREDIT}</p>
+
+      <Confirm open={ask === 'out'} onClose={() => setAsk(null)} title="Sign out?" yes="Sign out" danger
+        onYes={() => { nav.tab('home'); dispatch({ type: 'SIGN_OUT' }) }}>
+        There are no real accounts yet, so signing out clears your plans, chats and posted events on this device.
+      </Confirm>
+      <Confirm open={ask === 'reset'} onClose={() => setAsk(null)} title="Reset the app?" yes="Reset app" danger
+        onYes={() => { nav.tab('home'); dispatch({ type: 'RESET' }) }}>
+        This clears everything on this device (your plans, chats and sign-in) and starts over from the welcome screen.
+      </Confirm>
     </div>
   )
 }

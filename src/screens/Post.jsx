@@ -82,7 +82,7 @@ export default function Post() {
     const startAt = new Date(`${f.date}T${f.start}`)
     let endAt = new Date(`${f.date}T${f.end}`)
     if (isNaN(startAt)) return null
-    if (isNaN(endAt) || endAt <= startAt) endAt = new Date(startAt.getTime() + 2 * 3600000)
+    if (isNaN(endAt) || endAt <= startAt) endAt = new Date(startAt.getTime() + 2 * 3600000) // preview only: posting is stopped below
     return {
       id: `p-${uid()}`, title: f.title.trim() || 'Your event name', host: f.host.trim() || state.user.name,
       interest: f.interest, emoji: f.emoji, place: f.place.trim() || 'Where is it?', cost: Number(f.cost) || 0,
@@ -95,7 +95,17 @@ export default function Post() {
   }
   const draft = build()
   const preview = draft ? withTimes([draft])[0] : null
-  const ok = f.title.trim() && f.place.trim() && draft
+  // What's still wrong, in plain words (shown under the button)
+  const problems = []
+  if (!f.title.trim()) problems.push('Add an event name.')
+  if (!f.place.trim()) problems.push('Add where it is.')
+  if (!draft) problems.push('Pick a date and start time.')
+  else {
+    if (f.end <= f.start) problems.push('The end time has to be after the start time.')
+    else if (new Date(`${f.date}T${f.end}`) <= new Date()) problems.push('That date and time already passed. Pick a time that\'s still coming up.')
+  }
+  const timeBad = !!draft && (f.end <= f.start || new Date(`${f.date}T${f.end}`) <= new Date())
+  const ok = problems.length === 0
 
   const publish = () => {
     const event = build()
@@ -157,10 +167,11 @@ export default function Post() {
         <label className="field"><span>Event name</span><input value={f.title} onChange={(e) => set({ title: e.target.value })} placeholder="e.g. Taco Tuesday Mixer" /></label>
         <label className="field"><span>Club or host</span><input value={f.host} onChange={(e) => set({ host: e.target.value })} placeholder="e.g. ACM Sac State" /></label>
         <div className="row3">
-          <label className="field"><span>Date</span><input type="date" value={f.date} onChange={(e) => set({ date: e.target.value })} /></label>
+          <label className="field"><span>Date</span><input type="date" min={todayStr()} value={f.date} onChange={(e) => set({ date: e.target.value })} /></label>
           <label className="field"><span>Start</span><input type="time" value={f.start} onChange={(e) => set({ start: e.target.value })} /></label>
           <label className="field"><span>End</span><input type="time" value={f.end} onChange={(e) => set({ end: e.target.value })} /></label>
         </div>
+        {timeBad && <small className="error">{problems.at(-1)}</small>}
         <label className="field"><span>Where</span><input value={f.place} onChange={(e) => set({ place: e.target.value })} placeholder="e.g. University Union, Ballroom" /></label>
         <div className="row2">
           <label className="field"><span>Cost ($, 0 = free)</span><input type="number" min="0" value={f.cost} onChange={(e) => set({ cost: e.target.value })} /></label>
@@ -195,7 +206,8 @@ export default function Post() {
           </div>
         )}
 
-        <button className="btn btn-primary btn-lg" disabled={!ok} onClick={publish}>Save event (demo)</button>
+        <button className="btn btn-primary btn-lg" disabled={!ok} onClick={publish}>Post event (demo)</button>
+        {!ok && <p className="btn-hint">To post: {problems.join(' ')}</p>}
       </div>
     </div>
   )
