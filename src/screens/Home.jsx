@@ -8,7 +8,7 @@ import { useNow } from '../hooks'
 import { useStore } from '../store'
 import { APP_VERSION, CREDIT } from '../version'
 import { EVENTS_UPDATED } from '../realEvents'
-import { dayLabel, endedWord, fmtTime, fullDate, isGone, isLive, isPast, weekBucket } from '../utils'
+import { dayBadge, dayLabel, endedWord, fmtTime, fullDate, isGone, isLive, isPast, weekBucket } from '../utils'
 
 const FILTERS = [
   { id: 'now', label: '🔴 Now' },
@@ -91,7 +91,7 @@ export default function Home() {
 
       {n === 0 && (
         <p className="muted center empty-note">
-          {filter === 'now' ? 'Nothing is happening right now.' : filter === 'today' ? 'Nothing else on today.' : 'No events here yet.'}
+          {filter === 'now' ? 'Nothing is happening right now.' : filter === 'today' ? 'Nothing else on today.' : filter === 'week' ? 'Nothing left this week. Tap All to see what\'s coming up.' : 'No events here yet.'}
           {mineOnly && <><br />“For you” is on, so you only see your interests. <button className="link" onClick={() => setForYou(false)}>Show everything</button></>}
         </p>
       )}
@@ -121,13 +121,12 @@ function BoardCard({ event, tall, now }) {
   const live = isLive(event, now)
   const ended = !live && isPast(event, now)
   const faces = (event.open || []).slice(0, 2).map((s) => studentById[s])
-  const day = dayLabel(event.startAt)
   return (
     <div className={`pin ${ended ? 'ended' : ''}`}>
       <button className="pin-main" onClick={() => nav.push('event', { id: event.id })}>
         <Cover event={event} className={`pin-cover ${tall ? 'tall' : ''}`}>
           <div className="pin-top">
-            {live ? <span className="pin-badge"><LiveDot /></span> : <span className="pin-badge">{ended ? endedWord(event, now) : day === 'Today' ? 'Today' : day.split(',')[0]}</span>}
+            {live ? <span className="pin-badge"><LiveDot /></span> : <span className="pin-badge">{ended ? endedWord(event, now) : dayBadge(event.startAt)}</span>}
             {!event.cost && <span className="pin-badge">Free</span>}
           </div>
           <div className="pin-shade">

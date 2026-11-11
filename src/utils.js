@@ -120,12 +120,21 @@ export function daysFromToday(d) {
   return Math.round((b - a) / 86400000)
 }
 
-// "This week" = next 7 days, "Next week" = the 7 after that, then "Later"
+// Weeks run Monday to Sunday. "This week" = today through this Sunday,
+// "Next week" = the Monday to Sunday after that, then "Later".
 export function weekBucket(d) {
   const n = daysFromToday(d)
-  if (n < 7) return 'This week'
-  if (n < 14) return 'Next week'
+  const toSunday = (7 - new Date().getDay()) % 7 // days left until Sunday (0 on a Sunday)
+  if (n <= toSunday) return 'This week'
+  if (n <= toSunday + 7) return 'Next week'
   return 'Later'
+}
+
+// Short day for a card badge: "Today", "Tomorrow", "Friday" (this week), or "Wed, Nov 18" (after Sunday)
+export function dayBadge(d) {
+  const day = dayLabel(d)
+  if (day === 'Today' || day === 'Tomorrow') return day
+  return weekBucket(d) === 'This week' ? day.split(',')[0] : fullDate(d)
 }
 
 // ----- Add to calendar (no permissions needed) -----
