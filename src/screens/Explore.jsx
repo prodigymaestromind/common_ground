@@ -1,5 +1,5 @@
 // Explore: search and filter every upcoming event, as a list or on the campus map.
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense } from 'react'
 import { Search, List, Map as MapIcon } from 'lucide-react'
 import { INTERESTS } from '../data'
 import { Chip, EventCard, Empty } from '../components'
@@ -16,20 +16,22 @@ const QUICK = [
   { id: 'free', label: 'Free' },
   { id: 'fits', label: '✓ Fits my day' },
   { id: 'solo', label: '✨ Welcomes solo' },
+  { id: 'campus', label: '📍 On campus' },
+  { id: 'online', label: '💻 Online' },
 ]
 
 export default function Explore() {
   const { state, events, explore, setExplore } = useStore()
   const now = useNow()
-  const [q, setQ] = useState('')
-  const [quick, setQuick] = useState([])
-  const [interest, setInterest] = useState(null)
-  const { view, range } = explore
+  const { view, range, q, quick, interest } = explore
+  const setQ = (v) => setExplore((x) => ({ ...x, q: v }))
+  const setQuick = (fn) => setExplore((x) => ({ ...x, quick: typeof fn === 'function' ? fn(x.quick) : fn }))
+  const setInterest = (v) => setExplore((x) => ({ ...x, interest: v }))
   const setView = (v) => setExplore((x) => ({ ...x, view: v }))
   const setRange = (r) => setExplore((x) => ({ ...x, range: r }))
 
   const filtered = q || quick.length > 0 || interest
-  const clear = () => { setQ(''); setQuick([]); setInterest(null) }
+  const clear = () => setExplore((x) => ({ ...x, q: '', quick: [], interest: null }))
   const toggleQuick = (id) => setQuick((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]))
   const list = events
     .filter((e) => !isGone(e, now))
@@ -38,6 +40,8 @@ export default function Explore() {
     .filter((e) => !interest || e.interest === interest)
     .filter((e) => !quick.includes('free') || !e.cost)
     .filter((e) => !quick.includes('solo') || e.soloFriendly)
+    .filter((e) => !quick.includes('campus') || (!e.online && !e.offCampus))
+    .filter((e) => !quick.includes('online') || e.online)
     .filter((e) => !quick.includes('fits') || fitCheck(e, state.user?.busy).status !== 'conflict')
     .sort((a, b) => a.startAt - b.startAt)
 

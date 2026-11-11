@@ -642,3 +642,7 @@ a.btn { text-decoration: none; }
   .is-wide .side-links button:hover { background: #efede6; }
   .is-wide .foot-links { display: none; }
 }
+
+/* ---------- v1.7.0: online + off-campus labels ---------- */
+.pill-where { background: #e3ecf5; color: #2d4a6b; }
+.pin-where { background: rgba(227, 236, 245, 0.95); color: #2d4a6b; }

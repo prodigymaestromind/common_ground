@@ -35,7 +35,8 @@ export const endedWord = (e, now = Date.now()) => (e.runs && startOfDay(now) < e
 // "Tue–Fri · 12pm – 4pm" for multi-day events, "Today · 6pm – 8pm" for the rest
 export const whenLabel = (e) => `${e.runs ? runsLabel(e) : dayLabel(e.startAt)} · ${fmtRange(e)}`
 
-export const isLive = (e, now = Date.now()) => e.startAt <= now && e.endAt > now
+// All-day events have no start time, so they are never shown as "live"
+export const isLive = (e, now = Date.now()) => !e.allDay && e.startAt <= now && e.endAt > now
 export const isPast = (e, now = Date.now()) => e.endAt <= now
 // Already over AND from an earlier day. Today's events stay listed until midnight (shown as "Ended").
 export const isGone = (e, now = Date.now()) => {
@@ -49,6 +50,7 @@ export function fmtTime(d) {
 }
 
 export function fmtRange(e) {
+  if (e.allDay) return 'All day'
   return `${fmtTime(e.startAt)} – ${fmtTime(e.endAt)}`
 }
 

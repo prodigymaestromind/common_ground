@@ -135,8 +135,9 @@ const Ctx = createContext(null)
 export function StoreProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, undefined, load)
   const [toast, setToast] = useState(null)
-  // Explore remembers List/Map + the week tab while the app is open
-  const [explore, setExplore] = useState({ view: 'list', range: 'This week' })
+  // Explore remembers List/Map, the week tab, the search and the filters while the app is open,
+  // so going back from an event doesn't lose your place
+  const [explore, setExplore] = useState({ view: 'list', range: 'This week', q: '', quick: [], interest: null })
   // Home's "For you" switch (only events matching your interests)
   const [forYou, setForYou] = useState(false)
   // changes at midnight, so multi-day events move on to the next day's hours

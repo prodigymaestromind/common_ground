@@ -19,7 +19,9 @@ export default function CampusMap({ events, focus }) {
 
   // group events by building
   const byPlace = {}
-  for (const e of events) (byPlace[e.placeId || 'union'] ||= []).push(e)
+  // online, off-campus and unknown-room events have no pin (they are still in the list)
+  for (const e of events) if (e.placeId) (byPlace[e.placeId] ||= []).push(e)
+  const noPin = events.filter((e) => !e.placeId).length
 
   useEffect(() => {
     const f = focus && PLACES[focus]
@@ -60,7 +62,7 @@ export default function CampusMap({ events, focus }) {
     <div className="map-wrap">
       <div ref={el} className="map" role="application" aria-label="Campus map of events" />
       {noTiles && <p className="map-error">The map picture didn't load. Check your connection and try again. The pins still open events.</p>}
-      <p className="map-note">Tap a pin to open the event · 🔴 = happening now · numbers = several events there</p>
+      <p className="map-note">Tap a pin to open the event · 🔴 = happening now · numbers = several events there{noPin > 0 && ` · ${noPin} more with no pin (like online or off campus) are in the list`}</p>
       {sel && (
         <div className="map-panel">
           <div className="map-panel-head">

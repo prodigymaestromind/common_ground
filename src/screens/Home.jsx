@@ -128,6 +128,7 @@ function BoardCard({ event, tall, now }) {
           <div className="pin-top">
             {live ? <span className="pin-badge"><LiveDot /></span> : <span className="pin-badge">{ended ? endedWord(event, now) : dayBadge(event.startAt)}</span>}
             {!event.cost && <span className="pin-badge">Free</span>}
+            {(event.online || event.offCampus) && <span className="pin-badge pin-where">{event.online ? 'Online' : 'Off campus'}</span>}
           </div>
           <div className="pin-shade">
             <strong>{event.title}</strong>

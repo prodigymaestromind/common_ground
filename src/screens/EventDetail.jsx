@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Clock, MapPin, DollarSign, Car, Users, Bookmark, BookmarkCheck, Check, ShieldCheck, MessageCircle, UserPlus, ExternalLink, Radio, Trash2, CalendarPlus, Navigation, ChevronRight } from 'lucide-react'
+import { Clock, MapPin, Monitor, DollarSign, Car, Users, Bookmark, BookmarkCheck, Check, ShieldCheck, MessageCircle, UserPlus, ExternalLink, Radio, Trash2, CalendarPlus, Navigation, ChevronRight } from 'lucide-react'
 import { interestById, MEET_SPOTS } from '../data'
 import { studentById } from '../demo'
-import { Avatar, Confirm, Cover, DemoTag, Empty, FitBadge, LiveDot, Sheet, SoloBadge, TopBar } from '../components'
+import { Avatar, Confirm, Cover, DemoTag, Empty, FitBadge, LiveDot, Sheet, SoloBadge, TopBar, WhereTag } from '../components'
 import { useNav } from '../nav'
 import { useExplain, useGate } from '../hooks'
 import { PLACES } from '../places'
@@ -57,6 +57,7 @@ export default function EventDetail({ id }) {
         <div className="event-top">
           <span className="event-tag light">{interestById[e.interest]?.label}</span>
           {live && <LiveDot />}
+          <WhereTag event={e} />
           {e.soloFriendly && <SoloBadge />}
         </div>
         <h1>{e.title}</h1>
@@ -68,22 +69,26 @@ export default function EventDetail({ id }) {
         <FitBadge event={e} />
         <ul className="info">
           <li><Clock size={18} /><div><strong>{live ? 'Happening now' : ended ? (endedWord(e) === 'Closed' ? 'Closed for today' : 'Ended today') : dayLabel(e.startAt)}</strong><span>{e.runs ? `${runsLabel(e)} · ${fmtRange(e)} each day` : `${fullDate(e.startAt)} · ${fmtRange(e)}`}</span></div></li>
-          <li>
-            <button className="info-link" onClick={() => (place ? nav.push('place', { id: e.id }) : setDirOpen(true))}>
-              <MapPin size={18} /><div><strong>{e.place}</strong><span>Tap to see it on the map</span></div><ChevronRight size={18} />
-            </button>
-          </li>
+          {e.online ? (
+            <li><Monitor size={18} /><div><strong>Online</strong><span>The join link is on the official page below</span></div></li>
+          ) : (
+            <li>
+              <button className="info-link" onClick={() => (place ? nav.push('place', { id: e.id }) : setDirOpen(true))}>
+                <MapPin size={18} /><div><strong>{e.place}</strong><span>{place ? 'Tap to see it on the map' : e.offCampus ? 'Off campus · tap for directions' : 'Tap for directions'}</span></div><ChevronRight size={18} />
+              </button>
+            </li>
+          )}
           <li><DollarSign size={18} /><div><strong>{costLabel(e.cost)}</strong>{!e.cost && <span>No ticket needed</span>}</div></li>
           {parking && <li><Car size={18} /><div><strong>Parking</strong><span>{parking}</span></div></li>}
           <li ref={countRow}><Users size={18} /><div>{e.mine || showsCount
-            ? <><strong>{e.going + (going && !e.mine ? 1 : 0)} going {e.demo && <DemoTag />}</strong><span>{companyText(people.length)}</span></>
-            : <><strong>{companyText(people.length)}</strong><span>New event · be one of the first to go</span></>}</div></li>
+            ? <><strong>{e.going + (going && !e.mine ? 1 : 0)} going {e.demo && <DemoTag />}</strong><span>{e.online ? 'Online event' : companyText(people.length)}</span></>
+            : <><strong>{e.online ? 'Online event' : companyText(people.length)}</strong><span>New event · be one of the first to go</span></>}</div></li>
         </ul>
         {e.soloFriendly && <div className="note">✨ <span><b>Welcomes people coming alone.</b> {e.source === 'Sac State Events' ? 'The organizers invite people to come meet others here, so it is a good one to go to on your own.' : 'The host will help solo arrivals meet others (a greeter, mixed tables or an icebreaker).'}</span></div>}
         {!ended && (
           <div className="quick-actions">
             <button className="btn btn-outline" onClick={() => setCalOpen(true)}><CalendarPlus size={16} /> Add to calendar</button>
-            <button className="btn btn-outline" onClick={() => setDirOpen(true)}><Navigation size={16} /> Directions</button>
+            {!e.online && <button className="btn btn-outline" onClick={() => setDirOpen(true)}><Navigation size={16} /> Directions</button>}
           </div>
         )}
         <p className="desc">{e.desc}</p>
@@ -95,7 +100,7 @@ export default function EventDetail({ id }) {
         )}
         <p className="source"><ExternalLink size={14} /> Source: {e.source === 'Sac State Events' ? 'Sac State Events (events.csus.edu)' : e.source}</p>
 
-        {live && !e.mine && (
+        {live && !e.mine && !e.online && (
           <div className="card here-card">
             <Radio size={22} />
             <div>
@@ -119,7 +124,13 @@ export default function EventDetail({ id }) {
           </section>
         )}
 
-        {!e.mine && <section className="company">
+        {!e.mine && e.online && (
+          <section className="company">
+            <div className="card locked"><Monitor size={22} /><p><strong>This one is online.</strong> There's no meet-up, so “go with someone” is off for this event. Join from the official page.</p></div>
+          </section>
+        )}
+
+        {!e.mine && !e.online && <section className="company">
           <h2 className="section-title">Go with someone {e.demo && <DemoTag>Demo · sample students</DemoTag>}</h2>
           {!going && (
             <div className="card locked">
@@ -200,7 +211,7 @@ export default function EventDetail({ id }) {
             <a className="option" href={googleMapsUrl(place.lat, place.lng)} target="_blank" rel="noopener noreferrer"><Navigation size={16} /> Google Maps</a>
           </>
         ) : (
-          <a className="option" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${e.place} Sacramento State`)}`} target="_blank" rel="noopener noreferrer"><Navigation size={16} /> Google Maps</a>
+          <a className="option" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.offCampus ? e.place : `${e.place} Sacramento State`)}`} target="_blank" rel="noopener noreferrer"><Navigation size={16} /> Google Maps</a>
         )}
       </Sheet>
 

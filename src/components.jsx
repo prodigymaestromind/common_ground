@@ -1,6 +1,6 @@
 // Small shared UI pieces. (Hooks live in hooks.jsx, navigation in nav.js.)
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { ChevronLeft, Clock, MapPin, Users, CheckCircle2, AlertTriangle, CalendarPlus, Sparkles, Check, Bookmark, BookmarkCheck } from 'lucide-react'
+import { ChevronLeft, Clock, MapPin, Monitor, Users, CheckCircle2, AlertTriangle, CalendarPlus, Sparkles, Check, Bookmark, BookmarkCheck } from 'lucide-react'
 import { interestById } from './data'
 import { PLACES } from './places'
 import { TIPS } from './tips'
@@ -73,6 +73,13 @@ export function LiveDot() {
   return <span className="live"><span className="live-dot" /> LIVE</span>
 }
 
+// "Online" or "Off campus" label, so nobody walks to the Union for a Zoom talk
+export function WhereTag({ event }) {
+  if (event.online) return <span className="pill pill-where"><Monitor size={12} /> Online</span>
+  if (event.offCampus) return <span className="pill pill-where"><MapPin size={12} /> Off campus</span>
+  return null
+}
+
 export const SoloBadge = () => <span className="pill pill-solo"><Sparkles size={12} /> Welcomes solo</span>
 
 // "39 going" (with a Demo tag when the number is a sample), or "New event" when it's hidden.
@@ -138,11 +145,12 @@ export function EventCard({ event, preview }) {
           <div className="event-top">
             <span className="event-tag">{interestById[event.interest]?.label}</span>
             {live && <LiveDot />}
+            <WhereTag event={event} />
             <StatusPill event={event} />
           </div>
           <h3 className="event-title">{event.title}</h3>
           <div className="meta"><Clock size={14} /> {live ? `Now · until ${fmtRange(event).split('– ')[1]}` : ended ? `${endedWord(event)} · ${fmtRange(event)}` : whenLabel(event)}</div>
-          <div className="meta"><MapPin size={14} /> {event.place}</div>
+          <div className="meta">{event.online ? <Monitor size={14} /> : <MapPin size={14} />} {event.place}</div>
           <div className="event-foot">
             <GoingCount event={event} />
             <span className="cost">{costLabel(event.cost)}</span>
@@ -201,7 +209,8 @@ export function Confirm({ open, title, children, yes, danger, onYes, onClose }) 
 
 // Event picture: the event's own photo/flyer, or a colored tile with its icon.
 export function Cover({ event, className = '', small, children }) {
-  const place = PLACES[event?.placeId] || PLACES.union
+  // no known building (online, off campus): a plain green tile with no building name
+  const place = PLACES[event?.placeId] || { colors: ['#0b5a3e', '#1f7a55'], icon: '📅', short: event?.online ? 'Online' : event?.offCampus ? 'Off campus' : '' }
   const src = event?.image
   const [failedSrc, setFailedSrc] = useState(null)
   const showPhoto = src && failedSrc !== src

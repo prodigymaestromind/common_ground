@@ -46,8 +46,9 @@ export function withDemoPeople(events) {
       ...e,
       demo: true,
       going: 12 + (h % 70),
-      open: pool.slice(0, 2 + (h % 2)),
-      here: pool.slice(0, 2 + ((h >> 3) % 2)),
+      // online events have no meet-up, so nobody is "open to company" there
+      open: e.online ? [] : pool.slice(0, 2 + (h % 2)),
+      here: e.online ? [] : pool.slice(0, 2 + ((h >> 3) % 2)),
     }
   })
 }

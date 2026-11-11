@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Downloaded calendar files (see scripts/update-events.mjs). Big, and remade each refresh.
+events-feed/*.ics

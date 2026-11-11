@@ -10,7 +10,7 @@ import { fullDate } from '../utils'
 
 const BASICS = [
   { icon: '🏠', title: 'Home', text: 'What\'s on right now, today and this week. Signed in? Turn on “For you” to only see events that match your interests.' },
-  { icon: '🧭', title: 'Explore', text: 'Every upcoming event. Search, filter (free, fits my day, welcomes solo) or switch to the campus map.' },
+  { icon: '🧭', title: 'Explore', text: 'Every upcoming event. Search, filter (free, fits my day, on campus, online) or switch to the campus map.' },
   { icon: '🔖', title: 'Save or “I\'m going”', text: 'Tap the bookmark to save an event for later, or “I\'m going” to plan on it. Both show up in Plans.' },
   { icon: '✓', title: 'Fits my day', text: 'Add your class and work times in your profile, and each event shows whether it fits. Your times are never shown to anyone.' },
   { icon: '📣', title: 'Post an event', text: 'For clubs, ASI and departments. Sign in as an organizer, then add a photo or flyer and the details.' },
@@ -40,7 +40,7 @@ export default function Help() {
 
       <h2 className="section-title">What's real and what's a demo</h2>
       <ul className="privacy">
-        <li><b>Real:</b> the events. They come from the Sac State events calendar, last updated {fullDate(`${EVENTS_UPDATED}T12:00:00`)}.</li>
+        <li><b>Real:</b> the events. They come from the Sac State events calendar (student events for about the next month), last updated {fullDate(`${EVENTS_UPDATED}T12:00:00`)}.</li>
         <li><b>Demo:</b> the people, “going” counts and chat replies are samples, marked with a Demo tag.</li>
         <li>Everything you do stays on this device. Nothing is sent anywhere yet.</li>
       </ul>

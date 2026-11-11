@@ -11,7 +11,7 @@ Our interviews with Sac State students turned up three things:
 3. **Walking in alone is the hardest part.** Everyone else seems to arrive in groups.
 
 ## What Common Ground does
-- **Real Sac State events:** pulled from the public Sac State Events calendar (events.csus.edu), each linked to its official page. Today's events stay listed until midnight, even after they end.
+- **Real Sac State events:** about a month of events from the public Sac State Events calendar (events.csus.edu), each linked to its official page. Online and off-campus events are labelled; staff meetings and holidays are left out. Today's events stay listed until midnight, even after they end.
 - **Happening now first:** if nothing is live, the Now tab is simply empty.
 - **Fits my day:** add your class/work blocks once, and every event shows ✓ fits or ⚠ conflicts.
 - **Map, directions, calendar:** tap an event's location to see it on the campus map, open Apple/Google Maps, or add it to your calendar.
@@ -32,12 +32,13 @@ Our interviews with Sac State students turned up three things:
 - Next step: real accounts, chat and invites (for example with Supabase).
 
 ## Code map
-- `src/realEvents.js`: the real Sac State events. Nothing made up lives here.
+- `src/realEvents.js`: the real Sac State events. Nothing made up lives here. Made by `scripts/update-events.mjs`, so don't edit it by hand.
+- **Refreshing the events:** download the calendar files into `events-feed/` (steps in `events-feed/README.md`), run `npm run events`, check the app, push. `scripts/curated.json` holds hand-written details for a few events.
 - `src/demo.js`: **everything** made up (sample students, counts, automatic replies, placeholder handles). This is the file real accounts will replace.
 - `src/data.js`: interests and option lists. `src/places.js`: campus buildings and map coordinates.
 - `src/store.jsx`: app state, saved in the browser. `src/hooks.jsx`, `src/nav.js`, `src/components.jsx`: shared pieces.
 - `src/screens/`: one file per screen.
-- `EVENTS_UPDATED` in `src/realEvents.js`: the date shown in the app as "events updated". Change it when you refresh the events.
+- `EVENTS_UPDATED` in `src/realEvents.js`: the date shown in the app as "events updated". The refresh script sets it.
 - Version: bump `"version"` in `package.json` (shown in the app). Patch = fixes, minor = new feature, major = relaunch.
 
 ## Run locally
