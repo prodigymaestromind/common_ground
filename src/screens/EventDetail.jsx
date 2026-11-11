@@ -16,6 +16,7 @@ export default function EventDetail({ id }) {
   const [calOpen, setCalOpen] = useState(false)
   const [dirOpen, setDirOpen] = useState(false)
   const [delOpen, setDelOpen] = useState(false)
+  const [showAll, setShowAll] = useState(false) // "Read more" on long descriptions
   const [explain, popup] = useExplain()
   const gate = useGate()
   const e = eventById[id]
@@ -91,7 +92,8 @@ export default function EventDetail({ id }) {
             {!e.online && <button className="btn btn-outline" onClick={() => setDirOpen(true)}><Navigation size={16} /> Directions</button>}
           </div>
         )}
-        <p className="desc">{e.desc}</p>
+        <p className={`desc ${showAll ? 'desc-full' : ''}`}>{showAll && e.more ? e.more : e.desc}</p>
+        {e.more && <button className="link read-more" onClick={() => setShowAll(!showAll)} aria-expanded={showAll}>{showAll ? 'Show less' : 'Read more'}</button>}
         {e.need && <div className="good-to-know"><strong>Good to know</strong><span>{e.need}</span></div>}
         {e.link && (
           <a className="btn btn-outline official" href={e.link} target="_blank" rel="noopener noreferrer">

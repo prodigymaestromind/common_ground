@@ -140,6 +140,14 @@ function costOf(raw) {
   if (/^free\b.*onecard/i.test(c)) return 'Free w/ OneCard'
   return c.length > 42 ? `${c.slice(0, 40).trim()}…` : c
 }
+// The calendar's whole description, kept in paragraphs, for "Read more" in the app.
+function fullOf(e) {
+  return noTags(e.body).split('\n')
+    .filter((l) => !/^(cost|event type|short description|event image)\s*:/i.test(l))
+    .map((l) => l.replace(/https?:\/\/\S+/g, '').replace(/[\u200b\ufeff]/g, '').replace(/^Link:\s*/i, '').replace(/BUY TICKETS\s*>*/gi, '').replace(/[ \t]+/g, ' ').trim())
+    .filter(Boolean).join('\n')
+}
+
 function descOf(e) {
   let text = noTags(e.body).split('\n').filter((l) => !/^(cost|event type|short description|event image|contact (name|email|phone)|registration|more info(rmation)?)\s*:/i.test(l))
     .map((l) => l.replace(/BUY TICKETS\s*>*/gi, '').trim()).filter(Boolean)
@@ -177,7 +185,7 @@ for (const e of readFeed()) {
     startAt: e.allDay ? iso(startDay, '000000') : iso(e.start), endAt: e.allDay ? iso(endDay, '235900') : iso(e.end || e.start),
     ...(e.allDay ? { allDay: true } : {}),
     place: where.place, ...(where.online ? { online: true } : {}), ...(where.offCampus ? { offCampus: true } : {}),
-    cost: costOf(e.cost), desc: descOf(e), soloFriendly: false,
+    cost: costOf(e.cost), desc: descOf(e), ...(fullOf(e).length > descOf(e).length + 60 ? { more: fullOf(e) } : {}), soloFriendly: false,
     source: 'Sac State Events', link: e.link, ...(e.image ? { image: e.image } : {}),
     ...hand, // hand-written details win
     _key: `${e.title}|${where.place}|${e.start.slice(9)}|${e.end.slice(9)}`, _day: startDay, _endDay: endDay,

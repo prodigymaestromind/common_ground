@@ -646,3 +646,7 @@ a.btn { text-decoration: none; }
 /* ---------- v1.7.0: online + off-campus labels ---------- */
 .pill-where { background: #e3ecf5; color: #2d4a6b; }
 .pin-where { background: rgba(227, 236, 245, 0.95); color: #2d4a6b; }
+
+/* ---------- v1.7.1: Read more ---------- */
+.desc-full { white-space: pre-line; }
+.read-more { align-self: flex-start; margin-top: -6px; padding: 4px 0; }
